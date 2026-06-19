@@ -1,5 +1,6 @@
 <!-- Шаблон для сущности: REST-метод, событие, робот, приложение, термин. В wiki/glossary/. -->
 ---
+id: ""                   # см. §4.5 CLAUDE.md: <РАЗДЕЛ>-<ТИП><NN> по фактической папке, напр. G-EN01
 title: "Имя сущности (например, crm.deal.add)"
 type: entity
 module: rest-integrations
@@ -11,6 +12,7 @@ verified: ""
 tags: []
 sources: []
 related: []
+aliases: []              # прежние слаги при переименовании (см. §4.5)
 updated: "ГГГГ-ММ-ДД"
 ---
 

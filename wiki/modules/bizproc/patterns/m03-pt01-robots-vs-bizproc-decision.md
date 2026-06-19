@@ -1,4 +1,5 @@
 ---
+id: "M03-PT01"
 title: "Выбор: роботы/триггеры или бизнес-процессы"
 type: pattern
 module: bizproc
@@ -9,8 +10,9 @@ provenance: empirical
 verified: "2026-06-19 / Bitrix24 cloud + box"
 tags: [автоматизация, роботы, триггеры, бизнес-процессы]
 sources: []
-related: ["[[robots-triggers]]", "[[smart-process]]", "[[crm-sales-funnel-design-pattern]]"]
-updated: "2026-06-19"
+related: ["[[g-en02-robots-triggers]]", "[[g-en01-smart-process]]", "[[m01-pt01-crm-sales-funnel-design-pattern]]"]
+aliases: ["robots-vs-bizproc-decision"]
+updated: "2026-06-20"
 ---
 
 # Выбор: роботы/триггеры или бизнес-процессы
@@ -51,6 +53,6 @@ updated: "2026-06-19"
 - **Минусы:** требует дисциплины — соблазн «сделать БП на всё» или «робот на каждый чих».
 
 ## Связанное
-- [[robots-triggers]] (термины), [[smart-process]], [[crm-sales-funnel-design-pattern]]
+- [[g-en02-robots-triggers|Роботы и триггеры]] (термины), [[g-en01-smart-process|Смарт-процесс (СПА)]], [[m01-pt01-crm-sales-funnel-design-pattern|Проектирование воронки]]
 
-[← Бизнес-процессы](_index.md)
+[← Бизнес-процессы](../_index.md)

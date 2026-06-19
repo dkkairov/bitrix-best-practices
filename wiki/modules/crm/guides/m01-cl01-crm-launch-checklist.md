@@ -1,4 +1,5 @@
 ---
+id: "M01-CL01"
 title: "Чек-лист запуска CRM «под ключ»"
 type: checklist
 module: crm
@@ -9,24 +10,25 @@ provenance: empirical
 verified: "2026-06-19 / Bitrix24 cloud + box"
 tags: [crm, запуск, онбординг, воронка, права]
 sources: []
-related: ["[[crm-sales-funnel-design-pattern]]", "[[crm-stage-explosion]]", "[[crm-permissions-recipe]]", "[[portal-initial-setup-checklist]]"]
-updated: "2026-06-19"
+related: ["[[m01-pt01-crm-sales-funnel-design-pattern]]", "[[x03-ap01-crm-stage-explosion]]", "[[m13-rc01-crm-permissions-recipe]]", "[[m14-cl01-portal-initial-setup-checklist]]"]
+aliases: ["crm-launch-checklist"]
+updated: "2026-06-20"
 ---
 
 # Чек-лист запуска CRM «под ключ»
 
 **Когда применять:** ввод CRM в эксплуатацию у нового клиента — от чистого портала до рабочего
-отдела продаж. Используется после [предпроектного аудита](../../cross-cutting/playbooks/_index.md).
+отдела продаж. Используется после [предпроектного аудита](../../../cross-cutting/playbooks/_index.md).
 
 ## Предусловия
-- Портал создан и базово настроен — см. [[portal-initial-setup-checklist]].
+- Портал создан и базово настроен — см. [[m14-cl01-portal-initial-setup-checklist|Первичная настройка портала]].
 - Согласована модель процессов продаж (направления, этапы, ответственные).
 
 ## Чек-лист
 
 ### 1. Процессы и воронки
 - [ ] Определены **направления (категории)** сделок по разным процессам продаж
-- [ ] Спроектированы стадии каждой воронки по [[crm-sales-funnel-design-pattern]] (без [[crm-stage-explosion]])
+- [ ] Спроектированы стадии каждой воронки по [[m01-pt01-crm-sales-funnel-design-pattern|Проектирование воронки]] (без [[x03-ap01-crm-stage-explosion|Взрыв стадий воронки]])
 - [ ] Заданы причины провалов (fail-стадии) для аналитики потерь
 - [ ] Решён вопрос лидов: работаем с лидами или без них (упрощённый режим)
 
@@ -43,11 +45,11 @@ updated: "2026-06-19"
 
 ### 4. Автоматизация
 - [ ] Базовые роботы/триггеры по стадиям (постановка задач, уведомления, смена ответственного)
-- [ ] Сложная логика вынесена в бизнес-процессы осознанно — см. [[robots-vs-bizproc-decision]]
+- [ ] Сложная логика вынесена в бизнес-процессы осознанно — см. [[m03-pt01-robots-vs-bizproc-decision|Роботы vs бизнес-процессы]]
 - [ ] Нет конфликтующих/зацикленных правил
 
 ### 5. Права и роли
-- [ ] Роли и права доступа настроены по [[crm-permissions-recipe]]
+- [ ] Роли и права доступа настроены по [[m13-rc01-crm-permissions-recipe|Права доступа в CRM]]
 - [ ] Проверена видимость «свои / отдела / все» на реальных пользователях
 
 ### 6. Данные
@@ -65,10 +67,10 @@ updated: "2026-06-19"
 - Менеджеры понимают, что и на какой стадии делать.
 
 ## Частые ошибки
-- [[crm-stage-explosion]] — слишком детальная воронка.
-- [[everything-in-one-funnel]] — разные процессы в одной воронке.
+- [[x03-ap01-crm-stage-explosion|Взрыв стадий воронки]] — слишком детальная воронка.
+- [[x03-ap02-everything-in-one-funnel|Всё в одной воронке]] — разные процессы в одной воронке.
 
 ## Источники и связанное
-- [[crm-sales-funnel-design-pattern]], [[crm-permissions-recipe]], [[portal-initial-setup-checklist]]
+- [[m01-pt01-crm-sales-funnel-design-pattern|Проектирование воронки]], [[m13-rc01-crm-permissions-recipe|Права доступа в CRM]], [[m14-cl01-portal-initial-setup-checklist|Первичная настройка портала]]
 
-[← CRM](_index.md)
+[← CRM](../_index.md)

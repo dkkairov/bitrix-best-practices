@@ -1,4 +1,5 @@
 ---
+id: "S-SS02"
 title: "Конспект: курс 43, урок «Пространства имён»"
 type: source-summary
 module: core-d7
@@ -9,8 +10,9 @@ provenance: documented
 verified: "2026-06-19 / dev.1c-bitrix.ru"
 tags: [d7, namespaces, разработка, коробка]
 sources: []
-related: ["[[code-namespaces-and-autoloading]]"]
-updated: "2026-06-19"
+related: ["[[d01-cn01-code-namespaces-and-autoloading]]"]
+aliases: ["src-bxfw-course43-namespaces"]
+updated: "2026-06-20"
 ---
 
 # Конспект: курс 43, урок «Пространства имён»
@@ -36,11 +38,11 @@ updated: "2026-06-19"
 - `use` для алиасов длинных путей; допустимы полный/сокращённый/алиас-варианты обращения.
 
 ## Что встроено в вики
-- Создана страница [[code-namespaces-and-autoloading]] — соглашения по неймспейсам, автозагрузке и
+- Создана страница [[d01-cn01-code-namespaces-and-autoloading|Пространства имён]] — соглашения по неймспейсам, автозагрузке и
   размещению кода в `/local/` (с практикой автозагрузки и связью с антипаттерном правки ядра).
 
 ## Противоречия с текущими страницами
-- Нет. Дополняет [[box-core-modification]] (свой код в `/local/`, а не в ядре).
+- Нет. Дополняет [[d01-ap01-box-core-modification|Правка ядра коробки]] (свой код в `/local/`, а не в ядре).
 
 ## Открытые вопросы
 - Ингестить соседние уроки курса 43: автозагрузка классов, ORM D7, события, агенты, service locator.

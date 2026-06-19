@@ -1,4 +1,5 @@
 ---
+id: "X03-AP01"
 title: "Антипаттерн: взрыв стадий воронки"
 type: antipattern
 module: crm
@@ -9,8 +10,9 @@ provenance: empirical
 verified: "2026-06-19 / Bitrix24 cloud + box"
 tags: [crm, воронка, стадии, антипаттерн]
 sources: []
-related: ["[[crm-sales-funnel-design-pattern]]", "[[everything-in-one-funnel]]"]
-updated: "2026-06-19"
+related: ["[[m01-pt01-crm-sales-funnel-design-pattern]]", "[[x03-ap02-everything-in-one-funnel]]"]
+aliases: ["crm-stage-explosion"]
+updated: "2026-06-20"
 ---
 
 # Антипаттерн: взрыв стадий воронки
@@ -29,16 +31,16 @@ updated: "2026-06-19"
 Пытаются трекать чек-лист действий менеджера **через стадии**, путая состояние сделки с задачами.
 
 ## Как исправить
-Применить [[crm-sales-funnel-design-pattern]]:
+Применить [[m01-pt01-crm-sales-funnel-design-pattern|Проектирование воронки]]:
 1. Свести стадии к реальным состояниям (5–7), меняющим вероятность.
 2. Микрошаги перенести в **задачи/чек-листы** внутри стадии и в **роботов**.
-3. Разные процессы вынести в отдельные направления или [[smart-process]].
+3. Разные процессы вынести в отдельные направления или [[g-en01-smart-process|Смарт-процесс (СПА)]].
 
 ## Профилактика
 - Правило при проектировании: «Это состояние сделки или действие?» Действие → не стадия.
-- Ревизия воронки на этапе [[crm-launch-checklist]].
+- Ревизия воронки на этапе [[m01-cl01-crm-launch-checklist|Чек-лист запуска CRM]].
 
 ## Связанное
-- [[crm-sales-funnel-design-pattern]], [[everything-in-one-funnel]]
+- [[m01-pt01-crm-sales-funnel-design-pattern|Проектирование воронки]], [[x03-ap02-everything-in-one-funnel|Всё в одной воронке]]
 
 [← Антипаттерны](_index.md)

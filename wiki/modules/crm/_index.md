@@ -19,10 +19,10 @@ updated: "2026-06-19"
 - Права в CRM (см. [Права доступа](../permissions/_index.md))
 
 ## Страницы
-- [[crm-launch-checklist]] — чек-лист запуска CRM «под ключ»
-- [[crm-sales-funnel-design-pattern]] — как проектировать воронку и стадии
-- [[crm-stage-explosion]] — антипаттерн: слишком много стадий
-- [[everything-in-one-funnel]] — антипаттерн: всё в одной воронке
+- **M01-CL01** [[m01-cl01-crm-launch-checklist|Чек-лист запуска CRM «под ключ»]]
+- **M01-PT01** [[m01-pt01-crm-sales-funnel-design-pattern|Как проектировать воронку и стадии]]
+- **X03-AP01** [[x03-ap01-crm-stage-explosion|Антипаттерн: слишком много стадий]]
+- **X03-AP02** [[x03-ap02-everything-in-one-funnel|Антипаттерн: всё в одной воронке]]
 
 ## Статус покрытия
 Есть seed по запуску и проектированию воронок. Не хватает: поля/карточки, дубликаты,

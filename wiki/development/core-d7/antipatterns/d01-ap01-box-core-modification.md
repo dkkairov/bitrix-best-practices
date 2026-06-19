@@ -1,4 +1,5 @@
 ---
+id: "D01-AP01"
 title: "Антипаттерн: правка ядра коробки"
 type: antipattern
 module: core-d7
@@ -9,8 +10,9 @@ provenance: empirical
 verified: "2026-06-19 / Bitrix24 box"
 tags: [коробка, ядро, события, local, разработка]
 sources: []
-related: ["[[box-performance-checklist]]"]
-updated: "2026-06-19"
+related: ["[[d05-cl01-box-performance-checklist]]"]
+aliases: ["box-core-modification"]
+updated: "2026-06-20"
 ---
 
 # Антипаттерн: правка ядра коробки
@@ -40,6 +42,6 @@ updated: "2026-06-19"
 - Код-ревью отклоняет любые диффы внутри `/bitrix/modules/`.
 
 ## Связанное
-- [[box-performance-checklist]] — корректные расширения не мешают обновлениям и кэшу
+- [[d05-cl01-box-performance-checklist|Производительность коробки]] — корректные расширения не мешают обновлениям и кэшу
 
-[← Ядро D7](_index.md)
+[← Ядро D7](../_index.md)

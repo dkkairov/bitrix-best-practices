@@ -1,4 +1,5 @@
 ---
+id: "X01-CL01"
 title: "Playbook: предпроектный аудит"
 type: checklist
 module: playbooks
@@ -9,14 +10,15 @@ provenance: empirical
 verified: "2026-06-19 / Bitrix24 cloud + box"
 tags: [пресейл, аудит, обследование, оценка]
 sources: []
-related: ["[[crm-launch-checklist]]", "[[portal-initial-setup-checklist]]", "[[robots-vs-bizproc-decision]]"]
-updated: "2026-06-19"
+related: ["[[m01-cl01-crm-launch-checklist]]", "[[m14-cl01-portal-initial-setup-checklist]]", "[[m03-pt01-robots-vs-bizproc-decision]]"]
+aliases: ["presale-audit"]
+updated: "2026-06-20"
 ---
 
 # Playbook: предпроектный аудит
 
 **Когда применять:** до старта внедрения — чтобы понять процессы клиента, выбрать редакцию и
-обосновать объём работ. Выход аудита питает [[portal-initial-setup-checklist]] и [[crm-launch-checklist]].
+обосновать объём работ. Выход аудита питает [[m14-cl01-portal-initial-setup-checklist|Первичная настройка портала]] и [[m01-cl01-crm-launch-checklist|Чек-лист запуска CRM]].
 
 ## Шаги аудита
 
@@ -32,7 +34,7 @@ updated: "2026-06-19"
 ### 3. Данные и системы
 - [ ] Где сейчас данные (таблицы, другая CRM, 1С) — объём, качество, дубли
 - [ ] Нужные интеграции (1С, телефония, сайт, мессенджеры) — см. подход в
-      [[rest-webhooks-and-events-pattern]]
+      [[m11-pt01-rest-webhooks-and-events-pattern|Вебхуки и события]]
 
 ### 4. Выбор редакции
 - [ ] **Облако или коробка** — по требованиям к доработкам, безопасности, размещению данных,
@@ -40,7 +42,7 @@ updated: "2026-06-19"
 - [ ] Оценены тариф/лицензии и лимиты
 
 ### 5. Автоматизация и доработки
-- [ ] Что закрывается no-code (роботы/триггеры/БП — [[robots-vs-bizproc-decision]])
+- [ ] Что закрывается no-code (роботы/триггеры/БП — [[m03-pt01-robots-vs-bizproc-decision|Роботы vs бизнес-процессы]])
 - [ ] Что требует разработки (только коробка) и какова сложность
 
 ### 6. Объём, риски, план
@@ -53,7 +55,7 @@ updated: "2026-06-19"
   доработок, оценка и план этапов.
 
 ## Источники и связанное
-- [[portal-initial-setup-checklist]], [[crm-launch-checklist]], [[robots-vs-bizproc-decision]],
-  [[rest-webhooks-and-events-pattern]]
+- [[m14-cl01-portal-initial-setup-checklist|Первичная настройка портала]], [[m01-cl01-crm-launch-checklist|Чек-лист запуска CRM]], [[m03-pt01-robots-vs-bizproc-decision|Роботы vs бизнес-процессы]],
+  [[m11-pt01-rest-webhooks-and-events-pattern|Вебхуки и события]]
 
 [← Playbooks](_index.md)

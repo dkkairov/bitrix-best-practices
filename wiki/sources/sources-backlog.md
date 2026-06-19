@@ -9,8 +9,8 @@ provenance: documented
 verified: "2026-06-19"
 tags: [источники, бэклог, ингест, очередь]
 sources: []
-related: ["[[src-b24-crm-deal-add]]"]
-updated: "2026-06-19"
+related: ["[[s-ss01-src-b24-crm-deal-add]]"]
+updated: "2026-06-20"
 ---
 
 # Бэклог источников

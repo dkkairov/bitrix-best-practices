@@ -1,4 +1,5 @@
 ---
+id: "S-SS01"
 title: "Конспект: офф. документация метода crm.deal.add"
 type: source-summary
 module: rest-integrations
@@ -9,8 +10,9 @@ provenance: documented
 verified: "2026-06-19 / apidocs.bitrix24.ru"
 tags: [rest, crm, метод, deal]
 sources: []
-related: ["[[rest-webhooks-and-events-pattern]]", "[[crm-sales-funnel-design-pattern]]"]
-updated: "2026-06-19"
+related: ["[[m11-pt01-rest-webhooks-and-events-pattern]]", "[[m01-pt01-crm-sales-funnel-design-pattern]]"]
+aliases: ["src-b24-crm-deal-add"]
+updated: "2026-06-20"
 ---
 
 # Конспект: офф. документация метода `crm.deal.add`
@@ -32,7 +34,7 @@ updated: "2026-06-19"
 - **Возврат:** `result` — ID сделки; `time` — тайминги запроса.
 - **Стадия и направление:** `STAGE_ID` задаётся в формате `C{категория}:{статус}` (например,
   `C1:NEW`), `CATEGORY_ID` — направление. Это подтверждает модель из
-  [[crm-sales-funnel-design-pattern]].
+  [[m01-pt01-crm-sales-funnel-design-pattern|Проектирование воронки]].
 - **Полезные поля:** `TITLE`, `OPPORTUNITY`/`CURRENCY_ID`, `CONTACT_IDS`, `COMPANY_ID`,
   `BEGINDATE`/`CLOSEDATE`, `SOURCE_ID`, UTM-поля, пользовательские `UF_CRM_*`.
 - **`params.REGISTER_SONET_EVENT`** — регистрировать ли событие в Живой ленте.
@@ -41,8 +43,8 @@ updated: "2026-06-19"
 - Доступны примеры вызова: входящий вебхук (cURL), `BX24.callMethod` (JS), CRest/SDK (PHP).
 
 ## Что встроено в вики
-- [[rest-webhooks-and-events-pattern]] — использован как пример дозапроса данных и вызова метода.
-- [[crm-sales-funnel-design-pattern]] — подтверждён формат `CATEGORY_ID` + `STAGE_ID`.
+- [[m11-pt01-rest-webhooks-and-events-pattern|Вебхуки и события]] — использован как пример дозапроса данных и вызова метода.
+- [[m01-pt01-crm-sales-funnel-design-pattern|Проектирование воронки]] — подтверждён формат `CATEGORY_ID` + `STAGE_ID`.
 
 ## Противоречия с текущими страницами
 - Нет.

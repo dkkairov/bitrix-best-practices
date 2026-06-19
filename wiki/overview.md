@@ -4,7 +4,8 @@ type: concept
 module: overview
 edition: both
 status: verified
-updated: "2026-06-19"
+verified: "2026-06-20 / структура вики"
+updated: "2026-06-20"
 ---
 
 # Обзор: лучшие практики внедрения Bitrix24

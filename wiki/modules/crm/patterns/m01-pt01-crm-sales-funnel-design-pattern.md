@@ -1,4 +1,5 @@
 ---
+id: "M01-PT01"
 title: "Проектирование воронки и стадий"
 type: pattern
 module: crm
@@ -9,8 +10,9 @@ provenance: empirical
 verified: "2026-06-19 / Bitrix24 cloud + box"
 tags: [crm, воронка, стадии, направления, аналитика]
 sources: []
-related: ["[[crm-stage-explosion]]", "[[everything-in-one-funnel]]", "[[smart-process]]", "[[robots-vs-bizproc-decision]]", "[[crm-launch-checklist]]"]
-updated: "2026-06-19"
+related: ["[[x03-ap01-crm-stage-explosion]]", "[[x03-ap02-everything-in-one-funnel]]", "[[g-en01-smart-process]]", "[[m03-pt01-robots-vs-bizproc-decision]]", "[[m01-cl01-crm-launch-checklist]]"]
+aliases: ["crm-sales-funnel-design-pattern"]
+updated: "2026-06-20"
 ---
 
 # Проектирование воронки и стадий
@@ -25,17 +27,17 @@ updated: "2026-06-19"
   («позвонить», «отправить КП»), её место в задачах/роботах, а не в воронке.
 - **5–7 стадий** на воронку как ориентир. Каждая стадия должна заметно менять вероятность сделки.
 - **Разные процессы — разные воронки (направления / `CATEGORY_ID`).** Продажа, доставка, сервис,
-  повторные продажи — это разные воронки или [[smart-process]], а не стадии одной воронки
-  (антипаттерн [[everything-in-one-funnel]]).
+  повторные продажи — это разные воронки или [[g-en01-smart-process|Смарт-процесс (СПА)]], а не стадии одной воронки
+  (антипаттерн [[x03-ap02-everything-in-one-funnel|Всё в одной воронке]]).
 - **Причины провала** оформляются как fail-стадии — для аналитики потерь.
 - **Автоматизация по стадиям** через роботы/триггеры; сложную логику — осознанно в БП
-  ([[robots-vs-bizproc-decision]]).
+  ([[m03-pt01-robots-vs-bizproc-decision|Роботы vs бизнес-процессы]]).
 
 ## Когда применять
 - Любой запуск или ревизия CRM, проектирование нового направления продаж.
 
 ## Когда НЕ применять
-- Для несбытовых процессов (договоры, заявки, рекламации) — рассмотри [[smart-process]] вместо
+- Для несбытовых процессов (договоры, заявки, рекламации) — рассмотри [[g-en01-smart-process|Смарт-процесс (СПА)]] вместо
   растягивания продажной воронки.
 
 ## Как реализовать
@@ -54,7 +56,7 @@ updated: "2026-06-19"
 - Детальный трекинг шагов внутри стадии — через **чек-листы/задачи**, а не новые стадии.
 
 ## Связанное
-- Антипаттерны: [[crm-stage-explosion]], [[everything-in-one-funnel]]
-- [[crm-launch-checklist]], [[smart-process]]
+- Антипаттерны: [[x03-ap01-crm-stage-explosion|Взрыв стадий воронки]], [[x03-ap02-everything-in-one-funnel|Всё в одной воронке]]
+- [[m01-cl01-crm-launch-checklist|Чек-лист запуска CRM]], [[g-en01-smart-process|Смарт-процесс (СПА)]]
 
-[← CRM](_index.md)
+[← CRM](../_index.md)

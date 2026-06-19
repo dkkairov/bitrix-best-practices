@@ -1,4 +1,5 @@
 ---
+id: "G-EN01"
 title: "Смарт-процесс (СПА)"
 type: entity
 module: smart-process
@@ -9,8 +10,9 @@ provenance: mixed
 verified: "2026-06-19 / Bitrix24 cloud + box"
 tags: [спа, smart-process, crm, сущности]
 sources: []
-related: ["[[crm-sales-funnel-design-pattern]]", "[[everything-in-one-funnel]]", "[[robots-vs-bizproc-decision]]"]
-updated: "2026-06-19"
+related: ["[[m01-pt01-crm-sales-funnel-design-pattern]]", "[[x03-ap02-everything-in-one-funnel]]", "[[m03-pt01-robots-vs-bizproc-decision]]"]
+aliases: ["smart-process"]
+updated: "2026-06-20"
 ---
 
 # Смарт-процесс (СПА)
@@ -28,7 +30,7 @@ updated: "2026-06-19"
 
 ## Когда использовать
 - Договоры, заявки, поставки, рекламации, абонементы, согласования, объекты учёта.
-- Когда натягивание процесса на продажную воронку даёт [[everything-in-one-funnel]].
+- Когда натягивание процесса на продажную воронку даёт [[x03-ap02-everything-in-one-funnel|Всё в одной воронке]].
 
 ## Когда НЕ использовать
 - Для собственно продаж — это обычные сделки и направления.
@@ -40,6 +42,6 @@ updated: "2026-06-19"
 - Нумерация и обязательные поля — как и в сделках, привязывать к стадиям.
 
 ## Связанное
-- [[crm-sales-funnel-design-pattern]], [[everything-in-one-funnel]], [[robots-vs-bizproc-decision]]
+- [[m01-pt01-crm-sales-funnel-design-pattern|Проектирование воронки]], [[x03-ap02-everything-in-one-funnel|Всё в одной воронке]], [[m03-pt01-robots-vs-bizproc-decision|Роботы vs бизнес-процессы]]
 
 [← Глоссарий](_index.md)

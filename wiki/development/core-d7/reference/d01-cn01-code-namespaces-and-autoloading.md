@@ -1,4 +1,5 @@
 ---
+id: "D01-CN01"
 title: "Организация кода: пространства имён и автозагрузка"
 type: concept
 module: core-d7
@@ -8,9 +9,10 @@ confidence: high
 provenance: mixed
 verified: "2026-06-19 / Bitrix Framework (курс 43)"
 tags: [d7, namespaces, автозагрузка, local, разработка]
-sources: ["[[src-bxfw-course43-namespaces]]"]
-related: ["[[box-core-modification]]"]
-updated: "2026-06-19"
+sources: ["[[s-ss02-src-bxfw-course43-namespaces]]"]
+related: ["[[d01-ap01-box-core-modification]]"]
+aliases: ["code-namespaces-and-autoloading"]
+updated: "2026-06-20"
 ---
 
 # Организация кода: пространства имён и автозагрузка
@@ -51,7 +53,7 @@ Loc::getMessage('CODE'); // вместо \Bitrix\Main\Localization\Loc::getMessa
 
 ## Где размещать свой код
 - Только в **`/local/`** (`local/php_interface`, `local/modules`, `local/components`,
-  `local/templates`). Не править `/bitrix/` — это антипаттерн [[box-core-modification]].
+  `local/templates`). Не править `/bitrix/` — это антипаттерн [[d01-ap01-box-core-modification|Правка ядра коробки]].
 - Свой функционал оформляйте отдельным модулем `vendor.module` с пространством имён `Vendor\Module`.
 
 ## Как применять (чек-лист)
@@ -62,7 +64,7 @@ Loc::getMessage('CODE'); // вместо \Bitrix\Main\Localization\Loc::getMessa
 - [ ] Длинные пути — через `use`
 
 ## Источник и связанное
-- Конспект: [[src-bxfw-course43-namespaces]] (курс 43, урок «Пространства имён»)
-- [[box-core-modification]] — почему свой код не в ядре
+- Конспект: [[s-ss02-src-bxfw-course43-namespaces|курс 43: пространства имён]] (курс 43, урок «Пространства имён»)
+- [[d01-ap01-box-core-modification|Правка ядра коробки]] — почему свой код не в ядре
 
-[← Ядро D7](_index.md)
+[← Ядро D7](../_index.md)

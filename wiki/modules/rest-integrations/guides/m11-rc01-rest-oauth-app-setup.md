@@ -1,4 +1,5 @@
 ---
+id: "M11-RC01"
 title: "Рецепт: OAuth-приложение и работа с токенами"
 type: recipe
 module: rest-integrations
@@ -9,8 +10,9 @@ provenance: documented
 verified: "2026-06-19 / apidocs.bitrix24.ru"
 tags: [rest, oauth, токены, приложение, scope]
 sources: []
-related: ["[[rest-webhooks-and-events-pattern]]"]
-updated: "2026-06-19"
+related: ["[[m11-pt01-rest-webhooks-and-events-pattern]]"]
+aliases: ["rest-oauth-app-setup"]
+updated: "2026-06-20"
 ---
 
 # Рецепт: OAuth-приложение и работа с токенами
@@ -21,7 +23,7 @@ updated: "2026-06-19"
 ## Когда это нужно
 - Тиражные приложения и интеграции, которым нужны OAuth-права (а не один входящий вебхук).
 - Для простых внутренних интеграций «для себя» достаточно вебхука — см.
-  [[rest-webhooks-and-events-pattern]].
+  [[m11-pt01-rest-webhooks-and-events-pattern|Вебхуки и события]].
 
 ## Предусловия
 - Доступ к разделу разработчика (создание приложения).
@@ -42,7 +44,7 @@ updated: "2026-06-19"
 > принудительное обновление — `BX24.refreshAuth()`.
 
 ## Проверка результата
-- Тестовый вызов метода (например, `crm.deal.add` — см. [[src-b24-crm-deal-add]]) проходит с
+- Тестовый вызов метода (например, `crm.deal.add` — см. [[s-ss01-src-b24-crm-deal-add|crm.deal.add]]) проходит с
   актуальным токеном.
 - После истечения `access_token` интеграция сама продлевает доступ без ручного вмешательства.
 
@@ -53,6 +55,6 @@ updated: "2026-06-19"
 
 ## Источники и связанное
 - Офф. документация OAuth 2.0 на `apidocs.bitrix24.ru` (сверено через MCP).
-- [[rest-webhooks-and-events-pattern]]
+- [[m11-pt01-rest-webhooks-and-events-pattern|Вебхуки и события]]
 
-[← REST и интеграции](_index.md)
+[← REST и интеграции](../_index.md)

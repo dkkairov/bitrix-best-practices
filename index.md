@@ -30,11 +30,15 @@
 - [[rest-oauth-app-setup]] — OAuth-приложение и токены · REST · both
 - [[crm-permissions-recipe]] — права доступа в CRM · Права · both
 
+### Концепты
+- [[code-namespaces-and-autoloading]] — пространства имён и автозагрузка · Разработка · box
+
 ### Сущности и термины (глоссарий)
 - [[smart-process]] — смарт-процесс (СПА)
 - [[robots-triggers]] — роботы и триггеры
 
 ### Конспекты источников
+- [[sources-backlog]] — бэклог источников (очередь на ингест)
 - [[src-b24-crm-deal-add]] — офф. метод `crm.deal.add` (apidocs.bitrix24.ru)
 
 ---
@@ -81,6 +85,6 @@
 
 ## По редакции
 
-- **box (специфично для коробки):** [[box-performance-checklist]], [[box-core-modification]]
+- **box (специфично для коробки):** [[box-performance-checklist]], [[box-core-modification]], [[code-namespaces-and-autoloading]]
 - **cloud (специфично для облака):** — (пока нет; помечай `edition: cloud` по мере добавления)
 - **both:** остальные страницы.

@@ -28,7 +28,7 @@ updated: "2026-06-20"
 
 | # | Источник | Тип | Куда мапится | Приоритет | План ингеста |
 |---|----------|-----|--------------|-----------|--------------|
-| 1 | [Курс 43 «Разработчик Bitrix Framework»](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43) (урок [Пространства имён](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=3524)) | содержание (серия уроков) | [development/](../development/core-d7/_index.md) | **P1** | поурочно; начать с «Пространства имён» → `core-d7` |
+| 1 | [Курс 43 «Разработчик Bitrix Framework»](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43) (урок [Пространства имён](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=3524)) | содержание (серия уроков) | [development/](../development/core-d7/_index.md) | **P1** | поурочно; ингещены: пространства имён (S-SS02), модули (S-SS03); далее ORM/события |
 | 2 | [bx24devbook — Книга разработчика](https://bx24devbook.website.yandexcloud.net/Dokumentacia/Spravocnik.html) | содержание (многоглавный) | [development/](../development/core-d7/_index.md) + [modules/](../modules/crm/_index.md) | **P1** | по главам (см. карту ниже) |
 | 3 | [awesome-bitrix](https://github.com/awesomebitrix/awesome-bitrix) | каталог-указатель | мета (порождает под-источники) | **P2** | разобрать по категориям → завести под-источники |
 | 4 | [api_help (старое ядро)](https://dev.1c-bitrix.ru/api_help/) | каталог-указатель (legacy) | [development/](../development/core-d7/_index.md) | **P3** | по требованию: только когда нужен конкретный метод старого ядра; сначала смотреть D7/devbook/MCP |

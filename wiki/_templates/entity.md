@@ -1,12 +1,10 @@
 <!-- Шаблон для сущности: REST-метод, событие, робот, приложение, термин. В wiki/glossary/. -->
 ---
-id: ""                   # см. §4.5 CLAUDE.md: <РАЗДЕЛ>-<ТИП><NN> по фактической папке, напр. G-EN01
 title: "Имя сущности (например, crm.deal.add)"
 type: entity
 module: rest-integrations
 edition: both
 status: draft
-confidence: high
 provenance: documented   # сущности REST — со ссылкой на офф. доку
 verified: ""
 tags: []
@@ -40,4 +38,4 @@ updated: "ГГГГ-ММ-ДД"
 - На что обратить внимание.
 
 ## Связанное
-- [[слаг]]
+- `[[слаг]]`

@@ -56,6 +56,7 @@
 - [[pattern-rest-webhooks-and-events|Вебхуки и события для интеграций]] · REST · both
 - [[pattern-events-over-core-modification|Расширение через события]] · Разработка · box
 - [[pattern-module-based-development-standard|Модульная разработка: когда и как]] · Разработка · box
+- [[pattern-module-library-monorepo|Библиотека модулей агентства (монорепо)]] · Разработка · box
 
 ### Антипаттерны
 - [[antipattern-crm-stage-explosion|Взрыв стадий воронки]] · CRM · both
@@ -91,7 +92,7 @@
 
 ## По статусу
 
-- **verified:** все 29 страниц проверены (`verified`: 2026-06-19 … 2026-06-21).
+- **verified:** все 30 страниц проверены (`verified`: 2026-06-19 … 2026-06-21).
 - **draft:** —
 - **deprecated:** —
 

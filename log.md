@@ -7,6 +7,14 @@
 
 ## 2026-06
 
+- **2026-06-21 — дофайл: паттерн библиотеки модулей + согласование** — Создан
+  [[pattern-module-library-monorepo]] (modules-custom, box): монорепо-библиотека отраслевых модулей,
+  поставка всем набором + установка только нужных (отключение лишних), единая версия. MCP подтвердил:
+  apidocs покрывает REST/облачные приложения, не коробочные модули/git-стратегию. **Снято противоречие
+  (§6):** [[recipe-module-versioning-and-private-distribution]] переписан с multi-repo (отдельный репо
+  на модуль) + версии per-module → монорепо + единая версия (multi-repo оставлен исключением); в
+  [[pattern-module-based-development-standard]] уточнено «изоляция = от ядра» + ссылка. Входящие: хаб
+  modules-custom, index.md. Итого страниц: 30.
 - **2026-06-21 — дофайл: рецепт Composer-библиотек** — Создан
   [[recipe-composer-third-party-libraries]] (development/core-d7, edition box): где хранить сторонние
   пакеты (dompdf, PhpWord) — общий `local/vendor/` (по умолчанию) либо базовый модуль `vendor.core`;

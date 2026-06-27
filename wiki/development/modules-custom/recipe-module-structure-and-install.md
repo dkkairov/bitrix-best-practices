@@ -8,7 +8,7 @@ provenance: mixed
 verified: "2026-06-20 / Bitrix Framework (курс 43)"
 tags: [модуль, install, version, события, опции, агенты]
 sources: ["[[source-bxfw-course43-modules]]"]
-related: ["[[pattern-module-based-development-standard]]", "[[recipe-module-versioning-and-private-distribution]]", "[[concept-code-namespaces-and-autoloading]]"]
+related: ["[[pattern-module-based-development-standard]]", "[[pattern-module-library-monorepo]]", "[[recipe-module-versioning-and-private-distribution]]", "[[concept-code-namespaces-and-autoloading]]"]
 aliases: []
 updated: "2026-06-20"
 ---

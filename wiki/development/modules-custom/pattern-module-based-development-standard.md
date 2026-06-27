@@ -5,10 +5,10 @@ module: modules-custom
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-06-20 / Bitrix Framework (курс 43)"
+verified: "2026-06-21 / Bitrix Framework (курс 43)"
 tags: [модуль, local, дистрибуция, переиспользование, коробка]
 sources: ["[[source-bxfw-course43-modules]]"]
-related: ["[[recipe-module-structure-and-install]]", "[[recipe-module-versioning-and-private-distribution]]", "[[antipattern-box-core-modification]]"]
+related: ["[[recipe-module-structure-and-install]]", "[[recipe-module-versioning-and-private-distribution]]", "[[pattern-module-library-monorepo]]", "[[antipattern-box-core-modification]]"]
 aliases: []
 updated: "2026-06-20"
 ---
@@ -24,7 +24,9 @@ updated: "2026-06-20"
 - жизненный цикл `install`/`uninstall` (БД, события, агенты, права, опции) —
   [[recipe-module-structure-and-install|Структура модуля и установка]];
 - версионирование и распространение — [[recipe-module-versioning-and-private-distribution|Версии и дистрибуция]];
-- изоляцию (пространство имён `Vendor\Module`, без правки ядра — [[antipattern-box-core-modification|Правка ядра]]).
+- изоляцию **от ядра** (пространство имён `Vendor\Module`, без правки ядра —
+  [[antipattern-box-core-modification|Правка ядра]]); для **набора** отраслевых модулей допустимы
+  управляемые зависимости между ними — см. [[pattern-module-library-monorepo|Библиотека модулей агентства]].
 
 ## Когда модуль
 - Функциональность **переиспользуется** на нескольких проектах/коробках.

@@ -7,6 +7,22 @@
 
 ## 2026-09
 
+- **2026-09-16 — дофайл по query: БП, `.bpt` и утилита** — Созданы 4 страницы:
+  [[concept-bizproc-bpt-format]] (формат `.bpt`: структура, выражения, 4 формата условий, роботы
+  vs дизайнер; verified на 11 экспортах облака); [[entity-bizproc-template-rest-methods]] (glossary,
+  cloud; `bizproc.workflow.template.*` сверены через MCP: только контекст приложения, шаблоны
+  роботов недоступны, `DOCUMENT_TYPE`, смежные методы); [[pattern-bizproc-ai-assisted-generation]]
+  (**draft**: агент пишет спецификацию, код собирает, тестовый портал подтверждает; дообучение — не
+  вариант); [[antipattern-bizproc-hardcoded-portal-ids]] (cross-cutting). Утилита
+  `tools/bpt/bpt.php` (decode / encode / check / analyze / compact) проверена: 11 из 11 файлов
+  байт-в-байт, негативные тесты, windows-1251 на синтетике. `analyze` нашёл в одном клиентском
+  шаблоне 5 ссылок на удалённые шаги согласования. **Уточнение к записи ниже:** зашитые ID есть в
+  логике 10 из 11 файлов (11 из 11 — если считать `DOCUMENT_FIELDS`). Обратные ссылки:
+  [[pattern-robots-vs-bizproc-decision]] (строка «развёртывание через REST», provenance → mixed),
+  [[entity-robots-triggers]], [[entity-smart-process]], [[recipe-rest-oauth-app-setup]],
+  [[pattern-rest-webhooks-and-events]], [[recipe-migrations-as-code]]; хабы bizproc, glossary,
+  antipatterns; `index.md`. Схема: `tools/` добавлен в карту каталогов (`CLAUDE.md` §2–3) и
+  `README.md`; `*.bpt` и `*.bpt.json` — в `.gitignore`. Итого страниц: 34.
 - **2026-09-16 — query: может ли Claude Code сам создавать БП** — Вопрос: реализуемость генерации и
   настройки БП агентом (MCP + вики + `.bpt`), дообучение модели, риски. Из вики использованы только
   [[pattern-robots-vs-bizproc-decision]] и [[entity-robots-triggers]] — по формату `.bpt` и

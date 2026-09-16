@@ -4,6 +4,10 @@
 .obsidian/cache
 .trash/
 
+# Шаблоны БП клиентов и их разбор — конфиденциально (только обезличенные примеры, через git add -f)
+*.bpt
+*.bpt.json
+
 # OS
 .DS_Store
 Thumbs.db

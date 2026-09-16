@@ -4,7 +4,7 @@ type: index
 module: glossary
 edition: both
 status: verified
-updated: "2026-06-19"
+updated: "2026-09-16"
 ---
 
 # Глоссарий — сущности и термины
@@ -15,9 +15,10 @@ updated: "2026-06-19"
 ## Страницы
 - [[entity-smart-process|Смарт-процесс (СПА)]]
 - [[entity-robots-triggers|Роботы и триггеры]]
+- [[entity-bizproc-template-rest-methods|REST-методы шаблонов БП]] (`bizproc.workflow.template.*`)
 
 ## Статус покрытия
-Базовые термины автоматизации и СПА. Кандидаты: воронка, стадия, лид, открытая линия, вебхук,
-событие, scope, бизнес-процесс.
+Базовые термины автоматизации и СПА, REST-методы шаблонов БП. Кандидаты: воронка, стадия, лид,
+открытая линия, вебхук, событие, scope, бизнес-процесс, `bizproc.workflow.start`.
 
 [← Обзор вики](../../index.md)

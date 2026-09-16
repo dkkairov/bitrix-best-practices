@@ -8,9 +8,9 @@ provenance: mixed
 verified: "2026-06-19 / Bitrix24 cloud + box"
 tags: [спа, smart-process, crm, сущности]
 sources: []
-related: ["[[pattern-crm-sales-funnel-design]]", "[[antipattern-everything-in-one-funnel]]", "[[pattern-robots-vs-bizproc-decision]]"]
+related: ["[[pattern-crm-sales-funnel-design]]", "[[antipattern-everything-in-one-funnel]]", "[[pattern-robots-vs-bizproc-decision]]", "[[antipattern-bizproc-hardcoded-portal-ids]]"]
 aliases: ["smart-process"]
-updated: "2026-06-20"
+updated: "2026-09-16"
 ---
 
 # Смарт-процесс (СПА)
@@ -38,6 +38,9 @@ updated: "2026-06-20"
 - Не плодить СПА без необходимости: каждая сущность — это поддержка, права и обучение.
 - Заранее продумать **связи** с CRM и **права доступа**.
 - Нумерация и обязательные поля — как и в сделках, привязывать к стадиям.
+- ID смарт-процесса (`DYNAMIC_XXX`), стадий (`DTXXX_YY:…`) и полей (`UF_CRM_…`) на каждом портале
+  свои. При переносе автоматизации их нужно сопоставлять
+  ([[antipattern-bizproc-hardcoded-portal-ids|Зашитые ID портала]]).
 
 ## Связанное
 - [[pattern-crm-sales-funnel-design|Проектирование воронки]], [[antipattern-everything-in-one-funnel|Всё в одной воронке]], [[pattern-robots-vs-bizproc-decision|Роботы vs бизнес-процессы]]

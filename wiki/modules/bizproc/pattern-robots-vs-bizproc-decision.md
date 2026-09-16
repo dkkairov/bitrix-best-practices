@@ -4,13 +4,13 @@ type: pattern
 module: bizproc
 edition: both
 status: verified
-provenance: empirical
-verified: "2026-06-19 / Bitrix24 cloud + box"
+provenance: mixed
+verified: "2026-06-19 / Bitrix24 cloud + box; строка про REST — 2026-09-16 / apidocs.bitrix24.ru"
 tags: [автоматизация, роботы, триггеры, бизнес-процессы]
 sources: []
-related: ["[[entity-robots-triggers]]", "[[entity-smart-process]]", "[[pattern-crm-sales-funnel-design]]"]
+related: ["[[entity-robots-triggers]]", "[[entity-smart-process]]", "[[pattern-crm-sales-funnel-design]]", "[[entity-bizproc-template-rest-methods]]", "[[concept-bizproc-bpt-format]]", "[[pattern-bizproc-ai-assisted-generation]]"]
 aliases: ["robots-vs-bizproc-decision"]
-updated: "2026-06-20"
+updated: "2026-09-16"
 ---
 
 # Выбор: роботы/триггеры или бизнес-процессы
@@ -31,6 +31,7 @@ updated: "2026-06-20"
 | Кто настраивает | менеджер/внедренец, no-code | внедренец/аналитик, дизайнер БП |
 | Прозрачность | высокая, видно на стадиях | ниже, нужна документация |
 | Нагрузка/отладка | легче | тяжелее, важна аккуратность |
+| Развёртывание через REST (облако) | нет — шаблоны роботов в REST недоступны | да, из приложения ([[entity-bizproc-template-rest-methods\|REST-методы шаблонов]]) |
 
 ## Когда применять роботов/триггеров
 - Действия по достижении стадии: задачи, уведомления, смена ответственного, заполнение полей.
@@ -40,6 +41,9 @@ updated: "2026-06-20"
 - Многошаговые согласования с маршрутами и ролями.
 - Сложные ветвления/циклы, расчёты, работа за пределами стадийной модели.
 - Процессы над списками/документами, а не только над стадиями CRM.
+- Процесс нужно разворачивать программно на нескольких порталах: шаблон дизайнера загружается через
+  REST, роботы — только вручную. Перед переносом проверь
+  [[antipattern-bizproc-hardcoded-portal-ids|зашитые ID портала]].
 
 ## Как реализовать
 1. Опиши логику словами. Если она формулируется как «на стадии X сделать Y» — это роботы.
@@ -52,5 +56,6 @@ updated: "2026-06-20"
 
 ## Связанное
 - [[entity-robots-triggers|Роботы и триггеры]] (термины), [[entity-smart-process|Смарт-процесс (СПА)]], [[pattern-crm-sales-funnel-design|Проектирование воронки]]
+- [[concept-bizproc-bpt-format|Формат .bpt]], [[pattern-bizproc-ai-assisted-generation|AI-генерация БП]]
 
 [← Бизнес-процессы](_index-bizproc.md)

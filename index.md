@@ -17,7 +17,7 @@
 
 ### Продуктовые модули (облако и коробка)
 - [CRM](wiki/modules/crm/_index-crm.md) — сделки, лиды, воронки, контакты/компании, аналитика
-- [Бизнес-процессы](wiki/modules/bizproc/_index-bizproc.md) — БП, роботы, триггеры, дизайнер
+- [Бизнес-процессы](wiki/modules/bizproc/_index-bizproc.md) — БП, роботы, триггеры, дизайнер, формат `.bpt`, генерация агентом
 - [REST и интеграции](wiki/modules/rest-integrations/_index-rest-integrations.md) — REST API, вебхуки, события, OAuth
 - [Права доступа](wiki/modules/permissions/_index-permissions.md) — роли, права, экстранет
 - [Администрирование](wiki/modules/administration/_index-administration.md) — портал, тарифы, домены, безопасность
@@ -53,6 +53,7 @@
 ### Паттерны
 - [[pattern-crm-sales-funnel-design|Проектирование воронки и стадий]] · CRM · both
 - [[pattern-robots-vs-bizproc-decision|Роботы/триггеры vs бизнес-процессы]] · Бизнес-процессы · both
+- [[pattern-bizproc-ai-assisted-generation|AI-генерация БП: агент проектирует, код собирает]] · Бизнес-процессы · both · черновик
 - [[pattern-rest-webhooks-and-events|Вебхуки и события для интеграций]] · REST · both
 - [[pattern-events-over-core-modification|Расширение через события]] · Разработка · box
 - [[pattern-module-based-development-standard|Модульная разработка: когда и как]] · Разработка · box
@@ -62,6 +63,7 @@
 - [[antipattern-crm-stage-explosion|Взрыв стадий воронки]] · CRM · both
 - [[antipattern-everything-in-one-funnel|Всё в одной воронке]] · CRM · both
 - [[antipattern-box-core-modification|Правка ядра коробки]] · Разработка · box
+- [[antipattern-bizproc-hardcoded-portal-ids|Зашитые ID портала в шаблонах БП]] · Бизнес-процессы · both
 
 ### Рецепты
 - [[recipe-rest-oauth-app-setup|OAuth-приложение и токены]] · REST · both
@@ -77,10 +79,12 @@
 - [[concept-code-namespaces-and-autoloading|Пространства имён и автозагрузка]] · Разработка · box
 - [[concept-coding-standards|Код-стайл и безопасность]] · Разработка · box
 - [[concept-testing-approach|Подход к тестированию]] · Разработка · box
+- [[concept-bizproc-bpt-format|Формат шаблона БП (.bpt)]] · Бизнес-процессы · both
 
 ### Сущности и термины (глоссарий)
 - [[entity-smart-process|Смарт-процесс (СПА)]]
 - [[entity-robots-triggers|Роботы и триггеры]]
+- [[entity-bizproc-template-rest-methods|REST-методы шаблонов БП]] · cloud
 
 ### Конспекты источников
 - [[sources-backlog]] — бэклог источников (очередь на ингест) · служебный
@@ -92,8 +96,8 @@
 
 ## По статусу
 
-- **verified:** все 30 страниц проверены (`verified`: 2026-06-19 … 2026-06-21).
-- **draft:** —
+- **verified:** 33 страницы из 34 (`verified`: 2026-06-19 … 2026-09-16).
+- **draft:** [[pattern-bizproc-ai-assisted-generation]] — схема не подтверждена пилотом.
 - **deprecated:** —
 
 > При устаревании практики ставь `status: deprecated` и ссылку на замену; `/wiki:lint` следит за
@@ -105,5 +109,6 @@
 
 - **box (специфично для коробки):** вся ветка разработки `development/*` и конспекты курса 43
   ([[source-bxfw-course43-namespaces]], [[source-bxfw-course43-modules]]).
-- **cloud (специфично для облака):** — (пока нет; помечай `edition: cloud` по мере добавления).
+- **cloud (специфично для облака):** [[entity-bizproc-template-rest-methods]] (сверено по
+  документации облака).
 - **both:** остальные страницы.

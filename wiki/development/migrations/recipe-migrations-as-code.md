@@ -8,9 +8,9 @@ provenance: mixed
 verified: "2026-06-20 / эмпирика + sprint.migration"
 tags: [миграции, sprint.migration, структура, перенос, деплой]
 sources: []
-related: ["[[recipe-module-versioning-and-private-distribution]]", "[[recipe-module-structure-and-install]]"]
+related: ["[[recipe-module-versioning-and-private-distribution]]", "[[recipe-module-structure-and-install]]", "[[antipattern-bizproc-hardcoded-portal-ids]]"]
 aliases: []
-updated: "2026-06-20"
+updated: "2026-09-16"
 ---
 
 # Миграции как код
@@ -59,5 +59,7 @@ public function down(): void
 ## Связанное
 - [[recipe-module-versioning-and-private-distribution]], [[recipe-module-structure-and-install]],
   [[concept-dev-standards|Стандарт разработки]]
+- Перенос шаблонов БП между средами: ID сотрудников, полей и стадий на каждой среде свои —
+  [[antipattern-bizproc-hardcoded-portal-ids|Зашитые ID портала]]
 
 [← Миграции и обновления](_index-migrations.md)

@@ -8,9 +8,9 @@ provenance: mixed
 verified: "2026-06-19 / Bitrix24 cloud (apidocs.bitrix24.ru)"
 tags: [rest, вебхук, события, event.bind, интеграции]
 sources: ["[[source-b24-crm-deal-add]]"]
-related: ["[[recipe-rest-oauth-app-setup]]", "[[entity-robots-triggers]]"]
+related: ["[[recipe-rest-oauth-app-setup]]", "[[entity-robots-triggers]]", "[[entity-bizproc-template-rest-methods]]"]
 aliases: ["rest-webhooks-and-events-pattern"]
-updated: "2026-06-20"
+updated: "2026-09-16"
 ---
 
 # Паттерн: вебхуки и события — как строить интеграции
@@ -36,6 +36,9 @@ updated: "2026-06-20"
 - **Безопасность:** для событий приложения проверяй `application_token` (выдаётся при установке,
   событие `OnAppInstall`). Вебхук-код — секрет, не светить в клиенте.
 - **Лимиты:** учитывай ограничения частоты REST; тяжёлые выгрузки — батчами.
+- **Контекст приложения:** часть методов работает только из приложения, входящий вебхук их не
+  вызовет. Пример — `bizproc.workflow.template.add`
+  ([[entity-bizproc-template-rest-methods|REST-методы шаблонов БП]]).
 
 ## Как реализовать (реакция на изменение сделки)
 1. Создай исходящий вебхук (или подпишись через `event.bind`) на нужное событие

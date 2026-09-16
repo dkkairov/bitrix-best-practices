@@ -8,9 +8,9 @@ provenance: mixed
 verified: "2026-06-19 / Bitrix24 cloud + box"
 tags: [роботы, триггеры, автоматизация, crm]
 sources: []
-related: ["[[pattern-robots-vs-bizproc-decision]]", "[[pattern-rest-webhooks-and-events]]"]
+related: ["[[pattern-robots-vs-bizproc-decision]]", "[[pattern-rest-webhooks-and-events]]", "[[entity-bizproc-template-rest-methods]]", "[[antipattern-bizproc-hardcoded-portal-ids]]"]
 aliases: ["robots-triggers"]
-updated: "2026-06-20"
+updated: "2026-09-16"
 ---
 
 # Роботы и триггеры
@@ -34,9 +34,16 @@ updated: "2026-06-20"
 - **Зацикливание:** триггер двигает стадию → робот возвращает → снова триггер. Избегать.
 - Условия запуска проверять явно, чтобы робот не срабатывал «вхолостую».
 - Для сложных маршрутов/согласований — бизнес-процессы ([[pattern-robots-vs-bizproc-decision|Роботы vs бизнес-процессы]]).
+- **Шаблоны роботов недоступны в REST:** их нельзя получить, изменить или удалить, а
+  `bizproc.workflow.template.add` не привязывает шаблон к стадии. `bizproc.robot.add` лишь
+  регистрирует робота приложения. Перенос роботов между порталами — вручную
+  ([[entity-bizproc-template-rest-methods|REST-методы шаблонов БП]], сверено 2026-09-16).
+- В роботах выбирают конкретных людей и поля — при переносе это
+  [[antipattern-bizproc-hardcoded-portal-ids|зашитые ID портала]].
 
 ## Связанное
 - [[pattern-robots-vs-bizproc-decision|Роботы vs бизнес-процессы]] — когда роботов недостаточно
 - [[pattern-rest-webhooks-and-events|Вебхуки и события]] — внешняя реакция на те же события
+- [[entity-bizproc-template-rest-methods|REST-методы шаблонов БП]] — что можно развернуть программно
 
 [← Глоссарий](_index-glossary.md)

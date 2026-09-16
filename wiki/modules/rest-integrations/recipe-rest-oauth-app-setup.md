@@ -8,9 +8,9 @@ provenance: documented
 verified: "2026-06-19 / apidocs.bitrix24.ru"
 tags: [rest, oauth, токены, приложение, scope]
 sources: []
-related: ["[[pattern-rest-webhooks-and-events]]"]
+related: ["[[pattern-rest-webhooks-and-events]]", "[[entity-bizproc-template-rest-methods]]"]
 aliases: ["rest-oauth-app-setup"]
-updated: "2026-06-20"
+updated: "2026-09-16"
 ---
 
 # Рецепт: OAuth-приложение и работа с токенами
@@ -20,6 +20,8 @@ updated: "2026-06-20"
 
 ## Когда это нужно
 - Тиражные приложения и интеграции, которым нужны OAuth-права (а не один входящий вебхук).
+- Методы, которые работают **только в контексте приложения**, — например, загрузка шаблонов БП
+  ([[entity-bizproc-template-rest-methods|REST-методы шаблонов БП]]).
 - Для простых внутренних интеграций «для себя» достаточно вебхука — см.
   [[pattern-rest-webhooks-and-events|Вебхуки и события]].
 

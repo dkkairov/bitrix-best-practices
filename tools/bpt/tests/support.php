@@ -90,6 +90,18 @@ function minimalSpec(?array $steps = null): array
     ];
 }
 
+/** Плоский список всех действий дерева. */
+function allActivities(array $node, array $collected = []): array
+{
+    $collected[] = $node;
+    foreach ($node['Children'] ?? [] as $child) {
+        if (is_array($child)) {
+            $collected = allActivities($child, $collected);
+        }
+    }
+    return $collected;
+}
+
 function setCorpusDir(?string $dir): void
 {
     $GLOBALS['bpt_corpus_dir'] = $dir;

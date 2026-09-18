@@ -21,7 +21,9 @@ const USAGE = <<<'TXT'
   php bpt.php check   <file.bpt>... [--charset=windows-1251]
   php bpt.php analyze <file.bpt|file.json>... [--json] [--charset=windows-1251]
   php bpt.php compact <file.bpt|file.json> [-o out.txt] [--json] [--charset=windows-1251]
+  php bpt.php catalog [Тип|алиас] [--json]
 
+  catalog  каталог действий: таблица целиком или подробности одного типа
   decode   .bpt -> JSON без потерь (по умолчанию в stdout)
   encode   JSON -> .bpt
   check    обратимость .bpt -> JSON -> .bpt (сравнение serialize байт-в-байт)
@@ -48,6 +50,7 @@ function main(array $argv): int
             'check'   => cmdCheck($files, $opts),
             'analyze' => cmdAnalyze($files, $opts),
             'compact' => cmdCompact($files, $opts),
+            'catalog' => cmdCatalog($files, $opts),
             default   => usageError("неизвестная команда «{$command}»"),
         };
     } catch (BptException | JsonException $e) {
@@ -141,7 +144,7 @@ function cmdCheck(array $files, array $opts): int
 function cmdAnalyze(array $files, array $opts): int
 {
     requireFiles($files, 1);
-    $analyzer = new Analyzer();
+    $analyzer = new Analyzer(Catalog::load());
     $reports = [];
     foreach ($files as $file) {
         $reports[] = $analyzer->analyze($file, BptFile::readAny($file, charset($opts)));
@@ -185,6 +188,42 @@ function cmdCompact(array $files, array $opts): int
     }
     $lines[] = 'TEMPLATE:';
     outline($data['TEMPLATE'][0], 0, $lines);
+    emit(implode(PHP_EOL, $lines), $opts['out'] ?? null);
+    return 0;
+}
+
+function cmdCatalog(array $files, array $opts): int
+{
+    $catalog = Catalog::load();
+    $type = isset($files[0]) ? $catalog->resolveType($files[0]) : null;
+    if (isset($opts['json'])) {
+        emit($catalog->toJson($type), $opts['out'] ?? null);
+        return 0;
+    }
+    if ($type === null) {
+        emit(sprintf("Каталог действий: версия %d, проверен %s\n\n%s",
+            $catalog->version(), $catalog->verified(), $catalog->toMarkdown()), $opts['out'] ?? null);
+        return 0;
+    }
+    $entry = $catalog->entry($type);
+    $lines = [
+        "{$type} — {$catalog->title($type)}" . (($entry['title_guess'] ?? false) ? ' (заголовок под вопросом)' : ''),
+        'Алиас: ' . ($catalog->alias($type) ?? '— (служебный узел)')
+            . '; вложенность: ' . $catalog->shape($type)
+            . '; в корпусе: ' . ($entry['observed'] ?? 0),
+    ];
+    if ($catalog->isForbidden($type)) {
+        $lines[] = 'ЗАПРЕЩЕНО генерировать: ' . $catalog->forbiddenReason($type);
+    }
+    $lines[] = 'Свойства:';
+    foreach ($catalog->props($type) as $prop => $spec) {
+        $lines[] = sprintf('  %-24s %-9s %s', $prop, $spec['type'],
+            ($spec['required'] ?? false) ? 'обязательное'
+                : (array_key_exists('default', $spec) ? 'по умолчанию: ' . BptFile::flatJson($spec['default']) : '—'));
+    }
+    $returns = $catalog->returns($type);
+    $lines[] = 'Возвращает: ' . ($returns ? implode(', ', $returns)
+        : (is_string($entry['returns'] ?? null) ? "поля из свойства {$entry['returns']}" : '—'));
     emit(implode(PHP_EOL, $lines), $opts['out'] ?? null);
     return 0;
 }

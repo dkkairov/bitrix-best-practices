@@ -5,12 +5,12 @@ module: core-d7
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-06-20 / Bitrix Framework (курс 43)"
+verified: "2026-06-20 / курс 43; оговорка про D7-ORM — 2026-09-15, коробка main 26.700"
 tags: [события, eventmanager, расширение, local, разработка]
 sources: ["[[source-bxfw-course43-modules]]"]
-related: ["[[antipattern-box-core-modification]]", "[[recipe-module-structure-and-install]]"]
+related: ["[[antipattern-box-core-modification]]", "[[recipe-module-structure-and-install]]", "[[recipe-d7-orm-event-subscription]]", "[[entity-event-manager]]", "[[concept-orm-datamanager-events]]"]
 aliases: []
-updated: "2026-06-20"
+updated: "2026-09-18"
 ---
 
 # Расширение через события
@@ -39,6 +39,12 @@ updated: "2026-06-20"
   );
   ```
   `register…` сохраняет подписку в БД (переживает перезагрузки), `add…` — на текущий хит.
+
+> **Исключение — события D7 ORM.** `register…` пишет имя события в `b_module_to_module.MESSAGE_ID`,
+> а это `VARCHAR(50)`. Имена ORM-событий длиннее (`\Bitrix\BizProc\Workflow\Task\TaskUser::OnAfterUpdate`
+> — 53 символа): запись усекается, обработчик **молча не вызывается**, ошибки нет. Для таких событий
+> единственный рабочий путь — `addEventHandler` в `include.php` модуля плюс инжект загрузки модуля
+> в `init.php`: [[recipe-d7-orm-event-subscription]]. Проверено вживую на коробке (main 26.700).
 
 ## Обработчик (D7)
 ```php

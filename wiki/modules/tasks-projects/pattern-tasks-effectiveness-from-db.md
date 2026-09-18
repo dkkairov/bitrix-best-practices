@@ -4,8 +4,8 @@ type: pattern
 module: tasks-projects
 edition: box
 status: verified
-provenance: empirical
-verified: "2026-06-10 / коробка: сверка с виджетом эффективности на боевом портале"
+provenance: mixed
+verified: "2026-06-10 / коробка: сверка с виджетом эффективности на боевом портале; `tasks.task.list` сверен через MCP 2026-09-18"
 tags: [tasks, эффективность, отчётность, sql, дашборд, kpi]
 sources: []
 related: ["[[concept-platform-reverse-engineering]]", "[[concept-change-invasiveness-hierarchy]]", "[[checklist-box-performance]]"]
@@ -21,7 +21,7 @@ updated: "2026-09-18"
 (`/company/personal/user/<id>/tasks/effective/`), за произвольный период. Два тупика, оба пройдены
 на живом портале:
 
-- **Пересчёт через REST** (`tasks.task.list` + `tasks.task.history.list` + своя бизнес-логика)
+- **Пересчёт через REST** (`tasks.task.list` плюс выборка истории задачи и своя бизнес-логика)
   упёрся в 93 % совпадения (91 из 98 пользователей). Дальше не идёт без исходника: правила
   «было отложено», «перенесённая просрочка», исторический self-assign приходится угадывать.
 - **Парсинг HTML виджета** через headless-браузер с cookies из `.env` — работает, но хрупко:

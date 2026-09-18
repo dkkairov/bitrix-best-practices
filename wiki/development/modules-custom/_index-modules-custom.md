@@ -4,7 +4,7 @@ type: index
 module: modules-custom
 edition: box
 status: verified
-updated: "2026-06-21"
+updated: "2026-09-18"
 ---
 
 # Свои модули — практики разработки (коробка)
@@ -17,6 +17,7 @@ updated: "2026-06-21"
 - `install/index.php`: установка, события, БД
 - Опции модуля и настройки
 - Версионирование и обновления модуля
+- Надёжность: модуль не должен ронять портал
 - Библиотека модулей: монорепо, поставка набором, отключение
 
 ## Страницы
@@ -24,6 +25,7 @@ updated: "2026-06-21"
 - [[pattern-module-library-monorepo|Библиотека модулей агентства (монорепо)]]
 - [[recipe-module-structure-and-install|Структура модуля и установка]]
 - [[recipe-module-versioning-and-private-distribution|Версии и приватная дистрибуция]]
+- [[pattern-module-self-disabling-guard|Сторож модуля: портал важнее модуля]]
 
 См. также обзор [[concept-dev-standards|Стандарт разработки (коробка)]].
 

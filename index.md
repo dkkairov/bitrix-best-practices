@@ -48,6 +48,7 @@
 - [[checklist-portal-initial-setup|Первичная настройка портала]] · Администрирование · both
 - [[checklist-box-performance|Производительность коробки]] · Разработка · box
 - [[checklist-dev-environment-and-git|Окружение разработки и git]] · Разработка · box
+- [[checklist-windows-to-linux-deploy|Заливка с Windows на Linux-сервер: 6 граблей]] · Разработка · box
 - [[checklist-presale-audit|Playbook предпроектного аудита]] · Playbooks · both
 
 ### Паттерны
@@ -58,12 +59,16 @@
 - [[pattern-events-over-core-modification|Расширение через события]] · Разработка · box
 - [[pattern-module-based-development-standard|Модульная разработка: когда и как]] · Разработка · box
 - [[pattern-module-library-monorepo|Библиотека модулей агентства (монорепо)]] · Разработка · box
+- [[pattern-module-self-disabling-guard|Сторож модуля: портал важнее модуля]] · Разработка · box
+- [[pattern-agents-vs-cron|Агенты или cron: выбор фонового запуска]] · Разработка · box
 
 ### Антипаттерны
 - [[antipattern-crm-stage-explosion|Взрыв стадий воронки]] · CRM · both
 - [[antipattern-everything-in-one-funnel|Всё в одной воронке]] · CRM · both
 - [[antipattern-box-core-modification|Правка ядра коробки]] · Разработка · box
 - [[antipattern-bizproc-hardcoded-portal-ids|Зашитые ID портала в шаблонах БП]] · Бизнес-процессы · both
+- [[antipattern-ajax-controller-lowercase-name|Строчное имя контроллера в AJAX-действии]] · Разработка · box
+- [[antipattern-cli-php-as-root|Консольный PHP от root портит кэш портала]] · Разработка · box
 
 ### Рецепты
 - [[recipe-rest-oauth-app-setup|OAuth-приложение и токены]] · REST · both
@@ -72,6 +77,10 @@
 - [[recipe-module-versioning-and-private-distribution|Версии и приватная дистрибуция]] · Разработка · box
 - [[recipe-migrations-as-code|Миграции как код]] · Разработка · box
 - [[recipe-composer-third-party-libraries|Сторонние Composer-пакеты (dompdf, PhpWord)]] · Разработка · box
+- [[recipe-d7-orm-event-subscription|Подписка модуля на событие D7 ORM]] · Разработка · box
+- [[recipe-safe-module-deploy|Безопасная заливка модуля: guard, линт, откат]] · Разработка · box
+- [[recipe-git-deploy-to-production|Доставка правки на прод через git]] · Разработка · box
+- [[recipe-mysql-connection-refused|MySQL (2002) Connection refused]] · Разработка · box
 
 ### Концепты
 - [[concept-bitrix-framework-vs-bitrix24|Bitrix Framework vs Bitrix24: движок и продукт]] · Разработка · both

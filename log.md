@@ -7,6 +7,22 @@
 
 ## 2026-09
 
+- **2026-09-18 — перенос архивной вики: коробочная разработка (тир A)** — Перенесены эмпирические
+  находки архива по разработке, все с версиями ядра в `verified` и обезличенные (стенды, домены и
+  названия заказчиков вычищены по §4.4). **core-d7:** [[recipe-d7-orm-event-subscription]]
+  (`RegisterModuleDependences` молча не работает для D7-ORM-событий — `MESSAGE_ID` VARCHAR(50);
+  рабочий путь `addEventHandler` + инжект `init.php` с маркерами; архитектура обработчика с ранним
+  выходом и четырьмя исходами), [[pattern-agents-vs-cron]] (таблица выбора + три однозначных
+  правила), [[antipattern-ajax-controller-lowercase-name]] (`Resolver` лоуэркейсит namespace →
+  `DefaultController`; проверка из консоли врёт, воспроизводить в браузере). **modules-custom:**
+  [[pattern-module-self-disabling-guard]] (три уровня защиты, сверка сигнатур рефлексией до
+  объявления класса); дополнен [[recipe-module-structure-and-install]] — обязательный
+  `install/version.php`, автозагрузчик через `spl_autoload_register` вместо
+  `registerAutoLoadClasses`, таблица граблей `/local/modules/`. **server-admin:**
+  [[recipe-safe-module-deploy]], [[recipe-git-deploy-to-production]],
+  [[checklist-windows-to-linux-deploy]], [[recipe-mysql-connection-refused]],
+  [[antipattern-cli-php-as-root]]. Обновлены три хаба и `index.md`. Часть `related` пока указывает
+  на страницы модулей — они в следующем блоке.
 - **2026-09-18 — перенос архивной вики: схема и сквозные правила** — Изучена предшествующая
   LLM-вики разработки (196 страниц, 75 источников, код трёх универсальных модулей) — она покрывает
   коробочную разработку, которой у нас почти нет. Принято решение переносить пересборкой под нашу

@@ -21,6 +21,7 @@ updated: "2026-09-18"
 
 ## Страницы
 - [[pattern-robots-vs-bizproc-decision|Паттерн выбора: роботы/триггеры vs бизнес-процессы]]
+- [[concept-bizproc-engine|Устройство движка БП: шаблон, инстанс, активити]] · коробка
 - [[concept-bizproc-bpt-format|Формат шаблона БП (.bpt): устройство и чтение]]
 - [[pattern-bizproc-ai-assisted-generation|AI-генерация БП: агент проектирует, код собирает]] (черновик)
 - [[recipe-bizproc-custom-task-activity|Своё действие БП с заданием (CBPTaskService)]] · коробка

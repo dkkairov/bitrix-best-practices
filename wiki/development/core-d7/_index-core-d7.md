@@ -24,6 +24,10 @@ updated: "2026-09-18"
 - [[concept-change-invasiveness-hierarchy|Иерархия способов изменения: от штатного механизма до копии в /local/]]
 - [[concept-platform-reverse-engineering|Исследование платформы: 4 приёма, когда документация молчит]]
 - [[concept-bitrix-naming-conventions|Соглашения именования: CCrmDeal против \Bitrix\Crm\DealTable]]
+- [[concept-request-lifecycle|Жизненный цикл HTTP-запроса: где именно вмешиваться]]
+- [[concept-orm-datamanager-events|События ORM DataManager: девять хуков и формат имени]]
+- [[concept-service-locator|ServiceLocator: регистрация и подмена сервисов]]
+- [[concept-validation-d7|Валидация D7: PHP-атрибуты вместо простыней if]]
 - [[concept-code-namespaces-and-autoloading|Пространства имён, автозагрузка, размещение кода в /local/]]
 - [[recipe-composer-third-party-libraries|Сторонние Composer-пакеты (dompdf, PhpWord)]]
 - [[pattern-events-over-core-modification|Расширение через события]]
@@ -37,6 +41,6 @@ updated: "2026-09-18"
 ## Статус покрытия
 Есть стандарт разработки и иерархия инвазивности, организация кода и соглашения именования,
 события, приёмы исследования платформы, код-стайл/безопасность, тесты и ключевой антипаттерн.
-Не хватает: рецепты ORM D7 (запросы, связи), жизненный цикл запроса, ServiceLocator.
+Не хватает: рецепты ORM D7 (запросы, связи), Result/Error, отложенные функции.
 
 [← Обзор вики](../../../index.md)

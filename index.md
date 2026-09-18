@@ -33,7 +33,8 @@
 - [Производительность](wiki/development/performance/_index-performance.md) — кэширование, индексы, масштабирование
 - [Миграции](wiki/development/migrations/_index-migrations.md) — sprint.migration, обновления, перенос
 - [Администрирование сервера](wiki/development/server-admin/_index-server-admin.md) — окружение, git, бэкапы
-- _Планируются:_ Компоненты · Шаблоны и вёрстка
+- [Шаблоны и вёрстка](wiki/development/templates-design/_index-templates-design.md) — UI-подсистема, тулбар, фильтр, грид
+- _Планируются:_ Компоненты
 
 ### Сквозное
 - [Playbooks](wiki/cross-cutting/playbooks/_index-playbooks.md) — жизненный цикл: пресейл → деплой → поддержка
@@ -107,6 +108,13 @@
 - [[concept-bizproc-bpt-format|Формат шаблона БП (.bpt)]] · Бизнес-процессы · both
 - [[concept-crm-universal-api|Universal API CRM: Container → Factory → Item]] · CRM · box
 - [[concept-crm-dictionaries|Справочники CRM: новое читает, старое пишет]] · CRM · box
+- [[concept-request-lifecycle|Жизненный цикл HTTP-запроса]] · Разработка · box
+- [[concept-orm-datamanager-events|События ORM DataManager]] · Разработка · box
+- [[concept-service-locator|ServiceLocator: регистрация и подмена сервисов]] · Разработка · box
+- [[concept-validation-d7|Валидация D7: PHP-атрибуты]] · Разработка · box
+- [[concept-ui-subsystem|UI-подсистема: тулбар, фильтр, грид, кнопки]] · Разработка · box
+- [[concept-bizproc-engine|Устройство движка БП: шаблон, инстанс, активити]] · БП · box
+- [[concept-org-structure|Оргструктура портала]] · Администрирование · both
 
 ### Сущности и термины (глоссарий)
 - [[entity-smart-process|Смарт-процесс (СПА)]]
@@ -123,7 +131,7 @@
 
 ## По статусу
 
-- **verified:** 33 страницы из 34 (`verified`: 2026-06-19 … 2026-09-16).
+- **verified:** 64 страницы из 65 (`verified`: 2026-06-01 … 2026-09-16).
 - **draft:** [[pattern-bizproc-ai-assisted-generation]] — схема не подтверждена пилотом.
 - **deprecated:** —
 
@@ -134,8 +142,11 @@
 
 ## По редакции
 
-- **box (специфично для коробки):** вся ветка разработки `development/*` и конспекты курса 43
-  ([[source-bxfw-course43-namespaces]], [[source-bxfw-course43-modules]]).
-- **cloud (специфично для облака):** [[entity-bizproc-template-rest-methods]] (сверено по
-  документации облака).
-- **both:** остальные страницы.
+- **box (46 страниц):** вся ветка разработки `development/*`, конспекты курса 43 и коробочная
+  часть модулей — Universal API и доработки CRM, своё действие БП, программное создание
+  смарт-процесса, раздел в левом меню, эффективность задач, публикация в ленту.
+- **cloud (1 страница):** [[entity-bizproc-template-rest-methods]] (сверено по документации облака).
+- **both (18 страниц):** остальные — практики внедрения, не зависящие от редакции.
+
+> Перекос в сторону `box` — следствие переноса архивной вики разработки (2026-09-18). Облачная
+> половина (no-code, REST, маркетплейс) остаётся зоной роста.

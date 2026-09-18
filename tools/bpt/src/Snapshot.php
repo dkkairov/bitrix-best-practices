@@ -123,6 +123,12 @@ final class Snapshot
             . ($known ? '; есть: ' . implode(', ', $known) : '; раздел пуст'));
     }
 
+    /** @return array<string, string> раздел снимка: название → идентификатор */
+    public function section(string $kind): array
+    {
+        return $this->sections[$kind] ?? [];
+    }
+
     /** Обратный поиск: идентификатор → название (для разбора шаблона в спецификацию). */
     public function nameFor(string $kind, string $value): ?string
     {

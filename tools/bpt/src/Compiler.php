@@ -348,24 +348,31 @@ final class Compiler
         }
         $nodes = [];
         foreach (array_values($branches) as $i => $branch) {
-            $branchPath = "{$path}.branches[{$i}]";
-            // Ветка — либо список шагов, либо объект {title, steps}
-            $steps = is_array($branch) && array_is_list($branch) ? $branch : ($branch['steps'] ?? []);
-            $title = is_array($branch) && !array_is_list($branch) ? ($branch['title'] ?? null) : null;
-            $nodes[] = $this->makeSequence($steps, $branchPath, $kind, $title === null ? null : (string) $title);
+            $nodes[] = $this->makeSequence($branch, "{$path}.branches[{$i}]", $kind);
         }
         return $nodes;
     }
 
-    private function makeSequence(mixed $steps, string $path, string $kind, ?string $title = null): array
+    /**
+     * Последовательность действий. На входе либо список шагов, либо объект
+     * {title, name, off, steps} — так сохраняются свои заголовки веток.
+     */
+    private function makeSequence(mixed $branch, string $path, string $kind): array
     {
+        $meta = [];
+        $steps = $branch;
+        if (is_array($branch) && !array_is_list($branch)) {
+            $meta = $branch;
+            $steps = $branch['steps'] ?? [];
+        }
+        $title = isset($meta['title']) ? (string) $meta['title']
+            : ($kind === 'robots' ? 'Automation sequence' : 'Последовательность действий');
         return [
             'Type'       => 'SequenceActivity',
-            'Name'       => $this->makeName([], $path, $path),
-            'Activated'  => 'Y',
+            'Name'       => $this->makeName($meta, $path, $path),
+            'Activated'  => ($meta['off'] ?? false) ? 'N' : 'Y',
             'Node'       => null,
-            'Properties' => ['Title' => $title
-                ?? ($kind === 'robots' ? 'Automation sequence' : 'Последовательность действий')],
+            'Properties' => ['Title' => $title],
             'Children'   => $this->buildSteps($steps, "{$path}.steps", $kind),
         ];
     }

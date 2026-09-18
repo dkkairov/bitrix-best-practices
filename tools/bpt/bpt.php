@@ -23,12 +23,15 @@ const USAGE = <<<'TXT'
   php bpt.php compact <file.bpt|file.json> [-o out.txt] [--json] [--charset=windows-1251]
   php bpt.php catalog [Тип|алиас] [--json]
   php bpt.php compile <spec.yaml|spec.json> -o <out.bpt> [--portal=<снимок>] [--strict] [--force]
+  php bpt.php decompile <file.bpt> [-o spec.yaml] [--portal=<снимок>] [--keep-names] [--json]
   php bpt.php snapshot <file.bpt> [-o out.portal.yaml] [--json]
 
   catalog  каталог действий: таблица целиком или подробности одного типа
   compile  спецификация процесса -> .bpt; при ошибках файл не пишется
            --portal: снимок портала для плейсхолдеров {{вид:Название}}
            --strict: «сырые» ID портала в спецификации считать ошибкой
+  decompile .bpt -> спецификация процесса (для библиотеки примеров и сверки)
+            --portal: заменить идентификаторы на плейсхолдеры; --keep-names: сохранить имена действий
   snapshot снимок портала из экспорта: поля и стадии из DOCUMENT_FIELDS
   decode   .bpt -> JSON без потерь (по умолчанию в stdout)
   encode   JSON -> .bpt
@@ -58,6 +61,7 @@ function main(array $argv): int
             'compact' => cmdCompact($files, $opts),
             'catalog' => cmdCatalog($files, $opts),
             'compile' => cmdCompile($files, $opts),
+            'decompile' => cmdDecompile($files, $opts),
             'snapshot' => cmdSnapshot($files, $opts),
             default   => usageError("неизвестная команда «{$command}»"),
         };
@@ -250,6 +254,17 @@ function cmdCompile(array $files, array $opts): int
     }
     BptFile::write($out, $result['bpt'], charset($opts), isset($opts['force']));
     fwrite(STDERR, "Записано: {$out}" . PHP_EOL);
+    return 0;
+}
+
+function cmdDecompile(array $files, array $opts): int
+{
+    requireFiles($files, 1, 1);
+    $bpt = BptFile::readAny($files[0], charset($opts))['data'];
+    $result = (new Decompiler(Catalog::load(), portalSnapshot($opts), isset($opts['keep-names'])))->decompile($bpt);
+    printMessages(array_unique($result['warnings']), '[ВНИМАНИЕ]');
+    emit(isset($opts['json']) ? BptFile::toJson($result['spec']) : SpecReader::dump($result['spec']),
+        $opts['out'] ?? null);
     return 0;
 }
 

@@ -21,3 +21,8 @@ desktop.ini
 
 # Изолированные worktree (создаются Claude Code)
 .claude/worktrees/
+
+# Снимки порталов: данные клиента
+*.portal.yaml
+*.portal.json
+!tools/bpt/examples/*.portal.yaml

@@ -22,11 +22,14 @@ const USAGE = <<<'TXT'
   php bpt.php analyze <file.bpt|file.json>... [--json] [--charset=windows-1251]
   php bpt.php compact <file.bpt|file.json> [-o out.txt] [--json] [--charset=windows-1251]
   php bpt.php catalog [Тип|алиас] [--json]
-  php bpt.php compile <spec.yaml|spec.json> -o <out.bpt> [--strict] [--force]
+  php bpt.php compile <spec.yaml|spec.json> -o <out.bpt> [--portal=<снимок>] [--strict] [--force]
+  php bpt.php snapshot <file.bpt> [-o out.portal.yaml] [--json]
 
   catalog  каталог действий: таблица целиком или подробности одного типа
   compile  спецификация процесса -> .bpt; при ошибках файл не пишется
+           --portal: снимок портала для плейсхолдеров {{вид:Название}}
            --strict: «сырые» ID портала в спецификации считать ошибкой
+  snapshot снимок портала из экспорта: поля и стадии из DOCUMENT_FIELDS
   decode   .bpt -> JSON без потерь (по умолчанию в stdout)
   encode   JSON -> .bpt
   check    обратимость .bpt -> JSON -> .bpt (сравнение serialize байт-в-байт)
@@ -55,6 +58,7 @@ function main(array $argv): int
             'compact' => cmdCompact($files, $opts),
             'catalog' => cmdCatalog($files, $opts),
             'compile' => cmdCompile($files, $opts),
+            'snapshot' => cmdSnapshot($files, $opts),
             default   => usageError("неизвестная команда «{$command}»"),
         };
     } catch (BptException | JsonException $e) {
@@ -236,7 +240,8 @@ function cmdCompile(array $files, array $opts): int
 {
     requireFiles($files, 1, 1);
     $out = $opts['out'] ?? usageError('для compile нужен -o <out.bpt>');
-    $result = (new Compiler(Catalog::load(), isset($opts['strict'])))->compile(SpecReader::read($files[0]));
+    $result = (new Compiler(Catalog::load(), portalSnapshot($opts), isset($opts['strict'])))
+        ->compile(SpecReader::read($files[0]));
     printMessages($result['warnings'], '[ВНИМАНИЕ]');
     printMessages($result['errors'], '[ОШИБКА]');
     if ($result['errors']) {
@@ -246,6 +251,30 @@ function cmdCompile(array $files, array $opts): int
     BptFile::write($out, $result['bpt'], charset($opts), isset($opts['force']));
     fwrite(STDERR, "Записано: {$out}" . PHP_EOL);
     return 0;
+}
+
+function cmdSnapshot(array $files, array $opts): int
+{
+    requireFiles($files, 1, 1);
+    $snapshot = Snapshot::fromBpt(BptFile::readAny($files[0], charset($opts))['data'], basename($files[0]));
+    $data = $snapshot->toArray();
+    if (isset($opts['json'])) {
+        emit(BptFile::toJson($data), $opts['out'] ?? null);
+    } else {
+        emit(SpecReader::dump($data), $opts['out'] ?? null);
+    }
+    fwrite(STDERR, 'Поля и стадии заполнены из DOCUMENT_FIELDS; пользователей, группы,'
+        . ' смарт-процессы и шаблоны впишите вручную.' . PHP_EOL);
+    return 0;
+}
+
+function portalSnapshot(array $opts): ?Snapshot
+{
+    $portal = $opts['portal'] ?? null;
+    if ($portal === null || $portal === true) {
+        return null;
+    }
+    return Snapshot::load((string) $portal);
 }
 
 // ---------------------------------------------------------------- вывод

@@ -24,6 +24,7 @@ final class Compiler
 
     public function __construct(
         private readonly Catalog $catalog,
+        private readonly ?Snapshot $snapshot = null,
         private readonly bool $strict = false,
     ) {
     }
@@ -61,8 +62,10 @@ final class Compiler
             'Children'   => $children,
         ];
 
-        $this->warning('DOCUMENT_FIELDS', 'собрано без DOCUMENT_FIELDS: перед загрузкой проверьте'
-            . ' поведение на тестовом портале');
+        if (($this->snapshot?->documentFields() ?? []) === []) {
+            $this->warning('DOCUMENT_FIELDS', 'собрано без DOCUMENT_FIELDS: перед загрузкой проверьте'
+                . ' поведение на тестовом портале');
+        }
 
         $bpt = [
             'VERSION'         => 2,
@@ -70,7 +73,7 @@ final class Compiler
             'PARAMETERS'      => $this->definitions($spec['parameters'] ?? [], 'parameters'),
             'VARIABLES'       => $this->definitions($spec['variables'] ?? [], 'variables'),
             'CONSTANTS'       => $this->definitions($spec['constants'] ?? [], 'constants'),
-            'DOCUMENT_FIELDS' => [],
+            'DOCUMENT_FIELDS' => $this->snapshot?->documentFields() ?? [],
         ];
         $this->runAnalyzer($bpt);
 
@@ -210,6 +213,7 @@ final class Compiler
         if ($this->catalog->shape($type) === 'loop') {
             $props += $this->conditionProps($meta, $label, true);
         }
+        $props = $this->substitute($props, $label);
 
         $node = $this->makeNode($type, $props, $meta, $label, $path);
         $node['Children'] = $this->buildChildren($type, $meta, $label, $path, $kind);
@@ -320,7 +324,7 @@ final class Compiler
                 $this->error($branchPath, 'ветка должна быть объектом {title, when|else, steps}');
                 continue;
             }
-            $props = $this->conditionProps($branch, $branchPath, false);
+            $props = $this->substitute($this->conditionProps($branch, $branchPath, false), $branchPath);
             $props['Title'] = (string) ($branch['title'] ?? 'Ветка');
             $props['EditorComment'] = (string) ($branch['comment'] ?? '');
             $nodes[] = [
@@ -428,9 +432,26 @@ final class Compiler
                 $this->error("{$path}.{$code}", 'описание поля должно быть объектом {Name, Type, …}');
                 continue;
             }
-            $out[(string) $code] = Catalog::normalizeDefinition($definition);
+            $out[(string) $code] = Catalog::normalizeDefinition($this->substitute($definition, "{$path}.{$code}"));
         }
         return $out;
+    }
+
+    /** Подстановка {{вид:Название}} из снимка портала. */
+    private function substitute(mixed $value, string $label): mixed
+    {
+        if (!Snapshot::hasPlaceholder($value)) {
+            return $value;
+        }
+        if ($this->snapshot === null) {
+            $this->error($label, 'в спецификации есть плейсхолдеры {{…}}, но не задан снимок портала'
+                . ' (--portal <файл>)');
+            return $value;
+        }
+        $errors = [];
+        $value = $this->snapshot->substitute($value, $label, $errors);
+        array_push($this->errors, ...$errors);
+        return $value;
     }
 
     private function error(string $where, string $message): void

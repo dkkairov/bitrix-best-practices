@@ -131,6 +131,12 @@
 [[entity-crm-settings|<Type>Settings]] · [[entity-ccrm-status|CCrmStatus / StatusTable]] ·
 [[entity-ccrm-owner-type|CCrmOwnerType]] · [[entity-ccrm-field-multi|CCrmFieldMulti]]
 
+**Бизнес-процессы** — [[entity-cbp-activity|CBPActivity / BaseActivity]] ·
+[[entity-cbp-activity-condition|CBPActivityCondition]] · [[entity-cbp-task-service|CBPTaskService]] ·
+[[entity-bizproc-field-type|FieldType]] · [[entity-bizproc-globals-manager|GlobalsManager]]
+
+**Интранет** — [[entity-cintranet-utils|CIntranetUtils]] · [[entity-user-absence|UserAbsence]]
+
 ### Конспекты источников
 - [[sources-backlog]] — бэклог источников (очередь на ингест) · служебный
 - [[source-b24-crm-deal-add|Офф. метод crm.deal.add]] · apidocs.bitrix24.ru

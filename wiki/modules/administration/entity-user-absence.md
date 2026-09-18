@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля intranet, раздел отсутствий (dev.1c-bitrix.ru)"
 tags: [интранет, отсутствия, отпуска, класс, d7, кэш]
-sources: []
+sources: ["[[source-devbook-intranet]]"]
 related: ["[[entity-cintranet-utils]]", "[[concept-org-structure]]", "[[entity-config-option]]"]
 aliases: ["bitrix24-user-absence"]
 updated: "2026-09-18"

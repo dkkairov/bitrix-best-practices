@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля bizproc, раздел своих условий (dev.1c-bitrix.ru)"
 tags: [bizproc, условие, класс, цикл, ветвление]
-sources: []
+sources: ["[[source-devbook-bizproc]]"]
 related: ["[[entity-cbp-activity]]", "[[concept-bizproc-engine]]", "[[entity-bizproc-field-type]]"]
 aliases: ["bitrix24-cbp-activity-condition"]
 updated: "2026-09-18"

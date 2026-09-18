@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main, раздел валидации (dev.1c-bitrix.ru)"
 tags: [валидация, сервис, d7, класс, рефлексия]
-sources: []
+sources: ["[[source-devbook-core-d7]]"]
 related: ["[[concept-validation-d7]]", "[[concept-service-locator]]", "[[entity-validation-result]]", "[[entity-main-result]]"]
 aliases: ["bitrix24-validation-service"]
 updated: "2026-09-18"

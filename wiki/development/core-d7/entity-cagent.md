@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main, раздел агентов (dev.1c-bitrix.ru)"
 tags: [агенты, расписание, класс, c-api, b_agent]
-sources: []
+sources: ["[[source-devbook-core-d7]]"]
 related: ["[[pattern-agents-vs-cron]]", "[[concept-request-lifecycle]]", "[[recipe-module-structure-and-install]]"]
 aliases: ["bitrix24-cagent"]
 updated: "2026-09-18"

@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-02 / документация Universal API CRM (apidocs.bitrix24.ru)"
 tags: [crm, universal-api, действия, события, решение, фабрика]
-sources: []
+sources: ["[[source-devbook-crm]]"]
 related: ["[[concept-crm-universal-api]]", "[[pattern-events-over-core-modification]]", "[[recipe-d7-orm-event-subscription]]", "[[recipe-crm-history-all-fields]]", "[[concept-change-invasiveness-hierarchy]]"]
 aliases: ["bitrix24-crm-deystviya-vs-sobytiya"]
 updated: "2026-09-18"

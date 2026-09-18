@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / Книга разработчика Bitrix24 (dev.1c-bitrix.ru)"
 tags: [разработка, d7, namespace, соглашения, crm]
-sources: []
+sources: ["[[source-devbook-core-d7]]"]
 related: ["[[concept-code-namespaces-and-autoloading]]", "[[concept-platform-reverse-engineering]]", "[[concept-crm-universal-api]]"]
 aliases: ["bitrix24-naming-conventions"]
 updated: "2026-09-18"

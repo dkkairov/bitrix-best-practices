@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main, публичная часть фильтра (dev.1c-bitrix.ru)"
 tags: [ui, фильтр, javascript, lazy-load]
-sources: []
+sources: ["[[source-devbook-ui]]"]
 related: ["[[entity-filter-component]]", "[[entity-bx-main-grid]]", "[[concept-platform-reverse-engineering]]"]
 aliases: ["bitrix24-filtr-bx-main-filter"]
 updated: "2026-09-18"

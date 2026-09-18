@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация Bitrix Framework, раздел шаблонов (dev.1c-bitrix.ru)"
 tags: [шаблон, вёрстка, зоны-страницы, отложенные-функции]
-sources: []
+sources: ["[[source-devbook-ui]]"]
 related: ["[[concept-change-invasiveness-hierarchy]]", "[[entity-theme-picker]]", "[[concept-request-lifecycle]]", "[[entity-local-directory]]"]
 aliases: ["bitrix24-shablon-dizayna"]
 updated: "2026-09-18"

@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main (dev.1c-bitrix.ru, apidocs.bitrix24.ru)"
 tags: [d7, di, servicelocator, сервисы, kernel-php, подмена]
-sources: []
+sources: ["[[source-devbook-core-d7]]"]
 related: ["[[concept-crm-universal-api]]", "[[recipe-crm-history-all-fields]]", "[[concept-bitrix-naming-conventions]]", "[[concept-change-invasiveness-hierarchy]]"]
 aliases: ["bitrix24-service-locator"]
 updated: "2026-09-18"

@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля bizproc (dev.1c-bitrix.ru)"
 tags: [bizproc, типы, поля, класс, диалог-настроек]
-sources: []
+sources: ["[[source-devbook-bizproc]]"]
 related: ["[[entity-cbp-activity]]", "[[concept-bizproc-engine]]", "[[recipe-bizproc-custom-task-activity]]"]
 aliases: ["bitrix24-bizproc-fieldtype"]
 updated: "2026-09-18"

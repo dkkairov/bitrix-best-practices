@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / Книга разработчика Bitrix24 (dev.1c-bitrix.ru)"
 tags: [разработка, стандарт, ядро, local, расширение, манифест]
-sources: []
+sources: ["[[source-devbook-dev-rules]]"]
 related: ["[[concept-dev-standards]]", "[[antipattern-box-core-modification]]", "[[pattern-events-over-core-modification]]", "[[concept-platform-reverse-engineering]]"]
 aliases: ["bitrix24-pravila-razrabotki"]
 updated: "2026-09-18"

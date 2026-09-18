@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main, раздел фильтра (dev.1c-bitrix.ru)"
 tags: [ui, фильтр, компонент, пресеты, грид]
-sources: []
+sources: ["[[source-devbook-ui]]"]
 related: ["[[concept-ui-subsystem]]", "[[entity-filter-field-adapter]]", "[[entity-filter-options]]", "[[entity-grid-component]]", "[[entity-custom-filter]]"]
 aliases: ["bitrix24-filtr-component"]
 updated: "2026-09-18"

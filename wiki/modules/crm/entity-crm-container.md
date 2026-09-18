@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-02 / документация Universal API CRM (apidocs.bitrix24.ru)"
 tags: [crm, universal-api, container, класс, d7]
-sources: []
+sources: ["[[source-devbook-crm]]"]
 related: ["[[concept-crm-universal-api]]", "[[entity-crm-factory]]", "[[concept-service-locator]]", "[[recipe-crm-history-all-fields]]"]
 aliases: ["bitrix24-crm-container"]
 updated: "2026-09-18"

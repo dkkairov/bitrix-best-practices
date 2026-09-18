@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main, публичная часть таблиц (dev.1c-bitrix.ru)"
 tags: [ui, грид, javascript, inline-редактирование]
-sources: []
+sources: ["[[source-devbook-ui]]"]
 related: ["[[entity-grid-component]]", "[[entity-bx-main-filter]]", "[[recipe-crm-card-editor-js-access]]"]
 aliases: ["bitrix24-grid-bx-main"]
 updated: "2026-09-18"

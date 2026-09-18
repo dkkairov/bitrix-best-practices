@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-02 / документация Universal API CRM (apidocs.bitrix24.ru)"
 tags: [crm, universal-api, d7, фабрика, операции, servicelocator]
-sources: []
+sources: ["[[source-devbook-crm]]"]
 related: ["[[pattern-crm-action-vs-event]]", "[[recipe-crm-history-all-fields]]", "[[recipe-smart-process-programmatic-creation]]", "[[concept-crm-dictionaries]]", "[[entity-smart-process]]"]
 aliases: ["bitrix24-crm-ua"]
 updated: "2026-09-18"

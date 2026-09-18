@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля intranet, раздел тем (dev.1c-bitrix.ru)"
 tags: [темы, оформление, интранет, класс, d7]
-sources: []
+sources: ["[[source-devbook-intranet]]"]
 related: ["[[entity-site-template]]", "[[concept-change-invasiveness-hierarchy]]", "[[concept-org-structure]]"]
 aliases: ["bitrix24-theme-picker"]
 updated: "2026-09-18"

@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модулей ui и main (dev.1c-bitrix.ru)"
 tags: [ui, тулбар, фильтр, грид, кнопки, шаблон, отложенные-функции]
-sources: []
+sources: ["[[source-devbook-ui]]"]
 related: ["[[concept-change-invasiveness-hierarchy]]", "[[concept-request-lifecycle]]", "[[recipe-custom-left-menu-section]]", "[[recipe-crm-card-editor-js-access]]"]
 aliases: ["bitrix24-ui"]
 updated: "2026-09-18"

@@ -7,6 +7,26 @@
 
 ## 2026-09
 
+- **2026-09-18 — lint, долг по источникам, снятие черновиков** — **Lint по всей вики (121 страница):**
+  структурно чисто — 0 битых ссылок, 0 орфанов, 0 ошибок `edition` и frontmatter, имена и префиксы
+  корректны, подпапок по типам и пустых папок нет, `aliases` не дублируются, устаревших `verified`
+  нет. Единственная категория — REST без сверки; через MCP подтверждены `crm.type.add`,
+  `tasks.task.list`, `bizproc.task.list`, `bizproc.task.complete`, `log.blogpost.add`;
+  `tasks.task.history.list` в документации **не подтверждён** и убран из
+  [[pattern-tasks-effectiveness-from-db]]. Ложные срабатывания проверки —
+  `crm.service.factory.dynamic` (имя сервиса) и `crm.controller.item.update` (AJAX-действие).
+  **Долг по источникам закрыт частично:** заведены шесть кластерных конспектов
+  ([[source-devbook-dev-rules]], [[source-devbook-core-d7]], [[source-devbook-crm]],
+  [[source-devbook-bizproc]], [[source-devbook-ui]], [[source-devbook-intranet]]) — по разделу
+  книги, а не по главе; `sources` проставлен на **50 страницах**. Снимки глав в `raw/` сознательно
+  не копировались: объёмный сторонний текст, для прослеживаемости хватает ссылки в конспекте.
+  У эмпирических страниц `sources` намеренно пуст — они сами источник. **Черновики:**
+  [[entity-loader]] и [[entity-config-option]] сверены по справочнику D7 на `dev.1c-bitrix.ru`
+  и переведены в `verified`; у `Option` добавлен `getRealValue()` — штатный способ увидеть
+  расхождение с кэшем ([[antipattern-cli-php-as-root]]). [[entity-module-manager]] остаётся
+  `draft`: страница справочника не отдала содержимое, поиск выводит на функции старого ядра —
+  причина записана прямо на странице. Обновлены `index.md`, хабы sources и core-d7,
+  `sources-backlog`.
 - **2026-09-18 — облачно-внедренческая половина: 9 страниц** — Выправление перекоса после переноса
   архива. **REST (сверено через MCP, `provenance: documented`, `edition: cloud`):**
   [[pattern-rest-batch-and-limits]] (`batch` REST 3.0: `cmd`/`halt`/`as`, связывание через

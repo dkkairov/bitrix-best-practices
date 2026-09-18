@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main, раздел событий (dev.1c-bitrix.ru)"
 tags: [события, d7, eventmanager, класс, подписка]
-sources: []
+sources: ["[[source-devbook-core-d7]]"]
 related: ["[[pattern-events-over-core-modification]]", "[[recipe-d7-orm-event-subscription]]", "[[concept-orm-datamanager-events]]", "[[entity-main-event]]"]
 aliases: ["bitrix24-event-manager"]
 updated: "2026-09-18"

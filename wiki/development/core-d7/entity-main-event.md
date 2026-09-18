@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main, раздел событий (dev.1c-bitrix.ru)"
 tags: [события, d7, класс, свои-события, отладка]
-sources: []
+sources: ["[[source-devbook-core-d7]]"]
 related: ["[[entity-event-manager]]", "[[pattern-events-over-core-modification]]", "[[entity-main-result]]"]
 aliases: ["bitrix24-event-class"]
 updated: "2026-09-18"

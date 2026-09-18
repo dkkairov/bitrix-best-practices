@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / Книга разработчика Bitrix24 (dev.1c-bitrix.ru)"
 tags: [агенты, cron, фоновые-задачи, решение, тиражирование]
-sources: []
+sources: ["[[source-devbook-core-d7]]"]
 related: ["[[recipe-module-structure-and-install]]", "[[antipattern-cli-php-as-root]]", "[[concept-dev-standards]]"]
 aliases: ["bitrix24-agenty-vs-cron"]
 updated: "2026-09-18"

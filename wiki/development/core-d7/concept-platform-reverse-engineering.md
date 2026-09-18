@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / Книга разработчика Bitrix24 (dev.1c-bitrix.ru)"
 tags: [разработка, research, debugging, grep, devtools]
-sources: []
+sources: ["[[source-devbook-dev-rules]]"]
 related: ["[[concept-change-invasiveness-hierarchy]]", "[[concept-bitrix-naming-conventions]]", "[[concept-dev-standards]]"]
 aliases: ["bitrix24-issledovanie-platformy"]
 updated: "2026-09-18"

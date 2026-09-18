@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-02 / документация модуля CRM (apidocs.bitrix24.ru)"
 tags: [crm, настройки, universal-api, класс]
-sources: []
+sources: ["[[source-devbook-crm]]"]
 related: ["[[concept-crm-universal-api]]", "[[pattern-crm-action-vs-event]]", "[[entity-crm-factory]]"]
 aliases: ["bitrix24-crm-settings"]
 updated: "2026-09-18"

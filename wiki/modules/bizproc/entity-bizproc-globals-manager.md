@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля bizproc, раздел окружения (dev.1c-bitrix.ru)"
 tags: [bizproc, глобальные-переменные, константы, класс, видимость]
-sources: []
+sources: ["[[source-devbook-bizproc]]"]
 related: ["[[concept-bizproc-engine]]", "[[entity-cbp-activity]]", "[[antipattern-bizproc-hardcoded-portal-ids]]"]
 aliases: ["bitrix24-bizproc-globals-manager"]
 updated: "2026-09-18"

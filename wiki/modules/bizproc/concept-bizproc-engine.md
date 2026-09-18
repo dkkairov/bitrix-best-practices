@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля bizproc (dev.1c-bitrix.ru, курс 57)"
 tags: [bizproc, активити, шаблон, инстанс, роботы, окружение]
-sources: []
+sources: ["[[source-devbook-bizproc]]"]
 related: ["[[recipe-bizproc-custom-task-activity]]", "[[pattern-robots-vs-bizproc-decision]]", "[[concept-bizproc-bpt-format]]", "[[entity-robots-triggers]]", "[[concept-change-invasiveness-hierarchy]]"]
 aliases: ["bitrix24-bizproc"]
 updated: "2026-09-18"

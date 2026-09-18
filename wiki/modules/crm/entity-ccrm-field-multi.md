@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-02 / документация модуля CRM, раздел структур данных (apidocs.bitrix24.ru)"
 tags: [crm, мультиполя, телефон, почта, дубликаты, класс]
-sources: []
+sources: ["[[source-devbook-crm]]"]
 related: ["[[entity-ccrm-owner-type]]", "[[entity-crm-factory]]", "[[concept-crm-dictionaries]]"]
 aliases: ["bitrix24-ccrm-field-multi"]
 updated: "2026-09-18"

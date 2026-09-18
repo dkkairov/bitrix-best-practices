@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / Книга разработчика Bitrix24 (dev.1c-bitrix.ru)"
 tags: [пайплайн, события, init-php, urlrewrite, буферизация, агенты]
-sources: []
+sources: ["[[source-devbook-core-d7]]"]
 related: ["[[pattern-events-over-core-modification]]", "[[concept-change-invasiveness-hierarchy]]", "[[pattern-agents-vs-cron]]", "[[recipe-mysql-connection-refused]]"]
 aliases: ["bitrix24-zhiznennyj-cikl-zaprosa"]
 updated: "2026-09-18"

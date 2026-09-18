@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация Bitrix Framework (dev.1c-bitrix.ru)"
 tags: [php_interface, init-php, dbconn, хуки, конфигурация]
-sources: []
+sources: ["[[source-devbook-dev-rules]]"]
 related: ["[[entity-local-directory]]", "[[concept-request-lifecycle]]", "[[recipe-d7-orm-event-subscription]]", "[[pattern-events-over-core-modification]]"]
 aliases: ["bitrix24-php-interface"]
 updated: "2026-09-18"

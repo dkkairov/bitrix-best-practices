@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main, персональные настройки таблиц (dev.1c-bitrix.ru)"
 tags: [ui, грид, php, пресеты, производительность, сортировка]
-sources: []
+sources: ["[[source-devbook-ui]]"]
 related: ["[[entity-grid-component]]", "[[entity-filter-options]]", "[[checklist-box-performance]]"]
 aliases: ["bitrix24-grid-options"]
 updated: "2026-09-18"

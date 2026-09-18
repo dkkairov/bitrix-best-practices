@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля ui (dev.1c-bitrix.ru)"
 tags: [ui, тулбар, класс, кнопки, фасад]
-sources: []
+sources: ["[[source-devbook-ui]]"]
 related: ["[[concept-ui-subsystem]]", "[[entity-ui-button]]", "[[entity-filter-component]]"]
 aliases: ["bitrix24-toolbar"]
 updated: "2026-09-18"

@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация Bitrix Framework (dev.1c-bitrix.ru)"
 tags: [диагностика, админка, исследование, инструмент]
-sources: []
+sources: ["[[source-devbook-dev-rules]]"]
 related: ["[[concept-platform-reverse-engineering]]", "[[antipattern-cli-php-as-root]]", "[[concept-coding-standards]]"]
 aliases: ["bitrix24-komandnaya-php-stroka"]
 updated: "2026-09-18"

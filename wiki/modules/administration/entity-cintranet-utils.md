@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля intranet (dev.1c-bitrix.ru)"
 tags: [интранет, оргструктура, отсутствия, класс, c-api]
-sources: []
+sources: ["[[source-devbook-intranet]]"]
 related: ["[[concept-org-structure]]", "[[entity-user-absence]]", "[[concept-bitrix-naming-conventions]]"]
 aliases: ["bitrix24-cintranetutils"]
 updated: "2026-09-18"

@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация Bitrix Framework (dev.1c-bitrix.ru)"
 tags: [local, доработки, структура, приоритет, git]
-sources: []
+sources: ["[[source-devbook-dev-rules]]"]
 related: ["[[concept-change-invasiveness-hierarchy]]", "[[entity-php-interface]]", "[[concept-code-namespaces-and-autoloading]]", "[[checklist-dev-environment-and-git]]"]
 aliases: ["bitrix24-katalog-local"]
 updated: "2026-09-18"

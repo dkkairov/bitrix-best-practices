@@ -3,20 +3,17 @@ title: "\\Bitrix\\Main\\Config\\Option"
 type: entity
 module: core-d7
 edition: box
-status: draft
-provenance: mixed
-verified: ""
+status: verified
+provenance: documented
+verified: "2026-09-18 / dev.1c-bitrix.ru, справочник D7 \Bitrix\Main\Config\Option"
 tags: [настройки, опции, d7, класс, кэш, b_option]
-sources: []
+sources: ["[[source-devbook-core-d7]]"]
 related: ["[[antipattern-cli-php-as-root]]", "[[recipe-module-structure-and-install]]", "[[recipe-smart-process-programmatic-creation]]", "[[concept-org-structure]]"]
 aliases: []
 updated: "2026-09-18"
 ---
 
 # `\Bitrix\Main\Config\Option`
-
-> **Черновик.** Собрано по употреблению в проверенных страницах вики; сверки с первоисточником в
-> этой сессии не было (`apidocs.bitrix24.ru` — про REST и облако, не про ядро коробки).
 
 **Что это:** настройки модулей — хранение в `b_option` с кэшированием. Штатное место для всего,
 что не должно быть зашито в код: ID созданных сущностей, коды полей, флаги.
@@ -39,8 +36,16 @@ $key = Option::get('vendor.module', 'API_KEY', '');          // третий а�
 $key = Option::get('vendor.module', 'API_KEY', '', $siteId); // значение для конкретного сайта
 ```
 
-Поиск идёт сначала по значению сайта, затем по общему. Если значения расходятся, а вы этого не
-ждали — смотрите `SELECT … FROM b_option WHERE MODULE_ID = … ORDER BY SITE_ID`.
+Поиск идёт сначала по значению сайта, затем по общему.
+
+| Метод | Назначение |
+|---|---|
+| `get()` | значение параметра (с учётом кэша и значения по умолчанию) |
+| `set()` | установить и сохранить в базу |
+| `delete()` | удалить параметры из базы |
+| `getDefaults()` | значения по умолчанию, объявленные модулем |
+| **`getRealValue()`** | **реальные значения из базы** |
+| `getForModule()` | все параметры модуля (с 17.0.4) |
 
 ## Зачем это на внедрении
 
@@ -58,8 +63,9 @@ $key = Option::get('vendor.module', 'API_KEY', '', $siteId); // значение
   управляемого кэша с владельцем root; после этого `Option::set` пишет в базу, а `Option::get`
   продолжает отдавать старое — в вебе и в консоли. Полный разбор и лечение —
   [[antipattern-cli-php-as-root]].
-- **Проверка «записалось ли» через тот же `Option::get` может врать** по той же причине. Надёжная
-  проверка — сравнить значение из API со значением, прочитанным прямо из `b_option`.
+- **Проверка «записалось ли» через тот же `Option::get` может врать** по той же причине. Штатный
+  способ сравнить — **`Option::getRealValue()`**: он отдаёт то, что лежит в базе. Расхождение
+  `get()` и `getRealValue()` — прямой признак испорченного кэша настроек.
 - Секреты в опциях — приемлемо для токенов интеграций, но не для паролей в открытом виде; и в
   репозиторий значения опций не попадают (`CLAUDE.md` §4.4).
 

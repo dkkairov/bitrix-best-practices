@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main, раздел таблиц (dev.1c-bitrix.ru)"
 tags: [ui, грид, компонент, пагинация, групповые-действия]
-sources: []
+sources: ["[[source-devbook-ui]]"]
 related: ["[[concept-ui-subsystem]]", "[[entity-grid-options]]", "[[entity-bx-main-grid]]", "[[entity-filter-component]]"]
 aliases: ["bitrix24-grid-component"]
 updated: "2026-09-18"

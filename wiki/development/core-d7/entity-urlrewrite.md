@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация Bitrix Framework, обработка URI (dev.1c-bitrix.ru)"
 tags: [роутинг, чпу, urlrewrite, файл]
-sources: []
+sources: ["[[source-devbook-dev-rules]]"]
 related: ["[[concept-request-lifecycle]]", "[[concept-change-invasiveness-hierarchy]]", "[[recipe-custom-left-menu-section]]"]
 aliases: ["bitrix24-urlrewrite"]
 updated: "2026-09-18"

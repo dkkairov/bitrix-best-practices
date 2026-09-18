@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main, обзор фильтра (dev.1c-bitrix.ru)"
 tags: [ui, фильтр, типы-полей, селекторы]
-sources: []
+sources: ["[[source-devbook-ui]]"]
 related: ["[[entity-filter-component]]", "[[entity-filter-options]]", "[[concept-ui-subsystem]]"]
 aliases: ["bitrix24-filtr-fieldadapter"]
 updated: "2026-09-18"

@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля ui, раздел кнопок (dev.1c-bitrix.ru)"
 tags: [ui, кнопки, класс, адаптивность, меню]
-sources: []
+sources: ["[[source-devbook-ui]]"]
 related: ["[[entity-toolbar]]", "[[concept-ui-subsystem]]"]
 aliases: ["bitrix24-button-class"]
 updated: "2026-09-18"

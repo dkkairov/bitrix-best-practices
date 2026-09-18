@@ -7,7 +7,7 @@ status: draft
 provenance: mixed
 verified: ""
 tags: [модули, установка, d7, класс]
-sources: []
+sources: ["[[source-devbook-core-d7]]"]
 related: ["[[recipe-module-structure-and-install]]", "[[entity-loader]]", "[[recipe-module-versioning-and-private-distribution]]"]
 aliases: []
 updated: "2026-09-18"
@@ -15,8 +15,11 @@ updated: "2026-09-18"
 
 # `\Bitrix\Main\ModuleManager`
 
-> **Черновик.** Собрано по употреблению в проверенных страницах вики; сверки с первоисточником в
-> этой сессии не было (`apidocs.bitrix24.ru` — про REST и облако, не про ядро коробки).
+> **Черновик.** Состав методов собран по употреблению в проверенных страницах вики. Сверка
+> 2026-09-18 не удалась: страница справочника D7 по `ModuleManager` на `dev.1c-bitrix.ru` не отдала
+> содержимое, а поиск выводит на функции **старого** ядра (`RegisterModule`, `IsModuleInstalled`).
+> Соседние классы того же модуля сверить удалось — см. [[entity-loader]] и
+> [[entity-config-option]]. Снять `draft` после сверки по исходникам `main` или по справочнику.
 
 **Что это:** регистрация и снятие регистрации модуля, проверка установленности. D7-замена старому
 `CModule::RegisterModule()`.

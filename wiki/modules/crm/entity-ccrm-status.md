@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-02 / документация модуля CRM, раздел словарей (apidocs.bitrix24.ru)"
 tags: [crm, справочники, статусы, стадии, класс, кэш]
-sources: []
+sources: ["[[source-devbook-crm]]"]
 related: ["[[concept-crm-dictionaries]]", "[[entity-crm-factory]]", "[[concept-bitrix-naming-conventions]]", "[[pattern-crm-sales-funnel-design]]"]
 aliases: ["bitrix24-ccrm-status"]
 updated: "2026-09-18"

@@ -7,7 +7,7 @@ status: verified
 provenance: mixed
 verified: "2026-06-03 / коробка: исходники main и bizproc, проверено живой подпиской"
 tags: [orm, d7, datamanager, события, eventmanager, opcache]
-sources: []
+sources: ["[[source-devbook-core-d7]]"]
 related: ["[[recipe-d7-orm-event-subscription]]", "[[pattern-events-over-core-modification]]", "[[concept-bitrix-naming-conventions]]", "[[pattern-crm-action-vs-event]]"]
 aliases: ["bitrix24-orm-datamanager"]
 updated: "2026-09-18"

@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля intranet (dev.1c-bitrix.ru)"
 tags: [интранет, оргструктура, подразделения, права, инфоблоки]
-sources: []
+sources: ["[[source-devbook-intranet]]"]
 related: ["[[checklist-portal-initial-setup]]", "[[recipe-crm-permissions]]", "[[recipe-custom-left-menu-section]]"]
 aliases: ["bitrix24-orgstruktura"]
 updated: "2026-09-18"

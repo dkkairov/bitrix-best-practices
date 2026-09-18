@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля bizproc (dev.1c-bitrix.ru, курс 57)"
 tags: [bizproc, активити, класс, диалог-настроек, журнал]
-sources: []
+sources: ["[[source-devbook-bizproc]]"]
 related: ["[[concept-bizproc-engine]]", "[[recipe-bizproc-custom-task-activity]]", "[[entity-bizproc-field-type]]", "[[entity-cbp-activity-condition]]", "[[entity-main-result]]"]
 aliases: ["bitrix24-cbp-activity"]
 updated: "2026-09-18"

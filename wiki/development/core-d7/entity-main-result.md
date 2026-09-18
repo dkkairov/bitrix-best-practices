@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main (dev.1c-bitrix.ru)"
 tags: [d7, result, error, класс, обработка-ошибок, контроллеры]
-sources: []
+sources: ["[[source-devbook-core-d7]]"]
 related: ["[[concept-validation-d7]]", "[[entity-crm-operation]]", "[[concept-coding-standards]]", "[[entity-validation-result]]"]
 aliases: ["bitrix24-result-error"]
 updated: "2026-09-18"

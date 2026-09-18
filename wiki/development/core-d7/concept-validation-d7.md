@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main, раздел валидации (dev.1c-bitrix.ru)"
 tags: [d7, валидация, атрибуты, dto, контроллеры, result]
-sources: []
+sources: ["[[source-devbook-core-d7]]"]
 related: ["[[concept-service-locator]]", "[[concept-coding-standards]]", "[[concept-change-invasiveness-hierarchy]]", "[[antipattern-ajax-controller-lowercase-name]]"]
 aliases: ["bitrix24-validacia"]
 updated: "2026-09-18"

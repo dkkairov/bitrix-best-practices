@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-02 / документация модуля CRM, раздел структур данных (apidocs.bitrix24.ru)"
 tags: [crm, мнемокоды, типы-сущностей, класс, url]
-sources: []
+sources: ["[[source-devbook-crm]]"]
 related: ["[[entity-crm-factory]]", "[[concept-bitrix-naming-conventions]]", "[[entity-ccrm-field-multi]]"]
 aliases: ["bitrix24-ccrm-owner-type"]
 updated: "2026-09-18"

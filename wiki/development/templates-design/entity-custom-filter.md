@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main, раздел «Свой фильтр» (dev.1c-bitrix.ru)"
 tags: [ui, фильтр, свой-фильтр, dataprovider, orm, d7]
-sources: []
+sources: ["[[source-devbook-ui]]"]
 related: ["[[entity-filter-component]]", "[[entity-filter-options]]", "[[entity-main-event]]", "[[concept-ui-subsystem]]"]
 aliases: ["bitrix24-filter-class"]
 updated: "2026-09-18"

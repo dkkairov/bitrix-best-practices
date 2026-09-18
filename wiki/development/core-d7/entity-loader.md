@@ -3,22 +3,17 @@ title: "\\Bitrix\\Main\\Loader"
 type: entity
 module: core-d7
 edition: box
-status: draft
-provenance: mixed
-verified: ""
+status: verified
+provenance: documented
+verified: "2026-09-18 / dev.1c-bitrix.ru, справочник D7 \Bitrix\Main\Loader"
 tags: [загрузка-модулей, автозагрузка, d7, класс]
-sources: []
+sources: ["[[source-devbook-core-d7]]"]
 related: ["[[recipe-module-structure-and-install]]", "[[concept-code-namespaces-and-autoloading]]", "[[entity-module-manager]]", "[[recipe-d7-orm-event-subscription]]"]
 aliases: []
 updated: "2026-09-18"
 ---
 
 # `\Bitrix\Main\Loader`
-
-> **Черновик.** Страница собрана по употреблению класса в уже проверенных страницах этой вики.
-> Постраничной сверки с первоисточником не было: `apidocs.bitrix24.ru` покрывает REST и облако,
-> а не PHP-ядро коробки. Перед тем как ставить `status: verified`, сверьте по курсу
-> «Bitrix Framework» или по исходникам модуля `main`.
 
 **Что это:** подключение модулей и автозагрузка их классов. Самый часто вызываемый класс ядра в
 наших страницах.
@@ -42,10 +37,19 @@ if (Loader::includeModule('crm')) {   // false, если модуля нет и�
 Loader::requireModule('crm');          // бросает исключение вместо false
 ```
 
-- `includeModule($moduleId): bool` — подключить, вернуть результат. Подходит, когда модуль
-  опционален и есть запасной путь.
-- `requireModule($moduleId): void` — подключить или упасть. Подходит там, где без модуля
-  продолжать бессмысленно (например, внутри ленивой фабрики CRM).
+| Метод | Назначение |
+|---|---|
+| `includeModule($moduleName)` | подключить модуль по имени; результат **обязательно проверять** |
+| `includeSharewareModule($moduleName)` | подключить партнёрский модуль (с 14.0.2) |
+| `registerAutoLoadClasses()` | зарегистрировать классы для автозагрузки |
+| `registerNamespace()` | зарегистрировать пространство имён |
+| `getDocumentRoot()` | корень документов (с 14.0.0) |
+| `getLocal()` / `getPersonal()` | поиск файла в `/local` или `/bitrix` |
+| `autoLoad()` | загрузка зарегистрированных для автозагрузки |
+
+`requireModule($moduleId)` — «подключить или бросить исключение» — в справочнике D7 на момент
+сверки **не перечислен**, хотя широко используется в современном коде ядра (в том числе в
+ленивых фабриках CRM). Если пишете под старую версию, проверьте его наличие.
 
 Подключение модуля выполняет его `include.php` — именно поэтому там регистрируют обработчики
 событий и сервисы ([[recipe-d7-orm-event-subscription]]).

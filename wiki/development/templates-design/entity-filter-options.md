@@ -7,7 +7,7 @@ status: verified
 provenance: documented
 verified: "2026-06-01 / документация модуля main, фильтры пользователя (dev.1c-bitrix.ru)"
 tags: [ui, фильтр, php, пресеты, orm, b_user_option]
-sources: []
+sources: ["[[source-devbook-ui]]"]
 related: ["[[entity-filter-component]]", "[[entity-custom-filter]]", "[[concept-ui-subsystem]]"]
 aliases: ["bitrix24-filtr-options"]
 updated: "2026-09-18"

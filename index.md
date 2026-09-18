@@ -145,6 +145,13 @@
 [[entity-local-directory|/local/]] · [[entity-php-interface|php_interface]] ·
 [[entity-urlrewrite|urlrewrite.php]] · [[entity-admin-php-console|Командная PHP-строка]]
 
+**UI и шаблоны** — [[entity-toolbar|UI\Toolbar]] · [[entity-ui-button|Button]] ·
+[[entity-filter-component|main.ui.filter]] · [[entity-filter-field-adapter|FieldAdapter]] ·
+[[entity-filter-options|Filter\Options]] · [[entity-custom-filter|Main\Filter]] ·
+[[entity-bx-main-filter|BX.Main.Filter]] · [[entity-grid-component|main.ui.grid]] ·
+[[entity-grid-options|Grid\Options]] · [[entity-bx-main-grid|BX.Main.gridManager]] ·
+[[entity-site-template|Шаблон дизайна]] · [[entity-theme-picker|ThemePicker]]
+
 ### Конспекты источников
 - [[sources-backlog]] — бэклог источников (очередь на ингест) · служебный
 - [[source-b24-crm-deal-add|Офф. метод crm.deal.add]] · apidocs.bitrix24.ru
@@ -155,8 +162,12 @@
 
 ## По статусу
 
-- **verified:** 65 страниц из 66 (`verified`: 2026-06-01 … 2026-09-16).
-- **draft:** [[pattern-bizproc-ai-assisted-generation]] — схема не подтверждена пилотом.
+- **verified:** 102 страницы из 106 (`verified`: 2026-06-01 … 2026-09-18).
+- **draft:** 4 страницы —
+  [[pattern-bizproc-ai-assisted-generation]] (схема не подтверждена пилотом);
+  [[entity-loader]], [[entity-module-manager]], [[entity-config-option]] — карточки заведены
+  сверх перенесённого материала по употреблению в наших страницах; первоисточник не сверялся
+  (`apidocs.bitrix24.ru` покрывает REST и облако, не PHP-ядро коробки).
 - **deprecated:** —
 
 > При устаревании практики ставь `status: deprecated` и ссылку на замену; `/wiki:lint` следит за
@@ -166,11 +177,11 @@
 
 ## По редакции
 
-- **box (46 страниц):** вся ветка разработки `development/*`, конспекты курса 43 и коробочная
-  часть модулей — Universal API и доработки CRM, своё действие БП, программное создание
-  смарт-процесса, раздел в левом меню, эффективность задач, публикация в ленту.
+- **box (86 страниц):** вся ветка разработки `development/*`, коробочная часть модулей и
+  справочник по 43 классам и компонентам ядра.
 - **cloud (1 страница):** [[entity-bizproc-template-rest-methods]] (сверено по документации облака).
-- **both (19 страниц):** остальные — практики внедрения, не зависящие от редакции.
+- **both (19 страниц):** практики внедрения, не зависящие от редакции.
 
-> Перекос в сторону `box` — следствие переноса архивной вики разработки (2026-09-18). Облачная
-> половина (no-code, REST, маркетплейс) остаётся зоной роста.
+> Перекос в сторону `box` — следствие переноса архивной вики разработки (2026-09-18) и
+> последующего справочника классов. Облачная половина (no-code, REST, маркетплейс) остаётся
+> главной зоной роста: сейчас на неё приходится одна страница из 106.

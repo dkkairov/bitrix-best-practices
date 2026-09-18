@@ -7,6 +7,24 @@
 
 ## 2026-09
 
+- **2026-09-18 — справочник классов ядра: 40 entity-страниц** — По решению завести полный
+  набор карточек классов (а не только частотные). Разложены по папкам своих областей, а не в
+  `glossary/`: глоссарий остаётся сквозным словарём внедрения, классы лежат рядом с
+  практиками. Хабы CRM, bizproc, administration, core-d7 и templates-design разделены на
+  «Практики» и «Классы». **CRM (8):** Container, Factory, Item, Operation+Action,
+  `<Type>Settings`, CCrmStatus, CCrmOwnerType, CCrmFieldMulti. **bizproc (5):** CBPActivity и
+  BaseActivity, CBPActivityCondition, CBPTaskService, FieldType, GlobalsManager.
+  **administration (2):** CIntranetUtils, UserAbsence. **core-d7 (13):** EventManager,
+  Event/EventResult, Result/Error, CAgent, ValidationService, ValidationResult, каталоги
+  `/local/` и `php_interface`, `urlrewrite.php`, Командная PHP-строка + три сверх архива —
+  Loader, ModuleManager, Config\Option. **templates-design (12):** Toolbar, Button, компонент
+  и типы полей фильтра, `Filter\Options`, свой фильтр, `BX.Main.Filter`, компонент грида,
+  `Grid\Options`, `BX.Main.gridManager`, шаблон дизайна, ThemePicker.
+  **Не дублировались:** ServiceLocator и DataManager — у них уже есть полноценные концепты.
+  **Статусы:** три карточки (`Loader`, `ModuleManager`, `Option`) — `draft`: их не было в
+  перенесённом материале, MCP `apidocs` покрывает REST и облако, а не PHP-ядро коробки, так что
+  сверки с первоисточником не было; сказано и в самих страницах, и в хабе. Проверка: имена
+  уникальны, 0 битых ссылок, 0 орфанов. Итого: 106 контент-страниц (было 66), из них 43 entity.
 - **2026-09-18 — перенос архивной вики: playbook встречи + долг по источникам** — Последняя
   находка архива — процессная: [[checklist-requirements-workshop]] (разбор рабочей встречи по семи
   файлам — контекст / требования / решения с отклонёнными вариантами / задачи / открытые вопросы /

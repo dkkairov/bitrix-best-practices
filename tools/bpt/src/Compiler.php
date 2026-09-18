@@ -18,6 +18,9 @@ final class Compiler
     private array $errors = [];
     private array $warnings = [];
     private array $usedNames = [];
+    /** Логический id шага → имя действия, его тип и свойства (для проверки ссылок). */
+    private array $steps = [];
+    private array $nodeLabels = [];
 
     public function __construct(
         private readonly Catalog $catalog,
@@ -31,6 +34,8 @@ final class Compiler
         $this->errors = [];
         $this->warnings = [];
         $this->usedNames = [];
+        $this->steps = [];
+        $this->nodeLabels = [];
 
         $kind = (string) ($spec['kind'] ?? 'designer');
         if (!in_array($kind, ['designer', 'robots'], true)) {
@@ -59,18 +64,82 @@ final class Compiler
         $this->warning('DOCUMENT_FIELDS', 'собрано без DOCUMENT_FIELDS: перед загрузкой проверьте'
             . ' поведение на тестовом портале');
 
-        return [
-            'bpt' => [
-                'VERSION'         => 2,
-                'TEMPLATE'        => [$root],
-                'PARAMETERS'      => $this->definitions($spec['parameters'] ?? [], 'parameters'),
-                'VARIABLES'       => $this->definitions($spec['variables'] ?? [], 'variables'),
-                'CONSTANTS'       => $this->definitions($spec['constants'] ?? [], 'constants'),
-                'DOCUMENT_FIELDS' => [],
-            ],
-            'errors'   => $this->errors,
-            'warnings' => $this->warnings,
+        $bpt = [
+            'VERSION'         => 2,
+            'TEMPLATE'        => [$this->resolveReferences($root)],
+            'PARAMETERS'      => $this->definitions($spec['parameters'] ?? [], 'parameters'),
+            'VARIABLES'       => $this->definitions($spec['variables'] ?? [], 'variables'),
+            'CONSTANTS'       => $this->definitions($spec['constants'] ?? [], 'constants'),
+            'DOCUMENT_FIELDS' => [],
         ];
+        $this->runAnalyzer($bpt);
+
+        return ['bpt' => $bpt, 'errors' => $this->errors, 'warnings' => $this->warnings];
+    }
+
+    /** Ссылки {=@id:Результат} превращаются в {=ИмяДействия:Результат}. */
+    private function resolveReferences(array $node): array
+    {
+        $label = $this->nodeLabels[$node['Name']] ?? $node['Name'];
+        $node['Properties'] = $this->replaceRefs($node['Properties'], $label);
+        foreach ($node['Children'] as $i => $child) {
+            $node['Children'][$i] = $this->resolveReferences($child);
+        }
+        return $node;
+    }
+
+    private function replaceRefs(mixed $value, string $label): mixed
+    {
+        if (is_string($value)) {
+            return preg_replace_callback('/\{=@([^\s:}]+):([^\s>}]+)/u',
+                fn (array $m) => $this->resolveRef($m[0], $m[1], $m[2], $label), $value);
+        }
+        if (!is_array($value)) {
+            return $value;
+        }
+        $out = [];
+        foreach ($value as $key => $item) {
+            $newKey = is_string($key) ? $this->replaceRefs($key, $label) : $key;
+            $out[$newKey] = $this->replaceRefs($item, $label);
+        }
+        return $out;
+    }
+
+    private function resolveRef(string $original, string $id, string $result, string $label): string
+    {
+        if (!isset($this->steps[$id])) {
+            $this->error($label, "ссылка на несуществующий шаг «{$id}»"
+                . ($this->steps ? '; известные id: ' . implode(', ', array_keys($this->steps)) : ''));
+            return $original;
+        }
+        $step = $this->steps[$id];
+        $returns = $this->catalog->returns($step['type'], $step['props']);
+        if ($returns && !in_array($result, $returns, true)) {
+            $this->warning($label, "действие {$step['type']} (шаг {$id}) обычно не возвращает «{$result}»"
+                . '; известные результаты: ' . implode(', ', $returns));
+        }
+        return "{={$step['name']}:{$result}";
+    }
+
+    /** Проверки анализатора по собранному дереву: висячие ссылки, необъявленные переменные и прочее. */
+    private function runAnalyzer(array $bpt): void
+    {
+        $report = (new Analyzer($this->catalog))->analyze('собранный шаблон', [
+            'data' => $bpt, 'serialized' => null, 'compressed' => null,
+        ]);
+        foreach ($report['errors'] as $error) {
+            $this->error('проверка', $error);
+        }
+        foreach ($report['warnings'] as $warning) {
+            $this->warning('проверка', $warning);
+        }
+        foreach ($report['portal_bindings'] as $kind => $values) {
+            if (in_array($kind, ['urls', 'emails'], true)) {
+                continue;
+            }
+            $message = "в спецификации «сырые» идентификаторы портала ({$kind}): " . implode(', ', array_slice($values, 0, 5));
+            $this->strict ? $this->error('проверка', $message) : $this->warning('проверка', $message);
+        }
     }
 
     /** Детерминированное имя действия: одна и та же спецификация даёт тот же файл. */
@@ -190,9 +259,20 @@ final class Compiler
         $ordered['Title'] = isset($meta['title']) ? (string) $meta['title'] : $this->catalog->title($type);
         $ordered['EditorComment'] = isset($meta['comment']) ? (string) $meta['comment'] : '';
 
+        $name = $this->makeName($meta, $label, $path);
+        $this->nodeLabels[$name] = $label;
+        if (isset($meta['id'])) {
+            $id = (string) $meta['id'];
+            if (isset($this->steps[$id])) {
+                $this->error($label, "повтор id «{$id}»: он уже занят шагом {$this->steps[$id]['label']}");
+            } else {
+                $this->steps[$id] = ['name' => $name, 'type' => $type, 'props' => $ordered, 'label' => $label];
+            }
+        }
+
         return [
             'Type'       => $type,
-            'Name'       => $this->makeName($meta, $label, $path),
+            'Name'       => $name,
             'Activated'  => ($meta['off'] ?? false) ? 'N' : 'Y',
             'Node'       => null,
             'Properties' => $ordered,

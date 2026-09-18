@@ -166,6 +166,60 @@ test('Сборщик: ошибки вложенности', function () {
     }
 });
 
+test('Сборщик: ссылка на результат шага', function () {
+    $r = (new Compiler(Catalog::load()))->compile(minimalSpec([
+        ['approve' => ['id' => 'ap', 'Users' => ['user_42'], 'Name' => 'Согласование', 'on_yes' => [], 'on_no' => []]],
+        ['crm_event' => ['EventType' => 'INFO', 'EventText' => 'Комментарий: {=@ap:Comments > printable}']],
+    ]));
+    assertSame([], $r['errors']);
+    $children = $r['bpt']['TEMPLATE'][0]['Children'];
+    $name = $children[0]['Name'];
+    assertSame("Комментарий: {={$name}:Comments > printable}", $children[1]['Properties']['EventText']);
+});
+
+test('Сборщик: битая ссылка и повтор id — ошибки', function () {
+    $c = new Compiler(Catalog::load());
+    $errors = implode(' ', $c->compile(minimalSpec([['crm_event' => ['EventText' => '{=@нет:Comments}']]]))['errors']);
+    assertTrue(str_contains($errors, 'нет'), "ссылка на несуществующий шаг: {$errors}");
+    $dup = [
+        ['change_stage' => ['id' => 'x', 'TargetStatus' => 'DT1000_10:NEW']],
+        ['change_stage' => ['id' => 'x', 'TargetStatus' => 'DT1000_10:CLIENT']],
+    ];
+    assertTrue(str_contains(implode(' ', $c->compile(minimalSpec($dup))['errors']), 'повтор'), 'повтор id');
+});
+
+test('Сборщик: неизвестный результат — предупреждение', function () {
+    $r = (new Compiler(Catalog::load()))->compile(minimalSpec([
+        ['approve' => ['id' => 'ap', 'Users' => ['user_42'], 'Name' => 'С', 'on_yes' => [], 'on_no' => []]],
+        ['crm_event' => ['EventText' => '{=@ap:Выдумка}']],
+    ]));
+    assertSame([], $r['errors']);
+    assertTrue(str_contains(implode(' ', $r['warnings']), 'Выдумка'), 'предупреждение о результате');
+});
+
+test('Сборщик: результаты «получить информацию» берутся из свойства', function () {
+    $r = (new Compiler(Catalog::load()))->compile(minimalSpec([
+        ['get_smart_item' => ['id' => 'item', 'DynamicTypeId' => '1000', 'ReturnFields' => ['UF_X']]],
+        ['crm_event' => ['EventText' => 'Поле: {=@item:UF_X}']],
+    ]));
+    assertSame([], $r['errors']);
+    // Предупреждения о «сырых» ID портала здесь ожидаемы, а вот про результат — нет
+    assertSame([], array_values(array_filter($r['warnings'], fn ($w) => str_contains($w, 'не возвращает'))));
+});
+
+test('Сборщик: необъявленная переменная ловится анализатором', function () {
+    $errors = implode(' ', (new Compiler(Catalog::load()))->compile(minimalSpec([
+        ['crm_event' => ['EventText' => '{=Variable:призрак}']],
+    ]))['errors']);
+    assertTrue(str_contains($errors, 'призрак'), "необъявленная переменная: {$errors}");
+});
+
+test('Сборщик: объявленная переменная ошибок не даёт', function () {
+    $spec = minimalSpec([['crm_event' => ['EventText' => '{=Variable:amount}']]]);
+    $spec['variables'] = ['amount' => ['Name' => 'Сумма', 'Type' => 'double']];
+    assertSame([], (new Compiler(Catalog::load()))->compile($spec)['errors']);
+});
+
 test('Сборщик: пустое DOCUMENT_FIELDS — предупреждение', function () {
     $r = (new Compiler(Catalog::load()))->compile(minimalSpec());
     assertSame([], $r['bpt']['DOCUMENT_FIELDS']);

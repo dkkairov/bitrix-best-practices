@@ -141,7 +141,7 @@ final class Analyzer
             'Template' => array_keys($data['PARAMETERS'] ?? []),
         ];
         foreach ($declared as $kind => $names) {
-            preg_match_all('/\{=' . $kind . ':([A-Za-z0-9_]+)/', $logicJson, $m);
+            preg_match_all('/\{=' . $kind . ':([^\s:}>]+)/u', $logicJson, $m);
             $used = array_map(fn ($n) => preg_replace('/_printable$/i', '', $n), $m[1]);
             if ($kind === 'Variable') {
                 $used = array_merge($used, $stats['set_vars']);
@@ -161,7 +161,7 @@ final class Analyzer
         }
 
         if ($docFields) {
-            preg_match_all('/\{=Document:([A-Za-z0-9_.]+)/', $logicJson, $m);
+            preg_match_all('/\{=Document:([^\s:}>]+)/u', $logicJson, $m);
             $used = array_merge(
                 array_map(fn ($n) => preg_replace('/_printable$/i', '', $n), $m[1]),
                 $stats['doc_fields_used']

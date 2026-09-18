@@ -21,6 +21,9 @@ updated: "2026-06-21"
 ## Страницы
 - [[concept-bitrix-framework-vs-bitrix24|Bitrix Framework vs Bitrix24: движок и продукт]]
 - [[concept-dev-standards|Стандарт разработки (коробка) — обзор]]
+- [[concept-change-invasiveness-hierarchy|Иерархия способов изменения: от штатного механизма до копии в /local/]]
+- [[concept-platform-reverse-engineering|Исследование платформы: 4 приёма, когда документация молчит]]
+- [[concept-bitrix-naming-conventions|Соглашения именования: CCrmDeal против \Bitrix\Crm\DealTable]]
 - [[concept-code-namespaces-and-autoloading|Пространства имён, автозагрузка, размещение кода в /local/]]
 - [[recipe-composer-third-party-libraries|Сторонние Composer-пакеты (dompdf, PhpWord)]]
 - [[pattern-events-over-core-modification|Расширение через события]]
@@ -29,6 +32,8 @@ updated: "2026-06-21"
 - [[antipattern-box-core-modification|Антипаттерн: правка ядра вместо событий]]
 
 ## Статус покрытия
-Есть стандарт разработки, организация кода, события, код-стайл/безопасность, тесты и ключевой антипаттерн. Не хватает: рецепты ORM D7.
+Есть стандарт разработки и иерархия инвазивности, организация кода и соглашения именования,
+события, приёмы исследования платформы, код-стайл/безопасность, тесты и ключевой антипаттерн.
+Не хватает: рецепты ORM D7, жизненный цикл запроса, ServiceLocator.
 
 [← Обзор вики](../../../index.md)

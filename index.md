@@ -76,6 +76,9 @@
 ### Концепты
 - [[concept-bitrix-framework-vs-bitrix24|Bitrix Framework vs Bitrix24: движок и продукт]] · Разработка · both
 - [[concept-dev-standards|Стандарт разработки (коробка)]] · Разработка · box
+- [[concept-change-invasiveness-hierarchy|Иерархия способов изменения]] · Разработка · box
+- [[concept-platform-reverse-engineering|Исследование платформы: 4 приёма]] · Разработка · box
+- [[concept-bitrix-naming-conventions|Соглашения именования сущностей]] · Разработка · box
 - [[concept-code-namespaces-and-autoloading|Пространства имён и автозагрузка]] · Разработка · box
 - [[concept-coding-standards|Код-стайл и безопасность]] · Разработка · box
 - [[concept-testing-approach|Подход к тестированию]] · Разработка · box

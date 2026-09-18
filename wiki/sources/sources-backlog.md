@@ -9,7 +9,7 @@ verified: "2026-06-19"
 tags: [источники, бэклог, ингест, очередь]
 sources: []
 related: ["[[source-b24-crm-deal-add]]"]
-updated: "2026-06-20"
+updated: "2026-09-18"
 ---
 
 # Бэклог источников
@@ -28,9 +28,15 @@ updated: "2026-06-20"
 | # | Источник | Тип | Куда мапится | Приоритет | План ингеста |
 |---|----------|-----|--------------|-----------|--------------|
 | 1 | [Курс 43 «Разработчик Bitrix Framework»](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43) (урок [Пространства имён](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=3524)) | содержание (серия уроков) | [development/](../development/core-d7/_index-core-d7.md) | **P1** | поурочно; ингещены: пространства имён (S-SS02), модули (S-SS03); далее ORM/события |
-| 2 | [bx24devbook — Книга разработчика](https://bx24devbook.website.yandexcloud.net/Dokumentacia/Spravocnik.html) | содержание (многоглавный) | [development/](../development/core-d7/_index-core-d7.md) + [modules/](../modules/crm/_index-crm.md) | **P1** | по главам (см. карту ниже) |
+| 2 | [bx24devbook — Книга разработчика](https://bx24devbook.website.yandexcloud.net/Dokumentacia/Spravocnik.html) | содержание (многоглавный) | [development/](../development/core-d7/_index-core-d7.md) + [modules/](../modules/crm/_index-crm.md) | **P1** | по главам (см. карту ниже). Часть глав уже отражена в страницах, перенесённых 2026-09-18 — но **без конспектов в `wiki/sources/`**: снимки глав остались во внешнем архиве, `raw/` у нас их не содержит |
 | 3 | [awesome-bitrix](https://github.com/awesomebitrix/awesome-bitrix) | каталог-указатель | мета (порождает под-источники) | **P2** | разобрать по категориям → завести под-источники |
 | 4 | [api_help (старое ядро)](https://dev.1c-bitrix.ru/api_help/) | каталог-указатель (legacy) | [development/](../development/core-d7/_index-core-d7.md) | **P3** | по требованию: только когда нужен конкретный метод старого ядра; сначала смотреть D7/devbook/MCP |
+
+> **Долг по источникам (2026-09-18).** При переносе архивной вики разработки факты пришли
+> пересобранными страницами, а не через `ingest`: у них нет `source-summary` и нет снимков в
+> `raw/sources/`. Поэтому поле `sources` этих страниц пустое, а происхождение указано в
+> `verified`. Закрывается обычным батч-ингестом глав devbook — при нём проставить `sources`
+> на уже существующих страницах, а не создавать их заново.
 
 ## Карта глав devbook → страницы вики
 - Ядро, URI, страницы, шаблоны → [development/core-d7](../development/core-d7/_index-core-d7.md), templates-design

@@ -117,10 +117,19 @@
 - [[concept-bizproc-engine|Устройство движка БП: шаблон, инстанс, активити]] · БП · box
 - [[concept-org-structure|Оргструктура портала]] · Администрирование · both
 
-### Сущности и термины (глоссарий)
+### Сущности: термины внедрения (глоссарий)
 - [[entity-smart-process|Смарт-процесс (СПА)]]
 - [[entity-robots-triggers|Роботы и триггеры]]
 - [[entity-bizproc-template-rest-methods|REST-методы шаблонов БП]] · cloud
+
+### Сущности: классы API коробки
+
+Справочник по классам ядра — лежат рядом с практиками, в папке своей области.
+
+**CRM** — [[entity-crm-container|Container]] · [[entity-crm-factory|Factory]] ·
+[[entity-crm-item|Item]] · [[entity-crm-operation|Operation + Action]] ·
+[[entity-crm-settings|<Type>Settings]] · [[entity-ccrm-status|CCrmStatus / StatusTable]] ·
+[[entity-ccrm-owner-type|CCrmOwnerType]] · [[entity-ccrm-field-multi|CCrmFieldMulti]]
 
 ### Конспекты источников
 - [[sources-backlog]] — бэклог источников (очередь на ингест) · служебный

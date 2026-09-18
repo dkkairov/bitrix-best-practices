@@ -37,6 +37,15 @@ test('Корпус: снимок и плейсхолдеры не меняют �
     }
 });
 
+test('Корпус: схема строится для всех файлов', function () {
+    $mermaid = new Mermaid(Catalog::load());
+    foreach (corpusFiles() as $file) {
+        $diagram = $mermaid->render(BptFile::read($file)['data']);
+        assertTrue(str_contains($diagram, 'flowchart TD'), basename($file) . ': схема построена');
+        assertTrue(!str_contains($diagram, '""'), basename($file) . ': нет пустых подписей');
+    }
+});
+
 test('Корпус: каталог покрывает типы и свойства', function () {
     $catalog = Catalog::load();
     foreach (corpusFiles() as $file) {

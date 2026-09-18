@@ -24,6 +24,7 @@ const USAGE = <<<'TXT'
   php bpt.php catalog [Тип|алиас] [--json]
   php bpt.php compile <spec.yaml|spec.json> -o <out.bpt> [--portal=<снимок>] [--strict] [--force]
   php bpt.php decompile <file.bpt> [-o spec.yaml] [--portal=<снимок>] [--keep-names] [--json]
+  php bpt.php render <file.bpt|spec.yaml> [-o схема.md] [--portal=<снимок>]
   php bpt.php snapshot <file.bpt> [-o out.portal.yaml] [--json]
 
   catalog  каталог действий: таблица целиком или подробности одного типа
@@ -32,6 +33,7 @@ const USAGE = <<<'TXT'
            --strict: «сырые» ID портала в спецификации считать ошибкой
   decompile .bpt -> спецификация процесса (для библиотеки примеров и сверки)
             --portal: заменить идентификаторы на плейсхолдеры; --keep-names: сохранить имена действий
+  render   схема процесса (Mermaid) для ревью; спецификация рисуется как черновик
   snapshot снимок портала из экспорта: поля и стадии из DOCUMENT_FIELDS
   decode   .bpt -> JSON без потерь (по умолчанию в stdout)
   encode   JSON -> .bpt
@@ -62,6 +64,7 @@ function main(array $argv): int
             'catalog' => cmdCatalog($files, $opts),
             'compile' => cmdCompile($files, $opts),
             'decompile' => cmdDecompile($files, $opts),
+            'render' => cmdRender($files, $opts),
             'snapshot' => cmdSnapshot($files, $opts),
             default   => usageError("неизвестная команда «{$command}»"),
         };
@@ -265,6 +268,21 @@ function cmdDecompile(array $files, array $opts): int
     printMessages(array_unique($result['warnings']), '[ВНИМАНИЕ]');
     emit(isset($opts['json']) ? BptFile::toJson($result['spec']) : SpecReader::dump($result['spec']),
         $opts['out'] ?? null);
+    return 0;
+}
+
+function cmdRender(array $files, array $opts): int
+{
+    requireFiles($files, 1, 1);
+    try {
+        $bpt = BptFile::readAny($files[0], charset($opts))['data'];
+    } catch (BptException) {
+        // Не шаблон — пробуем как спецификацию: рисуем черновик, ошибки показываем
+        $result = (new Compiler(Catalog::load(), portalSnapshot($opts)))->compile(SpecReader::read($files[0]));
+        printMessages($result['errors'], '[ЧЕРНОВИК]');
+        $bpt = $result['bpt'];
+    }
+    emit((new Mermaid(Catalog::load()))->render($bpt), $opts['out'] ?? null);
     return 0;
 }
 

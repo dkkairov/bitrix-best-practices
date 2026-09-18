@@ -7,6 +7,23 @@
 
 ## 2026-09
 
+- **2026-09-18 — перенос архивной вики: продуктовые модули (тир A)** — 13 страниц, всё обезличено
+  и с версиями ядра в `verified`. Заведены три папки по факту первой страницы: **smart-process**
+  ([[recipe-smart-process-programmatic-creation]] — `TypeTable` + `CUserTypeEntity`, идемпотентность,
+  `getUserFieldEntityId()` вместо угадывания `ENTITY_ID`, `UF_CRM_<ID типа>` ≠ `UF_CRM_<ENTITY_TYPE_ID>`),
+  **tasks-projects** ([[pattern-tasks-effectiveness-from-db]] — читать `b_tasks_effective` теми же
+  запросами, что и ядро; REST упирается в 93 %), **communications** ([[recipe-post-to-livefeed]] —
+  без `CBlogPost::Notify(bSoNet)` пост невидим; транзакция обязательна). **CRM:**
+  [[concept-crm-universal-api]], [[concept-crm-dictionaries]] (новое API читает, старое пишет —
+  исключение из «D7 современный путь»), [[pattern-crm-action-vs-event]] (в событии приходят только
+  изменённые поля — источник ложных срабатываний), [[recipe-crm-history-all-fields]],
+  [[recipe-crm-card-editor-js-access]] (`BX.Crm.EntityEditor.items`, `BX.UI` пуст),
+  [[recipe-crm-hide-card-block-js]], [[pattern-crm-timeline-client-side]]. **bizproc:**
+  [[recipe-bizproc-custom-task-activity]] (`<div>`-вёрстка формы — в новом UI `<tr>` даёт пустое
+  тело задания; категория `task`; `SendExternalEvent` статически). **administration:**
+  [[recipe-custom-left-menu-section]] (`Intranet\CustomSection` вместо правки `.top.menu_ext.php`;
+  дефис в `CODE` страницы → 404). Обновлены хабы crm, bizproc, administration, три новых хаба,
+  карта тем и представления `index.md`.
 - **2026-09-18 — перенос архивной вики: коробочная разработка (тир A)** — Перенесены эмпирические
   находки архива по разработке, все с версиями ядра в `verified` и обезличенные (стенды, домены и
   названия заказчиков вычищены по §4.4). **core-d7:** [[recipe-d7-orm-event-subscription]]

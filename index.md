@@ -21,8 +21,11 @@
 - [REST и интеграции](wiki/modules/rest-integrations/_index-rest-integrations.md) — REST API, вебхуки, события, OAuth
 - [Права доступа](wiki/modules/permissions/_index-permissions.md) — роли, права, экстранет
 - [Администрирование](wiki/modules/administration/_index-administration.md) — портал, тарифы, домены, безопасность
-- _Планируются:_ Задачи и проекты · Смарт-процессы (СПА) · Телефония · Сайты и магазины ·
-  Коммуникации · Совместная работа · AI / CoPilot · HR · Приложения маркетплейса
+- [Смарт-процессы (СПА)](wiki/modules/smart-process/_index-smart-process.md) — типы, поля, стадии, карточка элемента
+- [Задачи и проекты](wiki/modules/tasks-projects/_index-tasks-projects.md) — задачи, проекты, эффективность
+- [Коммуникации](wiki/modules/communications/_index-communications.md) — живая лента, уведомления
+- _Планируются:_ Телефония · Сайты и магазины · Совместная работа · AI / CoPilot · HR ·
+  Приложения маркетплейса
 
 ### Разработка (коробка)
 - [Ядро D7](wiki/development/core-d7/_index-core-d7.md) — ORM, события, Result/Error, DI, размещение кода
@@ -61,6 +64,9 @@
 - [[pattern-module-library-monorepo|Библиотека модулей агентства (монорепо)]] · Разработка · box
 - [[pattern-module-self-disabling-guard|Сторож модуля: портал важнее модуля]] · Разработка · box
 - [[pattern-agents-vs-cron|Агенты или cron: выбор фонового запуска]] · Разработка · box
+- [[pattern-crm-action-vs-event|Operation\Action или обработчик события]] · CRM · box
+- [[pattern-crm-timeline-client-side|Таймлайн CRM на клиенте: догрузка и фильтрация]] · CRM · box
+- [[pattern-tasks-effectiveness-from-db|Эффективность задач 1:1 с виджетом]] · Задачи · box
 
 ### Антипаттерны
 - [[antipattern-crm-stage-explosion|Взрыв стадий воронки]] · CRM · both
@@ -81,6 +87,13 @@
 - [[recipe-safe-module-deploy|Безопасная заливка модуля: guard, линт, откат]] · Разработка · box
 - [[recipe-git-deploy-to-production|Доставка правки на прод через git]] · Разработка · box
 - [[recipe-mysql-connection-refused|MySQL (2002) Connection refused]] · Разработка · box
+- [[recipe-crm-history-all-fields|История смарт-процесса: все поля + источник]] · CRM · box
+- [[recipe-crm-card-editor-js-access|Карточка CRM из JS: редактор и модель]] · CRM · box
+- [[recipe-crm-hide-card-block-js|Скрыть блок в карточке смарт-процесса]] · CRM · box
+- [[recipe-smart-process-programmatic-creation|Создать смарт-процесс и поля из инсталлятора]] · СПА · box
+- [[recipe-bizproc-custom-task-activity|Своё действие БП с заданием (CBPTaskService)]] · БП · box
+- [[recipe-custom-left-menu-section|Свой раздел в левом меню (CustomSection)]] · Администрирование · box
+- [[recipe-post-to-livefeed|Пост в живую ленту из PHP]] · Коммуникации · box
 
 ### Концепты
 - [[concept-bitrix-framework-vs-bitrix24|Bitrix Framework vs Bitrix24: движок и продукт]] · Разработка · both
@@ -92,6 +105,8 @@
 - [[concept-coding-standards|Код-стайл и безопасность]] · Разработка · box
 - [[concept-testing-approach|Подход к тестированию]] · Разработка · box
 - [[concept-bizproc-bpt-format|Формат шаблона БП (.bpt)]] · Бизнес-процессы · both
+- [[concept-crm-universal-api|Universal API CRM: Container → Factory → Item]] · CRM · box
+- [[concept-crm-dictionaries|Справочники CRM: новое читает, старое пишет]] · CRM · box
 
 ### Сущности и термины (глоссарий)
 - [[entity-smart-process|Смарт-процесс (СПА)]]

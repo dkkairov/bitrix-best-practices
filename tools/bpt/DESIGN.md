@@ -77,10 +77,10 @@ YAML (по умолчанию) или JSON — структура одна и т
 bizproc: 1                        # версия формата
 name: Согласование выплаты        # имя процесса; в .bpt не пишется (задаётся при загрузке)
 kind: designer                    # designer | robots — служебные заголовки корня и веток
-document: "DYNAMIC_{{smart:Гарантии}}"   # тип документа: сверка со снимком, подсказка при загрузке
+document: "DYNAMIC_{{smart:Заявки}}"   # тип документа: сверка со снимком, подсказка при загрузке
 parameters: {}                    # как в .bpt: код → {Name, Type, Required, Multiple, Default, …}
 variables:
-  amount: {Name: Сумма к выплате, Type: double, Required: true}
+  amount: {Name: Сумма к оплате, Type: double, Required: true}
 constants: {}
 steps:
   - request_info_optional:
@@ -208,17 +208,17 @@ YAML 1.1 превращает `Y`, `N`, `yes`, `on` в булевы значен
 `tools/bpt/examples/` вносится явным исключением.
 
 ```yaml
-document: DYNAMIC_1214
-fields:    {"Сумма удержаний": UF_CRM_39_1752749868936}
-stages:    {"Общая/Клиент": "DT1214_44:CLIENT"}
-users:     {"Иванов Иван": user_106}
-groups:    {"Бухгалтерия": group_g36}
-smart:     {"Гарантии": 1214}
-templates: {"Обязательное согласование": 713}
+document: DYNAMIC_1000
+fields:    {"Сумма к оплате": UF_CRM_7_1700000000001}
+stages:    {"Общая/Клиент": "DT1000_10:CLIENT"}
+users:     {"Иванов Иван": user_42}
+groups:    {"Бухгалтерия": group_g7}
+smart:     {"Заявки": 1000}
+templates: {"Обязательное согласование": 900}
 document_fields: {…}     # полная копия DOCUMENT_FIELDS, если снимок сделан из .bpt
 ```
 
-- Снимок хранит **готовое значение** (`group_g36`), поэтому сборщику не нужно знать формат токенов
+- Снимок хранит **готовое значение** (`group_g7`), поэтому сборщику не нужно знать формат токенов
   пользователей, групп и отделов.
 - `bpt.php snapshot file.bpt` заполняет `fields`, `stages` и `document_fields` из `DOCUMENT_FIELDS`.
   При совпадении названий к ним добавляется код: `«Ответственный [ASSIGNED_BY_ID]»`. Остальные

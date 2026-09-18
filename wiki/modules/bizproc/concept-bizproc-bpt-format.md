@@ -10,7 +10,7 @@ tags: [бизнес-процессы, bpt, экспорт, импорт, шаб�
 sources: []
 related: ["[[entity-bizproc-template-rest-methods]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[pattern-robots-vs-bizproc-decision]]"]
 aliases: []
-updated: "2026-09-16"
+updated: "2026-09-18"
 ---
 
 # Формат шаблона БП (.bpt): устройство и чтение
@@ -49,11 +49,11 @@ ID портала.
 ```json
 {
   "Type": "SetFieldActivity",
-  "Name": "A24358_79617_50361_89651",
+  "Name": "A10001_20002_30003_40004",
   "Activated": "Y",
   "Node": null,
   "Properties": {
-    "FieldValue": { "UF_CRM_39_1752749868936": "{=Variable:payment_amount}" },
+    "FieldValue": { "UF_CRM_7_1700000000001": "{=Variable:amount}" },
     "Title": "Изменение документа"
   },
   "Children": []
@@ -71,18 +71,18 @@ ID портала.
 |--------|-------|
 | `{=Document:TITLE}` | поле документа |
 | `{=Variable:имя}`, `{=Constant:имя}`, `{=Template:имя}` | переменная, константа, параметр |
-| `{=A46287_54799_22644_54136:InfoUser}` | результат другого действия (по его `Name`) |
+| `{=A50005_60006_70007_80008:InfoUser}` | результат другого действия (по его `Name`) |
 | `{=System:Now}` | системные значения |
 | `{=Document:TITLE > friendly}`, `… > printable` | модификаторы вывода |
 | `=workdateadd({=System:Now},"1d",{=Document:ASSIGNED_BY_ID})` | формула |
-| `user_106`, `group_g36`, `group_d33` | пользователь, группа, отдел — ID портала |
+| `user_42`, `group_g7`, `group_d3` | пользователь, группа, отдел — ID портала |
 
 ## Условия ветвлений
 Свойство `IfElseBranchActivity`. В одном файле встречаются разные форматы:
 
 | Свойство | Формат | Пример |
 |----------|--------|--------|
-| `fieldcondition` | список `[поле, оператор, значение, связка]` | `[ ["UF_CRM_22_1738006132", "empty", "", "0"] ]` |
+| `fieldcondition` | список `[поле, оператор, значение, связка]` | `[ ["UF_CRM_7_1700000000002", "empty", "", "0"] ]` |
 | `propertyvariablecondition` | то же, по параметрам и переменным | `[ ["Approved_obligatory", "=", "Y", "0"] ]` |
 | `mixedcondition` | объекты | `{"object": "Document", "field": "UF_CRM_…", "operator": "empty", "value": "", "joiner": "0"}` |
 | `truecondition` | ветка «иначе» | `"1"` |

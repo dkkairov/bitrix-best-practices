@@ -10,7 +10,7 @@ tags: [rest, бизнес-процессы, шаблоны, bpt, приложе�
 sources: []
 related: ["[[concept-bizproc-bpt-format]]", "[[recipe-rest-oauth-app-setup]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[entity-robots-triggers]]", "[[antipattern-bizproc-hardcoded-portal-ids]]"]
 aliases: []
-updated: "2026-09-16"
+updated: "2026-09-18"
 ---
 
 # REST-методы шаблонов БП (`bizproc.workflow.template.*`)
@@ -73,7 +73,7 @@ updated: "2026-09-16"
 ```js
 // Приложение (OAuth): загрузить шаблон для смарт-процесса
 const response = await $b24.callMethod('bizproc.workflow.template.add', {
-  DOCUMENT_TYPE: ['crm', 'Bitrix\\Crm\\Integration\\BizProc\\Document\\Dynamic', 'DYNAMIC_1048'],
+  DOCUMENT_TYPE: ['crm', 'Bitrix\\Crm\\Integration\\BizProc\\Document\\Dynamic', 'DYNAMIC_1000'],
   NAME: 'Согласование счёта',
   AUTO_EXECUTE: 0,
   TEMPLATE_DATA: ['bp-invoice.bpt', base64Content], // base64 от содержимого файла .bpt

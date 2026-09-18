@@ -22,8 +22,11 @@ const USAGE = <<<'TXT'
   php bpt.php analyze <file.bpt|file.json>... [--json] [--charset=windows-1251]
   php bpt.php compact <file.bpt|file.json> [-o out.txt] [--json] [--charset=windows-1251]
   php bpt.php catalog [Тип|алиас] [--json]
+  php bpt.php compile <spec.yaml|spec.json> -o <out.bpt> [--strict] [--force]
 
   catalog  каталог действий: таблица целиком или подробности одного типа
+  compile  спецификация процесса -> .bpt; при ошибках файл не пишется
+           --strict: «сырые» ID портала в спецификации считать ошибкой
   decode   .bpt -> JSON без потерь (по умолчанию в stdout)
   encode   JSON -> .bpt
   check    обратимость .bpt -> JSON -> .bpt (сравнение serialize байт-в-байт)
@@ -51,6 +54,7 @@ function main(array $argv): int
             'analyze' => cmdAnalyze($files, $opts),
             'compact' => cmdCompact($files, $opts),
             'catalog' => cmdCatalog($files, $opts),
+            'compile' => cmdCompile($files, $opts),
             default   => usageError("неизвестная команда «{$command}»"),
         };
     } catch (BptException | JsonException $e) {
@@ -228,7 +232,30 @@ function cmdCatalog(array $files, array $opts): int
     return 0;
 }
 
+function cmdCompile(array $files, array $opts): int
+{
+    requireFiles($files, 1, 1);
+    $out = $opts['out'] ?? usageError('для compile нужен -o <out.bpt>');
+    $result = (new Compiler(Catalog::load(), isset($opts['strict'])))->compile(SpecReader::read($files[0]));
+    printMessages($result['warnings'], '[ВНИМАНИЕ]');
+    printMessages($result['errors'], '[ОШИБКА]');
+    if ($result['errors']) {
+        fwrite(STDERR, 'Файл не записан, ошибок: ' . count($result['errors']) . PHP_EOL);
+        return 1;
+    }
+    BptFile::write($out, $result['bpt'], charset($opts), isset($opts['force']));
+    fwrite(STDERR, "Записано: {$out}" . PHP_EOL);
+    return 0;
+}
+
 // ---------------------------------------------------------------- вывод
+
+function printMessages(array $messages, string $prefix): void
+{
+    foreach ($messages as $message) {
+        fwrite(STDERR, "{$prefix} {$message}" . PHP_EOL);
+    }
+}
 
 function emit(string $content, ?string $out): void
 {

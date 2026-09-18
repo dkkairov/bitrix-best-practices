@@ -137,6 +137,14 @@
 
 **Интранет** — [[entity-cintranet-utils|CIntranetUtils]] · [[entity-user-absence|UserAbsence]]
 
+**Ядро** — [[entity-loader|Loader]] · [[entity-module-manager|ModuleManager]] ·
+[[entity-config-option|Config\Option]] · [[entity-event-manager|EventManager]] ·
+[[entity-main-event|Event / EventResult]] · [[entity-main-result|Result / Error]] ·
+[[entity-cagent|CAgent]] · [[entity-validation-service|ValidationService]] ·
+[[entity-validation-result|ValidationResult / ValidationError]] ·
+[[entity-local-directory|/local/]] · [[entity-php-interface|php_interface]] ·
+[[entity-urlrewrite|urlrewrite.php]] · [[entity-admin-php-console|Командная PHP-строка]]
+
 ### Конспекты источников
 - [[sources-backlog]] — бэклог источников (очередь на ингест) · служебный
 - [[source-b24-crm-deal-add|Офф. метод crm.deal.add]] · apidocs.bitrix24.ru

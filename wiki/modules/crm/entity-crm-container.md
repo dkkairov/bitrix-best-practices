@@ -23,7 +23,7 @@ updated: "2026-09-18"
 |------|----------|
 | Тип | класс (singleton) |
 | Модуль | `crm` (`Loader::includeModule('crm')`) |
-| Имя сервиса | `crm.service.container` в [[entity-service-locator\|ServiceLocator]] |
+| Имя сервиса | `crm.service.container` в [[concept-service-locator\|ServiceLocator]] |
 | Edition | box |
 
 ```php

@@ -38,9 +38,26 @@ updated: "2026-09-18"
 - [[concept-testing-approach|Подход к тестированию]]
 - [[antipattern-box-core-modification|Антипаттерн: правка ядра вместо событий]]
 
+### Классы и объекты ядра (справочник)
+- [[entity-loader|Loader]] — подключение модулей · черновик
+- [[entity-module-manager|ModuleManager]] — регистрация модуля · черновик
+- [[entity-config-option|Config\Option]] — настройки модулей · черновик
+- [[entity-event-manager|EventManager]] — подписка на события
+- [[entity-main-event|Event и EventResult]] — объект события и результат
+- [[entity-main-result|Result и Error]] — возврат результата операции
+- [[entity-cagent|CAgent]] — агенты
+- [[entity-validation-service|ValidationService]] — исполнитель валидации
+- [[entity-validation-result|ValidationResult и ValidationError]] — ошибки валидации
+- [[entity-local-directory|Каталог /local/]] — где живут доработки
+- [[entity-php-interface|Каталог php_interface]] — init.php, dbconn.php и соседи
+- [[entity-urlrewrite|urlrewrite.php]] — правила обработки адресов
+- [[entity-admin-php-console|Командная PHP-строка]] — диагностика из админки
+
 ## Статус покрытия
 Есть стандарт разработки и иерархия инвазивности, организация кода и соглашения именования,
 события, приёмы исследования платформы, код-стайл/безопасность, тесты и ключевой антипаттерн.
-Не хватает: рецепты ORM D7 (запросы, связи), Result/Error, отложенные функции.
+Не хватает: рецепты ORM D7 (запросы, связи), отложенные функции и зоны страницы.
+Три карточки классов (`Loader`, `ModuleManager`, `Option`) — в статусе `draft`: их не было
+в перенесённом материале, а `apidocs.bitrix24.ru` покрывает REST и облако, не ядро коробки.
 
 [← Обзор вики](../../../index.md)

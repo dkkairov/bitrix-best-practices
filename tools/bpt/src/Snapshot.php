@@ -51,15 +51,16 @@ final class Snapshot
         $byName = [];
         foreach ($documentFields as $code => $field) {
             $name = trim((string) ($field['Name'] ?? $code));
-            $byName[$name][] = (string) $code;
+            // Группируем по нормализованному названию: «Договор» и «договор » — одно и то же
+            $byName[self::normalizeKey($name)][] = ['name' => $name, 'code' => (string) $code];
         }
-        foreach ($byName as $name => $codes) {
-            if (count($codes) === 1) {
-                $fields[$name] = $codes[0];
+        foreach ($byName as $group) {
+            if (count($group) === 1) {
+                $fields[$group[0]['name']] = $group[0]['code'];
                 continue;
             }
-            foreach ($codes as $code) {   // одинаковые названия различаем кодом
-                $fields["{$name} [{$code}]"] = $code;
+            foreach ($group as $item) {   // одинаковые названия различаем кодом
+                $fields["{$item['name']} [{$item['code']}]"] = $item['code'];
             }
         }
         $stages = [];
@@ -98,18 +99,27 @@ final class Snapshot
             throw new BptException("неизвестный вид плейсхолдера «{$kind}»; известные: "
                 . implode(', ', array_keys(self::KINDS)));
         }
-        $needle = $this->normalizeName($name);
+        $needle = self::normalizeKey($name);
+        $exact = [];
         $matches = [];
         foreach ($this->sections[$kind] as $title => $value) {
             $title = (string) $title;
-            if ($this->normalizeName($title) === $needle) {
-                return (string) $value;
+            if (self::normalizeKey($title) === $needle) {
+                $exact[$title] = (string) $value;
+                continue;
             }
             // «Воронка/Стадия» можно назвать просто «Стадия», если название однозначно
             $short = str_contains($title, '/') ? substr($title, strrpos($title, '/') + 1) : null;
-            if ($short !== null && $this->normalizeName($short) === $needle) {
+            if ($short !== null && self::normalizeKey($short) === $needle) {
                 $matches[$title] = (string) $value;
             }
+        }
+        if (count(array_unique($exact)) === 1) {
+            return (string) reset($exact);
+        }
+        if (count($exact) > 1) {
+            throw new BptException("«{$name}» ({$kind}) в снимке встречается несколько раз: "
+                . implode(', ', array_keys($exact)) . ' — уточните название');
         }
         if (count($matches) === 1) {
             return (string) reset($matches);
@@ -180,7 +190,7 @@ final class Snapshot
         return false;
     }
 
-    private function normalizeName(string $name): string
+    private static function normalizeKey(string $name): string
     {
         return mb_strtolower(trim($name));
     }

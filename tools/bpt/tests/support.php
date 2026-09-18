@@ -102,6 +102,94 @@ function allActivities(array $node, array $collected = []): array
     return $collected;
 }
 
+/**
+ * Приводит дерево к сравнимому виду: значения по умолчанию проставлены, служебный Node убран,
+ * имена действий заменены на позиции (и в ссылках тоже), ключи отсортированы.
+ */
+function canonicalTree(array $bpt, Catalog $catalog): array
+{
+    $positions = [];
+    $index = function (array $node, string $pos) use (&$index, &$positions): void {
+        $positions[(string) ($node['Name'] ?? '')] = $pos;
+        foreach (array_values(array_filter($node['Children'] ?? [], 'is_array')) as $i => $child) {
+            $index($child, "{$pos}.{$i}");
+        }
+    };
+    $index($bpt['TEMPLATE'][0], '0');
+
+    $canon = function (array $node, string $pos) use (&$canon, $catalog, $positions): array {
+        $type = (string) $node['Type'];
+        $props = is_array($node['Properties'] ?? null) ? $node['Properties'] : [];
+        if ($catalog->has($type)) {
+            $props += $catalog->defaults($type);
+        }
+        $props = canonicalValue(replaceNamesWithPositions($props, $positions));
+        ksort($props);
+        $children = [];
+        foreach (array_values(array_filter($node['Children'] ?? [], 'is_array')) as $i => $child) {
+            $children[] = $canon($child, "{$pos}.{$i}");
+        }
+        return [
+            'Type'       => $type,
+            'Name'       => $pos,
+            'Activated'  => (string) ($node['Activated'] ?? 'Y'),
+            'Properties' => $props,
+            'Children'   => $children,
+        ];
+    };
+    return $canon($bpt['TEMPLATE'][0], '0');
+}
+
+/** Параметры, переменные и константы в сравнимом виде. */
+function canonicalDefinitions(array $bpt): array
+{
+    $out = [];
+    foreach (['PARAMETERS', 'VARIABLES', 'CONSTANTS'] as $section) {
+        foreach ($bpt[$section] ?? [] as $code => $definition) {
+            $definition = is_array($definition) ? Catalog::normalizeDefinition($definition) : $definition;
+            if (is_array($definition)) {
+                ksort($definition);
+            }
+            $out[$section][(string) $code] = $definition;
+        }
+    }
+    return $out;
+}
+
+function replaceNamesWithPositions(mixed $value, array $positions): mixed
+{
+    if (is_string($value)) {
+        return preg_replace_callback('/\{=(A\d+_\d+_\d+_\d+):/',
+            fn (array $m) => isset($positions[$m[1]]) ? "{=#{$positions[$m[1]]}:" : $m[0], $value);
+    }
+    if (!is_array($value)) {
+        return $value;
+    }
+    $out = [];
+    foreach ($value as $key => $item) {
+        $out[is_string($key) ? replaceNamesWithPositions($key, $positions) : $key]
+            = replaceNamesWithPositions($item, $positions);
+    }
+    return $out;
+}
+
+/** Рекурсивная сортировка ключей отображений; порядок списков сохраняется. */
+function canonicalValue(mixed $value): mixed
+{
+    if (!is_array($value)) {
+        return $value;
+    }
+    $isList = array_is_list($value);
+    $out = [];
+    foreach ($value as $key => $item) {
+        $out[$key] = canonicalValue($item);
+    }
+    if (!$isList) {
+        ksort($out);
+    }
+    return $out;
+}
+
 function setCorpusDir(?string $dir): void
 {
     $GLOBALS['bpt_corpus_dir'] = $dir;

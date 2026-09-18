@@ -7,6 +7,20 @@
 
 ## 2026-09
 
+- **2026-09-18 — облачно-внедренческая половина: 9 страниц** — Выправление перекоса после переноса
+  архива. **REST (сверено через MCP, `provenance: documented`, `edition: cloud`):**
+  [[pattern-rest-batch-and-limits]] (`batch` REST 3.0: `cmd`/`halt`/`as`, связывание через
+  `$result[...]`, разбор `result_error`/`result_total`/`result_next`; при `halt = 0` частичный
+  отказ выглядит как успех) и [[pattern-rest-reliable-delivery]] (`event.offline.get` снимает
+  события с очереди, `event.offline.list` — только читает; таблица «какие коды ошибок повторять,
+  какие нет»; идемпотентность по `MESSAGE_ID`). **Playbooks — жизненный цикл закрыт целиком:**
+  [[checklist-data-migration]], [[checklist-golive-deployment]], [[checklist-user-adoption]],
+  [[checklist-support-handover]]. **Модули:** [[checklist-permissions-audit]],
+  [[pattern-smart-process-vs-deal-fields]], [[checklist-tasks-regulations]].
+  Семь методических страниц заведены как `draft` — это каркасы: последовательность шагов и типовые
+  ошибки взяты из практики внедрения и уже накопленного в вики, но пороги, роли, сроки реакции и
+  формулировки приёмки команда проставляет после первого применения. Так честнее, чем ставить
+  `verified` на непроверенный регламент. Обновлены пять хабов и `index.md`.
 - **2026-09-18 — снято противоречие: registerEventHandler и события D7 ORM** — Проверка после
   переноса: [[pattern-events-over-core-modification]] рекомендовала `registerEventHandler` для
   распространяемой функциональности без оговорок, а новый [[recipe-d7-orm-event-subscription]]

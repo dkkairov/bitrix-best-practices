@@ -55,6 +55,12 @@
 - [[checklist-windows-to-linux-deploy|Заливка с Windows на Linux-сервер: 6 граблей]] · Разработка · box
 - [[checklist-presale-audit|Playbook предпроектного аудита]] · Playbooks · both
 - [[checklist-requirements-workshop|Playbook рабочей встречи по требованиям]] · Playbooks · both
+- [[checklist-data-migration|Playbook миграции данных]] · Playbooks · both · черновик
+- [[checklist-golive-deployment|Playbook запуска портала в работу]] · Playbooks · both · черновик
+- [[checklist-user-adoption|Playbook обучения и адаптации]] · Playbooks · both · черновик
+- [[checklist-support-handover|Playbook передачи в поддержку]] · Playbooks · both · черновик
+- [[checklist-permissions-audit|Аудит прав доступа]] · Права · both · черновик
+- [[checklist-tasks-regulations|Регламент постановки задач]] · Задачи · both · черновик
 
 ### Паттерны
 - [[pattern-crm-sales-funnel-design|Проектирование воронки и стадий]] · CRM · both
@@ -69,6 +75,9 @@
 - [[pattern-crm-action-vs-event|Operation\Action или обработчик события]] · CRM · box
 - [[pattern-crm-timeline-client-side|Таймлайн CRM на клиенте: догрузка и фильтрация]] · CRM · box
 - [[pattern-tasks-effectiveness-from-db|Эффективность задач 1:1 с виджетом]] · Задачи · box
+- [[pattern-rest-batch-and-limits|Батчи и лимиты REST]] · REST · cloud
+- [[pattern-rest-reliable-delivery|Надёжная доставка событий]] · REST · cloud
+- [[pattern-smart-process-vs-deal-fields|Смарт-процесс или поля в сделке]] · СПА · both · черновик
 
 ### Антипаттерны
 - [[antipattern-crm-stage-explosion|Взрыв стадий воронки]] · CRM · both

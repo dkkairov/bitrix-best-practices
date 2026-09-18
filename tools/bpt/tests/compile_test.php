@@ -220,6 +220,31 @@ test('Сборщик: объявленная переменная ошибок �
     assertSame([], (new Compiler(Catalog::load()))->compile($spec)['errors']);
 });
 
+test('Пример: собирается, разбирается и рисуется', function () {
+    if (!SpecReader::hasYaml()) {
+        return;   // пример написан на YAML
+    }
+    $catalog = Catalog::load();
+    $snapshot = Snapshot::load(dirname(__DIR__) . '/examples/example.portal.yaml');
+    $spec = SpecReader::read(dirname(__DIR__) . '/examples/invoice-approval.bizproc.yaml');
+    $built = (new Compiler($catalog, $snapshot, true))->compile($spec);   // строгий режим: «сырых» ID быть не должно
+    assertSame([], $built['errors']);
+
+    $approve = $built['bpt']['TEMPLATE'][0]['Children'][1];
+    assertSame('ApproveActivity', $approve['Type']);
+    assertSame(['group_g7'], $approve['Properties']['Users']);
+    $yes = $approve['Children'][0]['Children'];
+    assertSame('DT1000_10:CLIENT', $yes[0]['Properties']['TargetStatus']);
+    assertTrue(str_contains($yes[1]['Properties']['EventText'], "{={$approve['Name']}:Comments}"), 'ссылка на шаг');
+
+    $back = (new Decompiler($catalog, $snapshot, true))->decompile($built['bpt']);
+    $again = (new Compiler($catalog, $snapshot))->compile($back['spec']);
+    assertSame([], $again['errors']);
+    assertSame($built['bpt']['TEMPLATE'], $again['bpt']['TEMPLATE'], 'разбор и повторная сборка');
+
+    assertTrue(str_contains((new Mermaid($catalog))->render($built['bpt']), 'Согласование бухгалтерией'), 'схема');
+});
+
 test('Сборщик: пустое DOCUMENT_FIELDS — предупреждение', function () {
     $r = (new Compiler(Catalog::load()))->compile(minimalSpec());
     assertSame([], $r['bpt']['DOCUMENT_FIELDS']);

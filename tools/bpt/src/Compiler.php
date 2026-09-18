@@ -51,6 +51,7 @@ final class Compiler
             $this->warning('bizproc', 'не указана версия формата спецификации (bizproc: 1)');
         }
 
+        $this->checkSpecPortalIds($spec);
         $children = $this->buildSteps($spec['steps'] ?? [], 'steps', $kind);
         $root = [
             'Type'       => 'SequentialWorkflowActivity',
@@ -136,12 +137,31 @@ final class Compiler
         foreach ($report['warnings'] as $warning) {
             $this->warning('проверка', $warning);
         }
-        foreach ($report['portal_bindings'] as $kind => $values) {
-            if (in_array($kind, ['urls', 'emails'], true)) {
+    }
+
+    /**
+     * «Сырые» идентификаторы портала ищем в самой спецификации: в собранном дереве они есть
+     * всегда, в том числе подставленные из снимка.
+     */
+    private function checkSpecPortalIds(array $spec): void
+    {
+        $json = BptFile::flatJson(['steps' => $spec['steps'] ?? [], 'variables' => $spec['variables'] ?? [],
+            'constants' => $spec['constants'] ?? [], 'parameters' => $spec['parameters'] ?? []]);
+        foreach (Analyzer::PORTAL_PATTERNS as $kind => $pattern) {
+            if (in_array($kind, ['urls', 'emails', 'globals'], true)) {
                 continue;
             }
-            $message = "в спецификации «сырые» идентификаторы портала ({$kind}): " . implode(', ', array_slice($values, 0, 5));
-            $this->strict ? $this->error('проверка', $message) : $this->warning('проверка', $message);
+            preg_match_all($pattern, $json, $m);
+            $found = array_values(array_unique($m[0]));
+            if ($kind === 'uf_fields') {
+                $found = array_values(array_diff($found, Analyzer::SYSTEM_UF));
+            }
+            if (!$found) {
+                continue;
+            }
+            $message = "«сырые» идентификаторы портала ({$kind}): " . implode(', ', array_slice($found, 0, 5))
+                . '. Лучше подставлять их из снимка: {{вид:Название}}';
+            $this->strict ? $this->error('спецификация', $message) : $this->warning('спецификация', $message);
         }
     }
 

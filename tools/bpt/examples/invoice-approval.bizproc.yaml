@@ -1,0 +1,42 @@
+# Пример спецификации процесса: согласование счёта.
+# Все названия берутся из снимка examples/example.portal.yaml:
+#   php tools/bpt/bpt.php compile tools/bpt/examples/invoice-approval.bizproc.yaml \
+#       --portal=tools/bpt/examples/example.portal.yaml -o /tmp/invoice.bpt
+#   php tools/bpt/bpt.php render /tmp/invoice.bpt
+
+bizproc: 1
+name: Согласование счёта
+kind: designer
+document: DYNAMIC_1000        # тип документа: подсказка при загрузке, в .bpt не пишется
+
+variables:
+  amount:
+    Name: Сумма к оплате
+    Type: double
+    Required: true
+
+steps:
+  - set_field:
+      title: Зафиксировать сумму
+      FieldValue:
+        "{{field:Сумма к оплате}}": "{=Variable:amount}"
+
+  - approve:
+      id: fin
+      title: Согласование бухгалтерией
+      Users: ["{{group:Бухгалтерия}}"]
+      Name: "Согласуйте счёт {=Document:TITLE}"
+      Description: "Сумма: {=Variable:amount > printable}"
+      TimeoutDuration: "172800"        # двое суток в секундах
+      on_yes:
+        - change_stage:
+            TargetStatus: "{{stage:Общая/Клиент}}"
+        - crm_event:
+            EventText: "Счёт согласован. Комментарий: {=@fin:Comments}"
+            EventUser: ["{=@fin:LastApprover}"]
+      on_no:
+        - change_stage:
+            TargetStatus: "{{stage:Общая/Доработка}}"
+        - notify:
+            MessageSite: "Счёт отклонён: {=@fin:Comments}"
+            MessageUserTo: ["{{user:Иванов Иван}}"]

@@ -103,6 +103,7 @@
 - [[recipe-safe-module-deploy|Безопасная заливка модуля: guard, линт, откат]] · Разработка · box
 - [[recipe-git-deploy-to-production|Доставка правки на прод через git]] · Разработка · box
 - [[recipe-mysql-connection-refused|MySQL (2002) Connection refused]] · Разработка · box
+- [[recipe-box-test-stand-docker|Тестовый стенд коробки в Docker]] · Разработка · box
 - [[recipe-crm-history-all-fields|История смарт-процесса: все поля + источник]] · CRM · box
 - [[recipe-crm-card-editor-js-access|Карточка CRM из JS: редактор и модель]] · CRM · box
 - [[recipe-crm-hide-card-block-js|Скрыть блок в карточке смарт-процесса]] · CRM · box
@@ -197,7 +198,7 @@
 
 ## По статусу
 
-- **verified:** 118 страниц из 138 (`verified`: 2026-06-01 … 2026-09-21).
+- **verified:** 119 страниц из 139 (`verified`: 2026-06-01 … 2026-09-21).
 - **draft:** 20 страниц, по четырём разным причинам —
   **методические каркасы**, которые уточняются после первого применения на проекте
   ([[checklist-data-migration]], [[checklist-golive-deployment]], [[checklist-user-adoption]],
@@ -221,7 +222,7 @@
 
 ## По редакции
 
-- **box (108 страниц):** ветка разработки `development/*`, коробочная часть модулей и справочник
+- **box (109 страниц):** ветка разработки `development/*`, коробочная часть модулей и справочник
   по 42 классам, файлам и компонентам ядра.
 - **cloud (3 страницы):** [[entity-bizproc-template-rest-methods]],
   [[pattern-rest-batch-and-limits]], [[pattern-rest-reliable-delivery]] — сверено через MCP

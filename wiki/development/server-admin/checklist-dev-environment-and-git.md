@@ -27,7 +27,9 @@ updated: "2026-09-21"
       сайте правят только контент, всё остальное — на копии и переносится автоматически
       ([Введение в разработку](https://bx24devbook.website.yandexcloud.net/Razrabotka/Vvedenie.html#nel-za-pravit-na-boevom-sajte-vse-cto-ne-kasaetsa-kontenta)).
       Для тестовой копии книга упоминает параметр «Установка для разработки».
-- [ ] Локальная среда повторяет прод по версиям (PHP/MySQL) — `bitrix-env` или Docker (BitrixDock)
+- [ ] Локальная среда повторяет прод по версиям (PHP/MySQL) — `bitrix-env` или Docker. С 2025 года
+      есть официальное Docker-окружение 1С-Битрикс — [[recipe-box-test-stand-docker|рецепт стенда]];
+      сторонний BitrixDock — запасной вариант
 - [ ] Отдельные среды dev / staging / prod; настройки ядра (`/bitrix/.settings.php`, `dbconn.php`) у
       каждой среды свои и в git не попадают
 - [ ] Конфигурация проекта, зависящая от среды (адреса, доступы внешних сервисов, флаги) — в **`.env` выше

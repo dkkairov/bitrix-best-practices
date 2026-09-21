@@ -10,7 +10,7 @@ tags: [инцидент, mysql, сервер, диагностика, bitrix-vm,
 sources: []
 related: ["[[checklist-box-performance]]", "[[checklist-dev-environment-and-git]]"]
 aliases: ["bitrix-mysql-connection-refused"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # MySQL `(2002) Connection refused`
@@ -75,6 +75,10 @@ tail -50 /var/log/mysqld.log
 | **Диск 100 %** | `df -h` показывает заполненный раздел | Сначала чистить, потом стартовать. Пухнут обычно `/var/log/`, каталог бэкапов портала и бинлоги в `/var/lib/mysql/`. Бэкапы Bitrix способны съесть сотни гигабайт |
 | **OOM-killer** | строки oom в `dmesg` | `start` поможет, но падение вернётся: уменьшить `innodb_buffer_pool_size` и/или добавить swap |
 | **`Error: 17 (File exists)`** в статусе | статус упавшего **автостарта**, возможно многодневной давности | Ручной `start` часто проходит: конфликтный сокет/pid к тому моменту уже убран. Если не прошёл — искать устаревшие `mysql.sock` / `mysqld.pid` и смотреть лог |
+
+Не путать с **`(2002) No such file or directory`**: это подключение к `localhost` через сокет там,
+где MySQL работает в другом контейнере. База жива, в настройках нужен хост контейнера —
+[[recipe-box-test-stand-docker|стенд в Docker]].
 
 ## Подводные камни
 - Сервис может быть `enabled` и всё равно не подняться после ребута (гонка при загрузке). После

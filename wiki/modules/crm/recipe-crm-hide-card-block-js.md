@@ -10,7 +10,7 @@ tags: [crm, smart-process, javascript, mutation-observer, слайдер, ui]
 sources: []
 related: ["[[recipe-crm-card-editor-js-access]]", "[[concept-change-invasiveness-hierarchy]]", "[[entity-smart-process]]"]
 aliases: ["hide-comments-in-spa"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # Скрыть блок в карточке смарт-процесса
@@ -75,6 +75,12 @@ updated: "2026-09-18"
 - **Смарт-процесс в своём разделе** открывается по адресу `/page/<раздел>/…/type/<id>/details/<id>/`,
   а не `/crm/type/…` — регулярка его не поймает. Учитывать оба вида адресов, если такой раздел
   заведён ([[recipe-custom-left-menu-section]]).
+- **`/crm/type/<id>/` — не только смарт-процессы.** Коммерческое предложение открывается по
+  `/crm/type/7/details/…` («Книга разработчика»,
+  [Предложение](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Predlozenie.html#sozdanie-na-osnovanii-sdelki));
+  вероятно, так же и новый счёт (31) — не проверено. Правило «скрыть везде, кроме одного типа»
+  скроет блок и в КП/счетах: если это нежелательно, держите белый список `entityTypeId`, к которым
+  правило применяется (добавлено при сверке с книгой 2026-09-21).
 - **CSS-only-вариант не работает:** Bitrix не проставляет `entityTypeId` атрибутом на `body`.
 - При множестве открытых слайдеров observer срабатывает для всех — некритично, но при заметной
   нагрузке имеет смысл дебаунс.

@@ -4,19 +4,21 @@ type: entity
 module: crm
 edition: box
 status: verified
-provenance: documented
-verified: "2026-06-02 / документация модуля CRM, раздел структур данных (apidocs.bitrix24.ru)"
+provenance: mixed
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль CRM — Словари / Структуры данных, Счёт; числовые коды и адреса СП в меню — ядро и опыт команды"
 tags: [crm, мнемокоды, типы-сущностей, класс, url]
 sources: ["[[source-devbook-crm]]"]
 related: ["[[entity-crm-factory]]", "[[concept-bitrix-naming-conventions]]", "[[entity-ccrm-field-multi]]"]
 aliases: ["bitrix24-ccrm-owner-type"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `\CCrmOwnerType` и `\CCrmOwnerTypeAbbr`
 
 **Что это:** словарь типов CRM-сущностей. Старый C-API, но используется повсеместно, включая
-современный Universal API: `getFactory(\CCrmOwnerType::Deal)`.
+современный Universal API: `getFactory(\CCrmOwnerType::Deal)`
+([Структуры данных](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Slovari/Struktury_dannyh.html);
+атрибуция исправлена при сверке 2026-09-21).
 
 ## Ключевые факты
 | Поле | Значение |
@@ -27,13 +29,20 @@ updated: "2026-09-18"
 
 ## Соглашение констант
 
-- **Порядковый номер** (int) — без постфикса: `\CCrmOwnerType::Lead` = `1`, `::Deal` = `2`.
+- **Порядковый номер** (int) — без постфикса: `\CCrmOwnerType::Lead` = `1`, `::Deal` = `2` (книга
+  коды сознательно не перечисляет — значения сверены по ядру; из примеров книги видны `Lead` = 1,
+  `Contact` = 3).
 - **Мнемокод** (string) — с постфиксом `Name`: `::LeadName` = `'LEAD'`, `::DealName` = `'DEAL'`.
 
 Это та самая семья идентификаторов вокруг кодового имени сущности, о которой
 [[concept-bitrix-naming-conventions]].
 
 Служебные группы: `Suspended*` — для корзины (recyclebin), `ScoringName` — для машинного обучения.
+
+Новые счета: `\CCrmOwnerType::SmartInvoice` = `31`, в корзине `SuspendedSmartInvoice` = `32`, мнемокод
+`SMART_INVOICE`; `\CCrmOwnerType::isPossibleDynamicTypeId(31)` возвращает `false` — код, который
+отличает смарт-процессы этой проверкой, счёт пропустит
+([Счёт](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Scet.html#osnovnoe)).
 
 ## Конвертация
 
@@ -45,8 +54,8 @@ updated: "2026-09-18"
 | `ResolveName($id)` | `1` → `'LEAD'` |
 | `ParseEntitySlug($slug)` | `'L_1'` → `['ENTITY_TYPE_ID' => …, 'ENTITY_ID' => …]` |
 
-`\CCrmOwnerTypeAbbr::ResolveByTypeID($typeID)` даёт однобуквенную аббревиатуру: сделка → `D`,
-лид → `L`. Комплексные префиксы (`L_1`) нужны полям, которые хранят ID разных сущностей.
+`\CCrmOwnerTypeAbbr::ResolveByTypeID($typeID)` даёт аббревиатуру из одной-двух букв: сделка → `D`,
+лид → `L`, счёт → `SI`. Комплексные префиксы (`L_1`) нужны полям, которые хранят ID разных сущностей.
 
 ## Генерация адресов
 

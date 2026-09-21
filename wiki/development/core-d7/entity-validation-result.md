@@ -4,13 +4,13 @@ type: entity
 module: core-d7
 edition: box
 status: verified
-provenance: documented
-verified: "2026-06-01 / документация модуля main, раздел валидации (dev.1c-bitrix.ru)"
+provenance: mixed
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Технологии — Валидация (Основное, Контроллеры, Существующие правила, Свои правила)"
 tags: [валидация, ошибки, d7, класс]
 sources: ["[[source-devbook-core-d7]]"]
 related: ["[[entity-main-result]]", "[[entity-validation-service]]", "[[concept-validation-d7]]"]
 aliases: ["bitrix24-validation-result"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `ValidationResult` и `ValidationError`
@@ -23,7 +23,7 @@ updated: "2026-09-18"
 |------|----------|
 | Тип | классы |
 | Модуль | `main`, namespace `\Bitrix\Main\Validation\` |
-| Родители | `\Bitrix\Main\Result` и `\Bitrix\Main\Error` |
+| Родители | `\Bitrix\Main\Result` и `\Bitrix\Main\Error` (по ядру; книга наследование не называет, по использованию совместимо) |
 
 ```php
 new \Bitrix\Main\Validation\ValidationError(
@@ -44,13 +44,18 @@ $error->getFailedValidator();   // экземпляр валидатора
 
 ## Подводные камни
 
-- **Поле `code` означает разное в разных ситуациях**: в ответе контроллера это числовой код
-  (`100` — ошибка валидации параметра), а при рекурсивной валидации — точечный путь к свойству
-  (`order.payment.systemCode`). Код, который ждёт число, на вложенном объекте сломается.
-- `ValidationService::validate()` возвращает обычный `Result`, но внутри лежат именно
-  `ValidationError`. Вызывающий код может об этом не знать — а может воспользоваться.
-- Для правил уровня класса (`OnlyOneOfPropertyRequired` и подобных) непонятно, что вернёт
-  `getFailedValidator()`: отдельного валидатора у них нет. Проверяйте перед использованием.
+- **Поле `code` означает разное в разных ситуациях.** В результате сервиса это **всегда строка** —
+  имя свойства (`id`), а у вложенных объектов точечный путь (`order.payment.systemCode`). В ответе
+  контроллера в примере книги — число `100`, а имя параметра приходит в тексте сообщения; смысл кода
+  книга не объясняет. Код, который ждёт число, на ошибке сервиса сломается.
+- Какой класс результата возвращает `ValidationService::validate()`, книга не называет; внутри лежат
+  именно `ValidationError`.
+- Своего валидатора, по книге, нет у `OnlyOneOfPropertyRequired` (правило класса) и `ElementsType`
+  (правило свойства) — что вернёт `getFailedValidator()` для их ошибок, проверяйте перед
+  использованием. У `AtLeastOnePropertyNotEmpty` валидатор есть — `AtLeastOneNotEmptyValidator`.
+
+> **Уточнено 2026-09-21 при сверке с книгой:** раньше «путь через точку» относился только к
+> рекурсивной валидации, а без валидатора назывались «правила уровня класса» целиком.
 
 ## Связанное
 - [[concept-validation-d7]] — общая картина

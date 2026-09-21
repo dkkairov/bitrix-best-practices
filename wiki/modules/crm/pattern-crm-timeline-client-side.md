@@ -8,9 +8,9 @@ provenance: empirical
 verified: "2026-06-11 / коробка, таймлайн карточки смарт-процесса"
 tags: [crm, timeline, javascript, производительность, mutation-observer, css]
 sources: []
-related: ["[[recipe-crm-card-editor-js-access]]", "[[recipe-crm-hide-card-block-js]]", "[[concept-platform-reverse-engineering]]", "[[concept-change-invasiveness-hierarchy]]"]
+related: ["[[recipe-crm-card-editor-js-access]]", "[[recipe-crm-hide-card-block-js]]", "[[concept-platform-reverse-engineering]]", "[[concept-change-invasiveness-hierarchy]]", "[[recipe-crm-todo-activity]]"]
 aliases: ["timeline-force-load-via-bx-api", "timeline-filter-css-class-toggle"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # Таймлайн CRM на клиенте
@@ -103,7 +103,9 @@ function applyFilterClasses() {                       // переключени�
 
 ## Когда НЕ применять
 - Нужна серверная выборка или отчёт: приватный JS-API для этого не годится, берите данные на
-  сервере.
+  сервере. Учтите, что дело может лежать только в таблице дел, только в таймлайне или и там и там
+  («Книга разработчика», [Дело](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Delo/index.html#vvedenie);
+  [[recipe-crm-todo-activity]]) — для отчёта нужны оба источника.
 - Портал обновляется часто, а сопровождать приватный API некому — см. риск ниже.
 
 ## Последствия

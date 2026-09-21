@@ -5,12 +5,12 @@ module: bizproc
 edition: box
 status: verified
 provenance: empirical
-verified: "2026-07-13 / коробка: классический попап заданий и новый UI в карточке смарт-процесса"
+verified: "2026-07-13 / коробка: классический попап заданий и новый UI в карточке смарт-процесса; сверено с «Книгой разработчика Bitrix24» 2026-09-21 — API сервиса в книге не разобрано"
 tags: [bizproc, задание, task, класс, делегирование]
-sources: []
+sources: ["[[source-devbook-bizproc]]"]
 related: ["[[recipe-bizproc-custom-task-activity]]", "[[entity-cbp-activity]]", "[[concept-bizproc-engine]]"]
 aliases: ["bitrix24-cbptaskservice"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `CBPTaskService`
@@ -18,13 +18,21 @@ updated: "2026-09-18"
 **Что это:** сервис движка БП для заданий — интерактивных шагов, которые ждут ответа человека.
 Задание, созданное через него, попадает в штатный список заданий и в живую ленту.
 
+> **Сверено с книгой 2026-09-21.** Книга описывает задания только в классификации действий: это
+> событийное действие с дополнительными методами, которое **наследует `CBPCompositeActivity`** и
+> реализует те же интерфейсы, что событийные
+> ([Действия → классификация](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#klassifikacia-dejstvij)).
+> Сам `CBPTaskService` книга не разбирает, поэтому всё ниже — эмпирика команды. Базовый класс в нашем
+> рецепте — `CBPActivity`; расхождение и решение — в [[recipe-bizproc-custom-task-activity]].
+
 ## Ключевые факты
 | Поле | Значение |
 |------|----------|
 | Тип | сервис движка |
 | Модуль | `bizproc` |
 | Получение | `$this->workflow->GetService('TaskService')` внутри активити |
-| Требует | активити с `IBPEventActivity` + `IBPActivityExternalEventListener` |
+| Требует | активити с `IBPEventActivity` + `IBPActivityExternalEventListener` (так и по книге) |
+| Базовый класс задания | по книге — `CBPCompositeActivity`; у команды — `CBPActivity` (проверено на стенде) |
 
 ## Методы, которые нужны на практике
 
@@ -71,6 +79,9 @@ workflow и доставать свойства активити — работ�
 
 ## Открытые вопросы
 - Чем именно отличается отображение при `IS_INLINE` `'Y'` и `'N'`.
+- От какого класса наследуются штатные задания дистрибутива («Утверждение», «Запрос доп.
+  информации») — сверить по коду `/bitrix/modules/bizproc/activities/` на своей версии, чтобы решить
+  спор «`CBPActivity` или `CBPCompositeActivity`».
 
 ## Связанное
 - [[recipe-bizproc-custom-task-activity]] — полный рецепт задания-активити

@@ -8,9 +8,9 @@ provenance: mixed
 verified: "2026-06-19 / Bitrix24 cloud + box"
 tags: [роботы, триггеры, автоматизация, crm]
 sources: []
-related: ["[[pattern-robots-vs-bizproc-decision]]", "[[pattern-rest-webhooks-and-events]]", "[[entity-bizproc-template-rest-methods]]", "[[antipattern-bizproc-hardcoded-portal-ids]]"]
+related: ["[[pattern-robots-vs-bizproc-decision]]", "[[pattern-rest-webhooks-and-events]]", "[[entity-bizproc-template-rest-methods]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[entity-bizproc-activity-description]]"]
 aliases: ["robots-triggers"]
-updated: "2026-09-16"
+updated: "2026-09-21"
 ---
 
 # Роботы и триггеры
@@ -28,6 +28,10 @@ updated: "2026-09-16"
 ## Как соотносятся
 Триггер **запускает** движение по воронке, робот **выполняет** действие на стадии. Вместе образуют
 стадийную автоматизацию.
+
+**Свой робот в коробке** — то же действие бизнес-процесса, только с `TYPE` `robot_activity` в
+`.description.php`; группу и порядок в списке роботов задаёт `ROBOT_SETTINGS`
+([[entity-bizproc-activity-description|паспорт действия]], по «Книге разработчика», 2026-09-21).
 
 ## Подводные камни
 - **Порядок роботов** на стадии важен — выполняются последовательно.

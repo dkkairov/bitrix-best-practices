@@ -5,12 +5,12 @@ module: crm
 edition: box
 status: verified
 provenance: empirical
-verified: "2026-09-16 / коробка: main 26.700, crm 26.800, PHP 8.2"
+verified: "2026-09-16 / коробка: main 26.700, crm 26.800, PHP 8.2; сверено с «Книгой разработчика Bitrix24» 2026-09-21 (подмена фабрики, операции)"
 tags: [crm, smart-process, история, фабрика, operation, servicelocator, аудит]
 sources: []
-related: ["[[pattern-crm-action-vs-event]]", "[[concept-crm-universal-api]]", "[[pattern-module-self-disabling-guard]]", "[[entity-smart-process]]"]
+related: ["[[pattern-crm-action-vs-event]]", "[[concept-crm-universal-api]]", "[[pattern-module-self-disabling-guard]]", "[[entity-smart-process]]", "[[recipe-smart-process-factory-customization]]", "[[entity-crm-operation]]"]
 aliases: ["bitrix24-crm-history-all-fields"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # История смарт-процесса: все поля + источник изменения
@@ -39,7 +39,15 @@ updated: "2026-09-18"
 
 Наследник `Factory\Dynamic`, регистрируется в `ServiceLocator` как
 `crm.service.factory.dynamic.<entityTypeId>`, лениво и **только для типов, которые нам нужны** —
-если настроек нет, модуль в работу CRM вообще не вмешивается.
+если настроек нет, модуль в работу CRM вообще не вмешивается. Регистрировать нужно **до первого
+`getFactory()`** в хите: книга описывает эту подмену как «окно» между инициализацией и первым
+вызовом фабрики — поздняя регистрация молча не сработает
+([Подмена фабрики](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Universalnoe_api/Kastomizacia/Podmena_fabriki.html#podmena-fabriki-bez-podmeny-kontejnera),
+[[recipe-smart-process-factory-customization]]).
+
+> **Осознанная практика (сверено с книгой 2026-09-21).** Книга советует не добавлять в
+> подменённую фабрику новых методов. Здесь добавлен вспомогательный `isTrackable()` — это наш
+> выбор ради читаемости; при переносе безопаснее вынести помощник в отдельный класс.
 
 ### 2. Расширить список отслеживаемых полей
 
@@ -126,6 +134,8 @@ $data = $factory->getTrackedObject($item, $item)->prepareUpdateEventData();
 - **Робота от бизнес-процесса так не отличить:** и робот «Изменить элемент», и БП идут через
   `Integration\BizProc\Document\Item`, который сам ставит `SCOPE_AUTOMATION`.
 - `isChanged()` ядра сравнивает массивы нестрого: `['119']` и `[119]` равны — ложных записей нет.
+- **В историю не попадает** то, что сохранено мимо операции (`$item->save()`) или операцией с
+  `disableSaveToHistory()` — так устроены шаги операции по книге ([[entity-crm-operation]]).
 
 ## Откат
 - Снять регистрацию фабрики в `ServiceLocator` (выключить модуль) — CRM возвращается к штатной

@@ -5,18 +5,20 @@ module: crm
 edition: box
 status: verified
 provenance: documented
-verified: "2026-06-02 / документация модуля CRM, раздел словарей (apidocs.bitrix24.ru)"
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль CRM — Словари / Справочники"
 tags: [crm, справочники, статусы, стадии, класс, кэш]
 sources: ["[[source-devbook-crm]]"]
 related: ["[[concept-crm-dictionaries]]", "[[entity-crm-factory]]", "[[concept-bitrix-naming-conventions]]", "[[pattern-crm-sales-funnel-design]]"]
 aliases: ["bitrix24-ccrm-status"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `\CCrmStatus` и `\Bitrix\Crm\StatusTable`
 
-**Что это:** два класса к одной таблице `b_crm_status`. Старый `CCrmStatus` кэширует и годится для
-записи; D7-шный `StatusTable` — **только для чтения**.
+**Что это:** два класса к одной таблице `b_crm_status`. Старый `CCrmStatus` кэширует, читает
+значения и годится для записи; D7-шный `StatusTable` — для ORM-связей и сложных выборок, **не для
+записи** ([Справочники](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Slovari/Spravocniki.html);
+атрибуция исправлена при сверке 2026-09-21).
 
 ## Ключевые факты
 | Поле | Значение |
@@ -24,7 +26,8 @@ updated: "2026-09-18"
 | Тип | классы |
 | Модуль | `crm` |
 | Таблица | `b_crm_status` — все справочники CRM в одной |
-| Чтение и ORM-связи | `\Bitrix\Crm\StatusTable` (`DataManager`) |
+| Значения справочника | `CCrmStatus::GetStatus*` (статический кэш) |
+| ORM-связи и сложные выборки | `\Bitrix\Crm\StatusTable` (`DataManager`) |
 | Любое изменение | `\CCrmStatus` |
 
 Почему так — разобрано в [[concept-crm-dictionaries]]: `CCrmStatus` держит кэш, и запись мимо него
@@ -50,7 +53,9 @@ $entity->Delete($id);
 $entity->GetLastError();
 ```
 
-Массово: `CCrmStatus::BulkCreate($entityId, $items)`, `CCrmStatus::Erase($entityId)`.
+Массово: `CCrmStatus::BulkCreate($entityId, $items)` — **ошибок не сообщает**,
+`CCrmStatus::Erase($entityId)`. У `Add($fields, $bCheckStatusId = true)` флаг включает проверку
+дублей.
 
 **`Update` меняет только** `SORT`, `NAME`, `SYSTEM`, `COLOR`, `SEMANTICS`. Для остального нужны
 опции: `'ENABLE_STATUS_ID' => true`, `'ENABLE_NAME_INIT' => true`.
@@ -65,7 +70,7 @@ $entity->GetLastError();
 | `NAME` / `NAME_INIT` | отображаемое / исходное (для сброса к системному) |
 | `SORT` | порядок |
 | `SYSTEM` | `Y`/`N` — можно ли удалить пользователю |
-| `CATEGORY_ID` | направление (для лидов и сделок) |
+| `CATEGORY_ID` | направление (сделки; у лидов направлений нет) |
 | `COLOR` | цвет |
 | `SEMANTICS` | семантика статуса |
 
@@ -80,13 +85,13 @@ $entity->GetLastError();
 ]]
 ```
 
-Старт, успех и провал описаны данными, а не зашиты в коде — поэтому модуль может
-зарегистрировать свой справочник с правильной семантикой.
+Старт, успех и провал отдаются метаданными справочника (`GetEntityTypes()`). Регистрацию своего
+справочника с семантикой воронки книга не описывает — не опираться без проверки по коду.
 
 ## Подводные камни
 
 - **`Delete($id)` работает по первичному ключу, а не по `STATUS_ID`.** Перепутать легко.
-- **Удаление несуществующего `ID` даёт фатальную ошибку**, а не `false`.
+- **Удаление несуществующего `ID` может дать фатальную ошибку**, а не `false` (формулировка книги).
 - **`Delete` не проверяет принадлежность `ID` справочнику из конструктора.** `ENTITY_ID` нужен
   только для сброса кэша — ошибка в коде **тихо удалит чужое значение** из другого справочника.
 - Изменение справочников через `StatusTable` противопоказано: см. выше про кэш.

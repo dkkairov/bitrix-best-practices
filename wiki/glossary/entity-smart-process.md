@@ -5,12 +5,12 @@ module: smart-process
 edition: both
 status: verified
 provenance: mixed
-verified: "2026-06-19 / Bitrix24 cloud + box"
+verified: "2026-06-19 / Bitrix24 cloud + box; коробочная часть — 2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook): Смарт-процессы / Описание"
 tags: [спа, smart-process, crm, сущности]
-sources: []
-related: ["[[pattern-crm-sales-funnel-design]]", "[[antipattern-everything-in-one-funnel]]", "[[pattern-robots-vs-bizproc-decision]]", "[[antipattern-bizproc-hardcoded-portal-ids]]"]
+sources: ["[[source-devbook-crm]]"]
+related: ["[[pattern-crm-sales-funnel-design]]", "[[antipattern-everything-in-one-funnel]]", "[[pattern-robots-vs-bizproc-decision]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[recipe-smart-process-programmatic-creation]]", "[[recipe-smart-process-factory-customization]]"]
 aliases: ["smart-process"]
-updated: "2026-09-16"
+updated: "2026-09-21"
 ---
 
 # Смарт-процесс (СПА)
@@ -22,9 +22,18 @@ updated: "2026-09-16"
 | Поле | Значение |
 |------|----------|
 | Тип | сущность CRM (конструктор) |
-| Назначение | моделировать процессы, которые не являются продажей |
+| Назначение | моделировать процессы, которые не являются продажей, и вспомогательные данные продаж |
+| Появление | в CRM с версии 20.700.0 (коробка) |
 | Edition | cloud и box (доступность зависит от тарифа/редакции) |
 | Автоматизация | роботы/триггеры и бизнес-процессы, как у сделок |
+
+## Хранение (коробка)
+
+По «Книге разработчика» ([Смарт-процессы](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Smart_processy/Opisanie.html#arhitektura-hranenia)):
+тип — строка в `b_crm_dynamic_type`, элементы — в `b_crm_dynamic_items_<ENTITY_TYPE_ID>`, поисковый
+индекс — в `…_index`, по таблице на каждое множественное пользовательское поле, описания полей — в
+`b_user_field`. По идее книга ставит СПА рядом с инфоблоками и универсальными списками. Код —
+[[recipe-smart-process-programmatic-creation]], [[recipe-smart-process-factory-customization]].
 
 ## Когда использовать
 - Договоры, заявки, поставки, рекламации, абонементы, согласования, объекты учёта.

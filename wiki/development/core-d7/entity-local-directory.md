@@ -5,18 +5,19 @@ module: core-d7
 edition: box
 status: verified
 provenance: documented
-verified: "2026-06-01 / документация Bitrix Framework (dev.1c-bitrix.ru)"
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Структура папки local — Основное, GIT"
 tags: [local, доработки, структура, приоритет, git]
 sources: ["[[source-devbook-dev-rules]]"]
-related: ["[[concept-change-invasiveness-hierarchy]]", "[[entity-php-interface]]", "[[concept-code-namespaces-and-autoloading]]", "[[checklist-dev-environment-and-git]]"]
+related: ["[[concept-change-invasiveness-hierarchy]]", "[[entity-php-interface]]", "[[concept-code-namespaces-and-autoloading]]", "[[checklist-dev-environment-and-git]]", "[[pattern-local-solution-structure]]"]
 aliases: ["bitrix24-katalog-local"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # Каталог `/local/`
 
 **Что это:** каталог рядом с `/bitrix/`, где живут все доработки проекта. Единственное место, где
-разработчику можно почти всё.
+разработчику можно почти всё
+([Структура папки local](https://bx24devbook.website.yandexcloud.net/Razrabotka/Struktura_papki_local/Osnovnoe.html)).
 
 ## Ключевые факты
 | Поле | Значение |
@@ -24,7 +25,11 @@ updated: "2026-09-18"
 | Тип | каталог |
 | Появился | с версии главного модуля 14.0.1 (вместе с D7) |
 | Приоритет | при коллизии имён `/local/` **побеждает** `/bitrix/` |
-| Git | единственная папка проекта, которая целиком идёт в репозиторий |
+| Git | идёт в репозиторий целиком — вместе с публичной частью сайта; вне git только `/bitrix/*`, `/upload`, `/urlrewrite.php` ([GIT](https://bx24devbook.website.yandexcloud.net/Razrabotka/GIT.html)) |
+
+> **Исправлено 2026-09-21 при сверке с книгой.** Было: «единственная папка проекта, которая целиком
+> идёт в репозиторий». По книге в репозитории — `/local` **и публичная часть**; целевой `.gitignore`
+> исключает только ядро, загрузки и правила ЧПУ — [[checklist-dev-environment-and-git]].
 
 ## Что внутри
 
@@ -39,7 +44,9 @@ updated: "2026-09-18"
 | `php_interface/` | хуки и внутренние классы ([[entity-php-interface]]) |
 | `templates/` | шаблоны сайтов |
 
-Дополнительно допустим `tools/` для технических скриптов.
+Других каталогов книга заводить не рекомендует; исключение — `tools/` для технических (как правило,
+устаревших) скриптов. Внутреннюю структуру `php_interface/` для клиентского кода —
+[[pattern-local-solution-structure]].
 
 ## Приоритет в действии
 
@@ -59,8 +66,11 @@ updated: "2026-09-18"
   ([[recipe-bizproc-custom-task-activity]]).
 - **Своих CSS в списке каталогов нет** — только `js/`. Стили подключают из шаблона или своего
   расширения.
-- Два случая, когда `/bitrix/` всё-таки трогают: разработка собственного модуля и техническая
-  невозможность альтернативы. Оба требуют отдельного обоснования.
+- Два случая, когда `/bitrix/` всё-таки трогают: реализация модуля и техническая невозможность
+  альтернативы (книга добавляет — или несоразмерно высокая цена правильного решения). Оба требуют
+  отдельного обоснования. Рабочая эвристика книги: всё в `/bitrix/` — ядро; менять можно только
+  `/local/`, технический `/bitrix/.settings_extra.php` и файлы, которые разработчик добавил сам
+  ([Ядро продукта](https://bx24devbook.website.yandexcloud.net/Obsie_svedenia/Adro_produkta.html#osobye-fajly)).
 
 ## Связанное
 - [[concept-change-invasiveness-hierarchy]] — почему всё живёт здесь

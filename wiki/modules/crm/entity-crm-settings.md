@@ -4,19 +4,21 @@ type: entity
 module: crm
 edition: box
 status: verified
-provenance: documented
-verified: "2026-06-02 / документация модуля CRM (apidocs.bitrix24.ru)"
+provenance: mixed
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль CRM — Универсальное API / Как включить; Лид — методы (отложенное удаление)"
 tags: [crm, настройки, universal-api, класс]
 sources: ["[[source-devbook-crm]]"]
 related: ["[[concept-crm-universal-api]]", "[[pattern-crm-action-vs-event]]", "[[entity-crm-factory]]"]
 aliases: ["bitrix24-crm-settings"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `\Bitrix\Crm\Settings\<Type>Settings`
 
 **Что это:** пер-сущностные настройки CRM. Практически важен один вопрос, на который они
-отвечают: **включён ли Universal API для лида, сделки, контакта, компании.**
+отвечают: **включён ли Universal API для лида, сделки, контакта, компании**
+([Как включить](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Universalnoe_api/Kak_vklucit.html);
+атрибуция исправлена при сверке 2026-09-21).
 
 ## Ключевые факты
 | Поле | Значение |
@@ -26,8 +28,9 @@ updated: "2026-09-18"
 | Получение | `DealSettings::getCurrent()` |
 | Edition | box |
 
-У смарт-процессов, счетов, предложений и документов своего Settings-класса нет — там Universal API
-включён **всегда**.
+Для смарт-процессов, счетов, предложений и документов подсистемы подписи переключатель не нужен —
+там Universal API поддерживается полностью. (Раньше здесь утверждалось, что у них нет своего
+Settings-класса; книга этого не говорит — снято.)
 
 ## Зачем это проверять
 
@@ -57,16 +60,19 @@ var_dump([
 \Bitrix\Crm\Settings\DealSettings::getCurrent()->setFactoryEnabled(true);
 ```
 
-Есть и URL-механизм: `?enableFactory=Y` / `?enableFactory=N`.
+Есть и URL-механизм: параметр `?enableFactory=Y` / `?enableFactory=N` в адресе раздела CRM.
+
+Ещё одна роль настроек: `<Type>Settings::getCurrent()->isDeferredCleaningEnabled()` задаёт значение
+по умолчанию для опции `ENABLE_DEFERRED_MODE` в `CCrm*::Delete` ([[recipe-crm-legacy-entity-crud]]).
 
 ## Подводные камни
 
 - **Переключить настройку может любой пользователь с доступом в CRM** — не только администратор.
   На проде это означает, что режим работы сущности может измениться без вашего ведома; если
   доработка от него зависит, проверяйте флаг в рантайме, а не один раз при установке.
-- Включение Universal API меняет путь сохранения сущности: обработчики событий, написанные под
-  старый API, могут начать вести себя иначе. Переключать на тестовом стенде и проверять
-  автоматизацию.
+- Включение Universal API меняет путь сохранения сущности. Книга обещает, что старый код продолжит
+  работать, а о несовместимостях просит сообщать в техподдержку; **практика команды** — всё равно
+  переключать на тестовом стенде и проверять обработчики и автоматизацию.
 
 ## Связанное
 - [[concept-crm-universal-api]] — что именно включает этот флаг

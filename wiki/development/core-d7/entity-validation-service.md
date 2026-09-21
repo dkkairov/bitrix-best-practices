@@ -4,19 +4,19 @@ type: entity
 module: core-d7
 edition: box
 status: verified
-provenance: documented
-verified: "2026-06-01 / документация модуля main, раздел валидации (dev.1c-bitrix.ru)"
+provenance: mixed
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Технологии — Валидация / Основное; тип результата validate() в книге не назван"
 tags: [валидация, сервис, d7, класс, рефлексия]
 sources: ["[[source-devbook-core-d7]]"]
-related: ["[[concept-validation-d7]]", "[[concept-service-locator]]", "[[entity-validation-result]]", "[[entity-main-result]]"]
+related: ["[[concept-validation-d7]]", "[[concept-service-locator]]", "[[entity-validation-result]]", "[[entity-main-result]]", "[[recipe-d7-custom-validation-rule]]"]
 aliases: ["bitrix24-validation-service"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `\Bitrix\Main\Validation\ValidationService`
 
-**Что это:** исполнитель валидации: принимает объект с атрибутами-правилами и возвращает
-[[entity-main-result|`Result`]] с ошибками.
+**Что это:** исполнитель валидации: принимает объект с атрибутами-правилами и возвращает результат
+с ошибками `ValidationError` ([Валидация](https://bx24devbook.website.yandexcloud.net/Razrabotka/Tehnologii/Validacia/Osnovnoe.html)).
 
 ## Ключевые факты
 | Поле | Значение |
@@ -24,7 +24,7 @@ updated: "2026-09-18"
 | Тип | сервис |
 | Модуль | `main` |
 | Имя в локаторе | `main.validation.service` |
-| Главный метод | `validate($object): \Bitrix\Main\Result` |
+| Главный метод | `validate($object)` — у результата `isSuccess()` и `getErrors()`; точный класс результата книга не называет (предположительно `ValidationResult` — сверить по `main/lib/validation/`) |
 
 ```php
 $service = \Bitrix\Main\DI\ServiceLocator::getInstance()->get('main.validation.service');
@@ -47,9 +47,10 @@ $result  = $service->validate($dto);
 ## Подводные камни
 
 - Рефлексия по объекту — не бесплатная операция. В горячем пути (валидация в цикле по тысячам
-  записей) измеряйте, а не предполагайте.
-- Валидация работает по **объекту**, а не по массиву: для старого кода с массивами правила через
-  атрибуты не применить — там вызывают валидатор напрямую.
+  записей) измеряйте, а не предполагайте (совет команды, в книге этого нет).
+- Валидация работает по **объекту**, а не по массиву. Для старого кода книга даёт два пути: собрать
+  DTO внутри метода, не меняя его сигнатуру, или вызвать валидатор напрямую без атрибутов
+  (`(new EmailValidator())->validate($value)`).
 
 ## Открытые вопросы
 - Есть ли у `validate()` опции (контекст, группы правил).

@@ -5,18 +5,22 @@ module: migrations
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-06-20 / эмпирика + sprint.migration"
-tags: [миграции, sprint.migration, структура, перенос, деплой]
-sources: []
-related: ["[[recipe-module-versioning-and-private-distribution]]", "[[recipe-module-structure-and-install]]", "[[antipattern-bizproc-hardcoded-portal-ids]]"]
+verified: "2026-06-20 / эмпирика + sprint.migration; 2026-09-21 / сверено с «Книгой разработчика Bitrix24» (bx24devbook): Структура папки local — Миграции"
+tags: [миграции, sprint.migration, инсталлеры, структура, перенос, деплой]
+sources: ["[[source-devbook-dev-rules]]"]
+related: ["[[recipe-module-versioning-and-private-distribution]]", "[[recipe-module-structure-and-install]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[pattern-local-solution-structure]]", "[[recipe-smart-process-programmatic-creation]]"]
 aliases: []
-updated: "2026-09-16"
+updated: "2026-09-21"
 ---
 
 # Миграции как код
 
 **Результат:** изменения структуры и данных (инфоблоки, HL-блоки, пользовательские поля, опции,
 агенты) воспроизводимо применяются на dev → staging → коробках клиентов.
+
+> **Дополнено 2026-09-21 по «Книге разработчика».** Встроенного механизма миграций в платформе нет.
+> Книга называет два перспективных инструмента и предлагает альтернативу — **инсталлеры** (раздел
+> ниже) ([Миграции](https://bx24devbook.website.yandexcloud.net/Razrabotka/Struktura_papki_local/Migracii.html)).
 
 ## Зачем
 Кликать одни и те же настройки руками на каждом портале — источник ошибок и рассинхрона. Миграция
@@ -25,7 +29,8 @@ updated: "2026-09-16"
 
 ## Инструмент
 De-facto стандарт — модуль **sprint.migration** (ставится как обычный модуль). Каждая миграция —
-класс с методами `up()` (применить) и `down()` (откатить).
+класс с методами `up()` (применить) и `down()` (откатить). Книга называет его перспективным наряду с
+`intervolga.migrato`, но второй больше ориентирован на «Управление сайтом», чем на Bitrix24.
 
 ```php
 public function up(): void
@@ -55,6 +60,27 @@ public function down(): void
 ## Откат и проблемы
 - Необратимые изменения данных → делать резервную копию перед `up`, предусматривать `down`.
 - «У клиента структура отличается» → не править руками, а догнать миграциями; вести реестр версий.
+
+## Альтернатива: инсталлеры (по книге)
+
+Bitrix24 рассчитан на бизнес-пользователей: они сами создают поля и бизнес-процессы на боевом
+портале. Синхронизировать всё не нужно — достаточно привести портал к состоянию, которое требуется
+**нашему коду**, не трогая созданное клиентом. Отсюда **инсталлеры** — идемпотентные скрипты,
+которые доводят конфигурацию до нужной.
+
+- **Где лежат** (практика авторов книги): `/local/php_interface/install/`, точка входа —
+  `install/setup.php`, шаги — `install/steps/` ([[pattern-local-solution-structure]]). В модуле ту же
+  роль играет установщик и апдейтер модуля ([[recipe-module-structure-and-install]],
+  [[recipe-smart-process-programmatic-creation]]).
+- **Инсталлер или миграция.** Оба способа переносят изменения через систему контроля версий. Инсталлер
+  работает только «вперёд»; миграция умеет откат, но за это платят разработкой `down()`, которая может
+  так и не понадобиться.
+
+| | Миграции (sprint.migration) | Инсталлеры |
+|---|---|---|
+| Направление | вперёд и откат | только вперёд |
+| Стоимость | выше: нужен `down()` | ниже |
+| Подходит, когда | структуру надо версионировать и уметь откатывать | нужно «довести портал до нужного коду», не трогая пользовательские настройки |
 
 ## Связанное
 - [[recipe-module-versioning-and-private-distribution]], [[recipe-module-structure-and-install]],

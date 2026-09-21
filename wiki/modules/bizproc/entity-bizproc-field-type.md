@@ -5,18 +5,20 @@ module: bizproc
 edition: box
 status: verified
 provenance: documented
-verified: "2026-06-01 / документация модуля bizproc (dev.1c-bitrix.ru)"
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы — Действия (RETURN, ADDITIONAL_RESULT), Свои действия (поля диалога)"
 tags: [bizproc, типы, поля, класс, диалог-настроек]
 sources: ["[[source-devbook-bizproc]]"]
-related: ["[[entity-cbp-activity]]", "[[concept-bizproc-engine]]", "[[recipe-bizproc-custom-task-activity]]"]
+related: ["[[entity-cbp-activity]]", "[[concept-bizproc-engine]]", "[[recipe-bizproc-custom-task-activity]]", "[[entity-bizproc-activity-description]]"]
 aliases: ["bitrix24-bizproc-fieldtype"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `\Bitrix\Bizproc\FieldType`
 
 **Что это:** перечисление типов значений бизнес-процесса. Используется в `.description.php`
-(ключ `RETURN`), в `getPropertiesDialogMap()` и в полях формы настроек действия.
+(ключ `RETURN`), в `getPropertiesDialogMap()` и в полях формы настроек действия
+([Свои действия → поля диалога](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Svoi_dejstvia.html#pola-dialoga);
+атрибуция и пара «тип результата» исправлены при сверке с книгой 2026-09-21).
 
 ## Ключевые факты
 | Поле | Значение |
@@ -65,14 +67,24 @@ updated: "2026-09-18"
 
 `FieldType::normalizeProperty($documentField): array` берёт описание поля документа и возвращает
 структуру, пригодную для регистрации свойства активити. Нужно, когда состав возвращаемых значений
-зависит от документа, а не известен заранее (используется в `ADDITIONAL_RESULT`).
+зависит от документа, а не известен заранее (используется в `ADDITIONAL_RESULT`). Схема по книге в
+три шага: в `.description.php` — `ADDITIONAL_RESULT` с кодом свойства-карты; в
+`GetPropertiesDialogValues()` — построить карту «код → описание типа»; в `Execute()` — объявить типы
+через `SetPropertiesTypes($map)` и заполнить значения
+([ADDITIONAL_RESULT](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#additional-result),
+[[entity-bizproc-activity-description]]).
 
 ## Подводные камни
 
 - **`ExternalExtract` меняет формат значения.** Без него в свойстве окажется `user_1`, а не `1` —
   и последующее сравнение с ID сотрудника молча не сработает.
-- Тип в `RETURN` описания действия и тип в `getPropertiesDialogMap()` должны совпадать: расхождение
-  проявится только в дизайнере, при попытке подставить результат в следующий шаг.
+- **Пара для `RETURN` — `SetPropertiesTypes()`, а не `getPropertiesDialogMap()`.** Карта формы
+  описывает **входные** поля; тип результата, объявленный в `RETURN`, регистрируется в классе
+  действия через `SetPropertiesTypes()` (книга, пример `helloworldactivity`). Результат в карту формы
+  не кладите — он станет полем ввода (вывод команды). Раньше здесь было сказано, что тип в `RETURN`
+  должен совпадать с картой формы, — исправлено при сверке 2026-09-21.
+- У `SELECT` без `Groups` пункты берутся из `Options`; своя отрисовка поля —
+  `renderFieldControl(..., FieldType::RENDER_MODE_DESIGNER)`.
 - Не путать с `\Bitrix\Main\UI\Filter\DateType` — это другое семейство констант, для подтипов дат
   в фильтре ([[entity-filter-field-adapter]]).
 

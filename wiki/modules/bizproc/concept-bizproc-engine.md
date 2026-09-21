@@ -4,19 +4,22 @@ type: concept
 module: bizproc
 edition: box
 status: verified
-provenance: documented
-verified: "2026-06-01 / документация модуля bizproc (dev.1c-bitrix.ru, курс 57)"
+provenance: mixed
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы — О модуле, Действия, Свои действия, Свои условия, Окружение; курс 57 книга даёт только как ссылку"
 tags: [bizproc, активити, шаблон, инстанс, роботы, окружение]
 sources: ["[[source-devbook-bizproc]]"]
-related: ["[[recipe-bizproc-custom-task-activity]]", "[[pattern-robots-vs-bizproc-decision]]", "[[concept-bizproc-bpt-format]]", "[[entity-robots-triggers]]", "[[concept-change-invasiveness-hierarchy]]"]
+related: ["[[recipe-bizproc-custom-task-activity]]", "[[pattern-robots-vs-bizproc-decision]]", "[[concept-bizproc-bpt-format]]", "[[entity-robots-triggers]]", "[[concept-change-invasiveness-hierarchy]]", "[[entity-bizproc-activity-description]]", "[[antipattern-bizproc-php-code-activity]]"]
 aliases: ["bitrix24-bizproc"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # Устройство движка БП
 
 **TL;DR:** шаблон, собранный в дизайнере, при запуске **копируется** в экземпляр, и дальше процесс
 идёт по копии. Кубик исполнения — активити; робот — это тот же класс активити с другим типом.
+Источник — раздел «Модуль Бизнес-процессы» «Книги разработчика»
+([О модуле](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/O_module.html);
+атрибуция исправлена при сверке 2026-09-21: курс 57 книга даёт только как ссылку).
 
 ## Терминология
 
@@ -36,12 +39,17 @@ updated: "2026-09-18"
 Шаблон **копируется в экземпляр** при запуске. Отсюда два следствия, о которых регулярно
 приходится напоминать заказчику:
 
-- правка шаблона **не влияет** на уже запущенные процессы — они доживут по старой логике;
-- «исправить зависший процесс» правкой шаблона нельзя: нужно останавливать и запускать заново.
+- правка шаблона **не влияет** на уже запущенные процессы — они доживут по старой логике (книга
+  называет остановку запущенных процессов при изменении шаблона неправильным выходом);
+- «исправить зависший процесс» правкой шаблона нельзя: его останавливают и запускают заново
+  (практика команды).
+
+БП запускается только на объектах, которые поддерживают эту механику: задачи — частично, старые
+счета и события календаря — нет (книга).
 
 ## Три типа активити
 
-Тип задаётся в `.description.php`:
+Тип задаётся в `.description.php` ([[entity-bizproc-activity-description]]):
 
 | `TYPE` | Что это | Базовый класс |
 |---|---|---|
@@ -76,8 +84,12 @@ updated: "2026-09-18"
 4. `/bitrix/activities/bitrix/`
 5. `/bitrix/modules/bizproc/activities/`
 
-Своё кладём в `/local/activities/custom/` или поставляем модулем. Имя каталога = имя класса без
-префикса `CBP` в нижнем регистре: `CBPHelloWorldActivity` → `helloworldactivity/`.
+Берётся **первое совпадение** (книга): одноимённый каталог выше по списку перекрывает штатное
+действие — имя своего каталога не должно совпадать со штатным (вывод команды из порядка поиска, на
+стенде не проверялось). Своё кладём в `/local/activities/custom/`.
+Каталога своего модуля в списке нет: модуль при установке копирует действие в один из этих
+каталогов (обычно `/local/activities/custom/<имя>/`) и убирает его при удалении. Имя каталога = имя
+класса без префикса `CBP` в нижнем регистре: `CBPHelloWorldActivity` → `helloworldactivity/`.
 
 Каноническая структура каталога:
 
@@ -85,14 +97,15 @@ updated: "2026-09-18"
 <name>/
 ├── .description.php            — $arActivityDescription
 ├── <name>.php                  — класс активити
-├── properties_dialog.php       — форма настроек (для activity)
+├── properties_dialog.php       — форма настроек (для activity); при getPropertiesDialogMap() — только для своей отрисовки
 ├── robot_properties_dialog.php — форма настроек (для robot_activity)
 └── lang/<lang>/
 ```
 
 ## Подключение модуля
 
-В отличие от `main` и `intranet`, `bizproc` подключён не всегда:
+В отличие от `main` и `intranet` (последний гарантирован в публичной части), `bizproc` может быть не
+установлен или не подключён — книга требует явной проверки:
 
 ```php
 if (\Bitrix\Main\Loader::includeModule('bizproc')) { /* … */ }
@@ -104,7 +117,8 @@ if (\Bitrix\Main\Loader::includeModule('bizproc')) { /* … */ }
 
 Своё активити — уровень 2 [[concept-change-invasiveness-hierarchy|иерархии]]: легитимное
 расширение, которое переживает обновления продукта. Почти любая просьба «пусть процесс делает
-что-то нестандартное» решается своим действием, а не правкой ядра и не внешним сервисом.
+что-то нестандартное» решается своим действием, а не правкой ядра, не внешним сервисом и не
+действием «PHP код» ([[antipattern-bizproc-php-code-activity]]).
 
 ## Связанные страницы
 - [[concept-bizproc-bpt-format]] — как шаблон выглядит в экспортном файле

@@ -85,7 +85,9 @@ class vendor_module extends CModule
 
     public function InstallEvents()
     {
-        EventManager::getInstance()->registerEventHandler(
+        // OnAfterCrmDealAdd — событие старого ядра: регистрируем …Compatible,
+        // обработчик получает array &$fields (см. pattern-events-over-core-modification)
+        EventManager::getInstance()->registerEventHandlerCompatible(
             'crm', 'OnAfterCrmDealAdd', $this->MODULE_ID,
             \Vendor\Module\Handler\Deal::class, 'onAfterAdd'
         );

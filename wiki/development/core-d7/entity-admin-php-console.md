@@ -4,19 +4,21 @@ type: entity
 module: core-d7
 edition: box
 status: verified
-provenance: documented
-verified: "2026-06-01 / документация Bitrix Framework (dev.1c-bitrix.ru)"
+provenance: mixed
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Сам себе источник — исследование через REST; подводные камни — опыт команды"
 tags: [диагностика, админка, исследование, инструмент]
 sources: ["[[source-devbook-dev-rules]]"]
 related: ["[[concept-platform-reverse-engineering]]", "[[antipattern-cli-php-as-root]]", "[[concept-coding-standards]]"]
 aliases: ["bitrix24-komandnaya-php-stroka"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # Командная PHP-строка
 
 **Что это:** страница административного раздела, на которой выполняется произвольный PHP-код в
-контексте портала. Основной инструмент быстрой диагностики.
+контексте портала. Основной инструмент быстрой диагностики. Книга прямо оговаривает: это **не CLI**,
+а страница админки ([Сам себе источник](https://bx24devbook.website.yandexcloud.net/Dokumentacia/Sam_sebe_istocnik.html#issledovanie-cerez-rest)).
+Подводные камни ниже — наблюдения команды, не книги.
 
 ## Ключевые факты
 | Поле | Значение |

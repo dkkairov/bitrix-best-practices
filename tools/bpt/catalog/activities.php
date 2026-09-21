@@ -274,7 +274,8 @@ return [
             'title'    => 'Утверждение документа',
             'title_guess' => true,
             'shape'    => 'waiting-branches',
-            'props'    => $waitingCommon + [
+            // array_merge, а не «+»: частные значения должны перекрывать общие
+            'props'    => array_merge($waitingCommon, [
                 'ApproveType'        => ['type' => 'str', 'default' => 'all'],
                 'ApproveMinPercent'  => ['type' => 'str', 'default' => '50'],
                 'ApproveWaitForAll'  => ['type' => 'yn', 'default' => 'N'],
@@ -282,7 +283,7 @@ return [
                 // В корпусе обе кнопки переименованы; здесь — нейтральные подписи
                 'TaskButton1Message' => ['type' => 'str', 'default' => 'Утвердить'],
                 'TaskButton2Message' => ['type' => 'str', 'default' => 'Отклонить'],
-            ],
+            ]),
             'returns'  => ['Comments', 'LastApprover'],
             'observed' => 8,
         ],
@@ -291,12 +292,12 @@ return [
             'title'    => 'Ознакомление',
             'title_guess' => true,
             'shape'    => 'waiting',
-            'props'    => $waitingCommon + [
+            'props'    => array_merge($waitingCommon, [
                 'ApproveType'         => ['type' => 'str', 'default' => 'all'],
                 'Parameters'          => ['type' => 'str', 'default' => ''],
                 'TaskButtonMessage'   => ['type' => 'str', 'default' => 'Принято'],
                 'CommentLabelMessage' => ['type' => 'str', 'default' => 'Комментарий'],
-            ],
+            ]),
             'returns'  => ['Comments', 'LastReviewer'],
             'observed' => 18,
         ],
@@ -305,10 +306,10 @@ return [
             'title'    => 'Запрос дополнительной информации',
             'title_guess' => true,
             'shape'    => 'waiting',
-            'props'    => $waitingCommon + [
+            'props'    => array_merge($waitingCommon, [
                 'RequestedInformation' => ['type' => 'defs', 'required' => true],
                 'TaskButtonMessage'    => ['type' => 'str', 'default' => 'Принято'],
-            ],
+            ]),
             'returns'  => ['Comments', 'InfoUser'],
             'observed' => 6,
         ],
@@ -317,13 +318,13 @@ return [
             'title'    => 'Запрос информации с возможностью отклонить',
             'title_guess' => true,
             'shape'    => 'waiting-branches',
-            'props'    => $waitingCommon + [
+            'props'    => array_merge($waitingCommon, [
                 'RequestedInformation'    => ['type' => 'defs', 'required' => true],
                 'TaskButtonMessage'       => ['type' => 'str', 'default' => 'Принято'],
                 'CancelType'              => ['type' => 'str', 'default' => 'any'],
                 'TaskButtonCancelMessage' => ['type' => 'str', 'default' => 'Отклонить'],
                 'SaveVariables'           => ['type' => 'yn', 'default' => 'N'],
-            ],
+            ]),
             'returns'  => ['Comments', 'InfoUser'],
             'observed' => 3,
         ],

@@ -36,6 +36,12 @@ test('Каталог: значения по умолчанию и обязате
     assertSame(['TITLE'], $c->returns('CrmGetRelationsInfoActivity', ['ParentEntityFields' => ['TITLE' => ['Name' => 'Название']]]));
 });
 
+test('Каталог: частные значения заданий перекрывают общие', function () {
+    // У ознакомления своя подпись поля комментария, у утверждения — общая
+    assertSame('Комментарий', Catalog::load()->defaults('ReviewActivity')['CommentLabelMessage']);
+    assertSame('Пояснение', Catalog::load()->defaults('ApproveActivity')['CommentLabelMessage']);
+});
+
 test('Каталог: типы свойств', function () {
     $c = Catalog::load();
     assertSame('map', $c->propType('SetFieldActivity', 'FieldValue'));

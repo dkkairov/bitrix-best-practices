@@ -7,16 +7,22 @@ status: verified
 provenance: mixed
 verified: "2026-06-03 / коробка: исходники main и bizproc, проверено живой подпиской"
 tags: [orm, d7, datamanager, события, eventmanager, opcache]
-sources: ["[[source-devbook-core-d7]]"]
-related: ["[[recipe-d7-orm-event-subscription]]", "[[pattern-events-over-core-modification]]", "[[concept-bitrix-naming-conventions]]", "[[pattern-crm-action-vs-event]]"]
+sources: []
+related: ["[[recipe-d7-orm-event-subscription]]", "[[pattern-events-over-core-modification]]", "[[concept-bitrix-naming-conventions]]", "[[pattern-crm-action-vs-event]]", "[[entity-event-manager]]"]
 aliases: ["bitrix24-orm-datamanager"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # События ORM DataManager
 
 **TL;DR:** любой наследник `DataManager` автоматически получает девять событий жизненного цикла.
 Ошибка в формате имени не даёт ни ошибки, ни предупреждения — обработчик просто молчит.
+
+> **Источник уточнён 2026-09-21.** Страница ссылалась на конспект «Книги разработчика», но при сверке
+> с сайтом книги выяснилось: событий ORM `DataManager` в книге нет вообще. Всё ниже — из исходников
+> `main`/`bizproc` и живой проверки (см. `verified`); книге отсюда соответствует только общее правило
+> «обработчик нового ядра получает один `Event`»
+> ([События](https://bx24devbook.website.yandexcloud.net/Razrabotka/Tehnologii/Sobytia.html#kak-podpisat-sa-na-sobytia)).
 
 ## Девять событий
 

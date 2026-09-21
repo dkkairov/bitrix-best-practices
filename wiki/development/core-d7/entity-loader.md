@@ -7,10 +7,10 @@ status: verified
 provenance: documented
 verified: "2026-09-18 / dev.1c-bitrix.ru, справочник D7 \Bitrix\Main\Loader"
 tags: [загрузка-модулей, автозагрузка, d7, класс]
-sources: ["[[source-devbook-core-d7]]"]
+sources: []
 related: ["[[recipe-module-structure-and-install]]", "[[concept-code-namespaces-and-autoloading]]", "[[entity-module-manager]]", "[[recipe-d7-orm-event-subscription]]"]
 aliases: []
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `\Bitrix\Main\Loader`
@@ -49,7 +49,12 @@ Loader::requireModule('crm');          // бросает исключение в
 
 `requireModule($moduleId)` — «подключить или бросить исключение» — в справочнике D7 на момент
 сверки **не перечислен**, хотя широко используется в современном коде ядра (в том числе в
-ленивых фабриках CRM). Если пишете под старую версию, проверьте его наличие.
+ленивых фабриках CRM). «Книга разработчика» тоже подключает модули через
+`Loader::requireModule()` в примерах (например, глава «Модуль Задачи») — но отдельной главы про
+`Loader` в книге нет. Если пишете под старую версию, проверьте наличие метода.
+
+> **Источник уточнён 2026-09-21.** Ссылка на конспект книги убрана из `sources`: страница сверена
+> по справочнику D7 на dev.1c-bitrix.ru (см. `verified`), книга класс `Loader` не разбирает.
 
 Подключение модуля выполняет его `include.php` — именно поэтому там регистрируют обработчики
 событий и сервисы ([[recipe-d7-orm-event-subscription]]).

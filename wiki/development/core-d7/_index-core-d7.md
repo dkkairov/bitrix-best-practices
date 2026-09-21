@@ -4,7 +4,7 @@ type: index
 module: core-d7
 edition: box
 status: verified
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # Ядро D7 — практики разработки (коробка)
@@ -28,12 +28,15 @@ updated: "2026-09-18"
 - [[concept-orm-datamanager-events|События ORM DataManager: девять хуков и формат имени]]
 - [[concept-service-locator|ServiceLocator: регистрация и подмена сервисов]]
 - [[concept-validation-d7|Валидация D7: PHP-атрибуты вместо простыней if]]
+- [[recipe-d7-custom-validation-rule|Свой валидатор и правило валидации D7]] · черновик
+- [[concept-deferred-functions-and-page-areas|Отложенные функции и зоны страницы]] · черновик
 - [[concept-code-namespaces-and-autoloading|Пространства имён, автозагрузка, размещение кода в /local/]]
 - [[pattern-local-solution-structure|Решение в /local/php_interface: структура клиентского проекта]]
 - [[recipe-composer-third-party-libraries|Сторонние Composer-пакеты (dompdf, PhpWord)]]
 - [[pattern-events-over-core-modification|Расширение через события]]
 - [[recipe-d7-orm-event-subscription|Подписка модуля на событие D7 ORM]]
 - [[pattern-agents-vs-cron|Агенты или cron: выбор способа фонового запуска]]
+- [[recipe-cli-script-bootstrap|Консольный и cron-скрипт: подключение ядра и завершение]] · черновик
 - [[antipattern-ajax-controller-lowercase-name|Антипаттерн: строчное имя контроллера в AJAX-действии]]
 - [[concept-coding-standards|Код-стайл и безопасность]]
 - [[concept-testing-approach|Подход к тестированию]]
@@ -56,8 +59,10 @@ updated: "2026-09-18"
 
 ## Статус покрытия
 Есть стандарт разработки и иерархия инвазивности, организация кода и соглашения именования,
-события, приёмы исследования платформы, код-стайл/безопасность, тесты и ключевой антипаттерн.
-Не хватает: рецепты ORM D7 (запросы, связи), отложенные функции и зоны страницы.
+структура клиентского решения в `/local/php_interface`, события, отложенные функции и зоны
+страницы, консольные скрипты, своя валидация, приёмы исследования платформы, код-стайл/безопасность,
+тесты и ключевой антипаттерн. Страницы по «Книге разработчика» сверены с сайтом книги 2026-09-21.
+Не хватает: рецепты ORM D7 (запросы, связи).
 `Loader` и `Config\Option` сверены по справочнику D7 на `dev.1c-bitrix.ru` (2026-09-18).
 `ModuleManager` остаётся `draft`: страница справочника не отдала содержимое, а поиск выводит
 на функции старого ядра.

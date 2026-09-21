@@ -7,10 +7,10 @@ status: draft
 provenance: mixed
 verified: ""
 tags: [модули, установка, d7, класс]
-sources: ["[[source-devbook-core-d7]]"]
+sources: []
 related: ["[[recipe-module-structure-and-install]]", "[[entity-loader]]", "[[recipe-module-versioning-and-private-distribution]]"]
 aliases: []
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `\Bitrix\Main\ModuleManager`
@@ -20,6 +20,7 @@ updated: "2026-09-18"
 > содержимое, а поиск выводит на функции **старого** ядра (`RegisterModule`, `IsModuleInstalled`).
 > Соседние классы того же модуля сверить удалось — см. [[entity-loader]] и
 > [[entity-config-option]]. Снять `draft` после сверки по исходникам `main` или по справочнику.
+> 2026-09-21: в «Книге разработчика» `ModuleManager` не встречается — ссылка на её конспект снята.
 
 **Что это:** регистрация и снятие регистрации модуля, проверка установленности. D7-замена старому
 `CModule::RegisterModule()`.

@@ -7,10 +7,10 @@ status: verified
 provenance: documented
 verified: "2026-09-18 / dev.1c-bitrix.ru, справочник D7 \Bitrix\Main\Config\Option"
 tags: [настройки, опции, d7, класс, кэш, b_option]
-sources: ["[[source-devbook-core-d7]]"]
+sources: ["[[source-devbook-intranet]]"]
 related: ["[[antipattern-cli-php-as-root]]", "[[recipe-module-structure-and-install]]", "[[recipe-smart-process-programmatic-creation]]", "[[concept-org-structure]]"]
 aliases: []
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `\Bitrix\Main\Config\Option`
@@ -58,7 +58,10 @@ $key = Option::get('vendor.module', 'API_KEY', '', $siteId); // значение
 
 - **Значение по умолчанию выбирайте осознанно.** Для ID сущностей ставьте `'-1'`, а не `'0'`:
   ноль в фильтре `getList` инфоблока не сужает выборку, а обнуляет условие, и вместо пустого
-  результата вы получите «всё подряд» ([[concept-org-structure]]).
+  результата вы получите «всё подряд» ([[concept-org-structure]]). Обоснование в «Книге
+  разработчика» дано для опций интранета и `getList` инфоблоков
+  ([Оргструктура](https://bx24devbook.website.yandexcloud.net/Modul_Intranet/Orgstruktura.html#api));
+  на любые ID это правило распространяет команда.
 - **Опции кэшируются, и кэш можно испортить.** Консольный PHP, запущенный от root, создаёт файлы
   управляемого кэша с владельцем root; после этого `Option::set` пишет в базу, а `Option::get`
   продолжает отдавать старое — в вебе и в консоли. Полный разбор и лечение —

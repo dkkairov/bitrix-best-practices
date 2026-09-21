@@ -5,12 +5,12 @@ module: core-d7
 edition: box
 status: verified
 provenance: empirical
-verified: "2026-06-04 / коробка: модуль bizproc, D7 ORM; повторно 2026-09-15 на main 26.700"
+verified: "2026-06-04 / коробка: модуль bizproc, D7 ORM; повторно 2026-09-15 на main 26.700; скелет обработчика выправлен 2026-09-21"
 tags: [события, orm, d7, модуль, init-php, eventmanager]
 sources: []
-related: ["[[pattern-events-over-core-modification]]", "[[recipe-module-structure-and-install]]", "[[pattern-crm-action-vs-event]]"]
+related: ["[[pattern-events-over-core-modification]]", "[[recipe-module-structure-and-install]]", "[[pattern-crm-action-vs-event]]", "[[concept-orm-datamanager-events]]", "[[entity-event-manager]]"]
 aliases: ["bitrix24-d7-orm-event-module"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # Подписка модуля на событие D7 ORM
@@ -18,10 +18,18 @@ updated: "2026-09-18"
 **Результат:** свой модуль ловит `OnAfterAdd` / `OnAfterUpdate` / `OnAfterDelete` ORM-сущности
 (`DataManager`) — надёжно, на каждом хите, с корректным снятием при удалении модуля.
 
+> **Осознанная практика команды (сверено с книгой 2026-09-21).** «Книга разработчика» советует
+> модулям регистрировать обработчики в БД без оговорок
+> ([События](https://bx24devbook.website.yandexcloud.net/Razrabotka/Tehnologii/Sobytia.html#kak-podpisat-sa-na-sobytia));
+> события ORM она не разбирает. Для событий D7 ORM регистрация молча не работает — проверено вживую
+> (см. `verified`), поэтому здесь `addEventHandler` на каждом хите. Также выправлен скелет
+> обработчика: подписка через `addEventHandler` передаёт один объект `Event`, а не `$id, $fields`.
+
 ## Почему штатный путь не работает
 
-Регистрация обработчика в `DoInstall` через `RegisterModuleDependences` (и D7-обёртку
-`registerEventHandler`) кладёт запись в `b_module_to_module`, где `MESSAGE_ID` — **`VARCHAR(50)`**.
+Регистрация обработчика в `DoInstall` через `RegisterModuleDependences` (и методы D7
+`registerEventHandler` / `registerEventHandlerCompatible`) кладёт запись в `b_module_to_module`, где
+`MESSAGE_ID` — **`VARCHAR(50)`**.
 Имена событий D7 ORM длиннее:
 
 ```
@@ -134,9 +142,12 @@ private function getInitBlock(): string
 Рабочая форма:
 
 ```php
-public static function onSomeEntityUpdate($id, $fields = null): void
+public static function onSomeEntityUpdate(\Bitrix\Main\Event $event): void
 {
-    // 1. Разбор аргументов: Event или массивы
+    // 1. Разбор аргументов: подписка через addEventHandler даёт один объект Event
+    $id = $event->getParameter('id');
+    $fields = $event->getParameter('fields') ?? [];
+
     // 2. Ранний выход, если это не наш случай — молча, без уведомления
     if (!array_key_exists('SOME_FIELD', $fields)) return;
 

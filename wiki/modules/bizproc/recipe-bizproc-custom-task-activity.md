@@ -4,13 +4,13 @@ type: recipe
 module: bizproc
 edition: box
 status: verified
-provenance: empirical
-verified: "2026-06-08 / коробка: классический дизайнер БП + новый UI заданий в карточке смарт-процесса"
+provenance: mixed
+verified: "2026-06-08 / коробка: классический дизайнер БП + новый UI заданий в карточке смарт-процесса; сверено с «Книгой разработчика Bitrix24» 2026-09-21 (Модуль Бизнес-процессы — Действия): базовый класс и RETURN/ADDITIONAL_RESULT расходятся с книгой, см. врезку"
 tags: [bizproc, активити, задание, CBPTaskService, дизайнер, форма]
-sources: []
-related: ["[[pattern-robots-vs-bizproc-decision]]", "[[recipe-module-structure-and-install]]", "[[concept-change-invasiveness-hierarchy]]", "[[entity-robots-triggers]]"]
+sources: ["[[source-devbook-bizproc]]"]
+related: ["[[pattern-robots-vs-bizproc-decision]]", "[[recipe-module-structure-and-install]]", "[[concept-change-invasiveness-hierarchy]]", "[[entity-robots-triggers]]", "[[entity-cbp-task-service]]", "[[entity-cbp-activity]]", "[[entity-bizproc-activity-description]]", "[[antipattern-bizproc-php-code-activity]]"]
 aliases: ["bitrix24-bp-task-activity"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # Своё действие БП с заданием
@@ -19,10 +19,31 @@ updated: "2026-09-18"
 задание попадает в штатный список заданий БП и в живую ленту, как встроенные «Утверждение» и
 «Ознакомление».
 
+> **Сверено с книгой 2026-09-21: три расхождения, рецепт оставлен как практика команды.**
+> 1. **Базовый класс.** По книге задание — событийное действие, которое наследует
+>    `CBPCompositeActivity` и реализует те же интерфейсы
+>    ([Действия → классификация](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#klassifikacia-dejstvij)).
+>    У нас — `CBPActivity` + `IBPEventActivity` + `IBPActivityExternalEventListener`, и это работает на
+>    стенде (2026-06-08). **Решение:** оставить как осознанную практику; при обновлении коробки или
+>    странностях выполнения сверить со штатными заданиями дистрибутива и при необходимости перейти на
+>    `CBPCompositeActivity` ([[entity-cbp-task-service]], открытый вопрос).
+> 2. **`CATEGORY`.** Книга называет только `['ID' => 'other']` и свой раздел через `OWN_ID`/`OWN_NAME`
+>    ([CATEGORY](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#category)).
+>    Таблица встроенных кодов в шаге 5 — наблюдения команды.
+> 3. **`RETURN` и `ADDITIONAL_RESULT`.** По книге `ADDITIONAL_RESULT` перечисляет **свойства-карты**
+>    результатов, состав которых определяется на ходу, а не дублирует ключи `RETURN`
+>    ([ADDITIONAL_RESULT](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#additional-result)).
+>    Наш тезис «`RETURN` — для классического дизайнера, `ADDITIONAL_RESULT` — для роботов, указывать
+>    оба» — эмпирика, книгой не подтверждается; сама книга здесь противоречит себе
+>    ([[entity-bizproc-activity-description]]). **Решение:** до проверки на стенде постоянный
+>    результат объявлять в `RETURN` + `SetPropertiesTypes()`, `ADDITIONAL_RESULT` — только со
+>    свойством-картой; после выкладки проверить «Вставку значения» и в дизайнере, и в роботах.
+
 ## Предусловия
 - Решено, что нужен полноценный БП, а не робот — [[pattern-robots-vs-bizproc-decision]].
 - Действие поставляется модулем — [[recipe-module-structure-and-install]]; файлы активити
-  раскладываются в `DoInstall` через `CopyDirFiles`.
+  раскладываются в `DoInstall` через `CopyDirFiles` в один из каталогов, где движок ищет действия,
+  обычно `/local/activities/custom/` (порядок поиска — [[entity-bizproc-activity-description]]).
 
 ## Почему не свой URL
 
@@ -36,6 +57,7 @@ updated: "2026-09-18"
 ### 1. Класс активити
 
 ```php
+// практика команды: CBPActivity; книга для заданий называет CBPCompositeActivity (см. врезку вверху)
 class CBPMyActivity extends CBPActivity
     implements IBPEventActivity, IBPActivityExternalEventListener
 {
@@ -192,9 +214,11 @@ $arActivityDescription = [
     'JSCLASS'           => 'BizProcActivity',
     'CATEGORY'          => ['ID' => 'task'],  // см. таблицу ниже
     'RETURN'            => ['ResultField' => ['NAME' => '…', 'TYPE' => 'int']],
-    'ADDITIONAL_RESULT' => ['ResultField'],
+    'ADDITIONAL_RESULT' => ['ResultField'],   // эмпирика команды; по книге здесь свойство-карта — см. врезку
 ];
 ```
+
+Встроенные коды разделов — наблюдения команды; в книге есть только `other` и свой раздел:
 
 | `CATEGORY['ID']` | Раздел дизайнера |
 |---|---|
@@ -208,7 +232,9 @@ $arActivityDescription = [
 Неизвестный `ID` → действие падает в «Мои действия» либо не отображается вовсе.
 
 `RETURN` делает результаты выбираемыми в классическом дизайнере, `ADDITIONAL_RESULT` — в
-D7-движке и роботах. Указывать оба безопасно и покрывает обе среды.
+D7-движке и роботах. Указывать оба безопасно и покрывает обе среды. **Расходится с книгой
+(2026-09-21):** книга описывает `ADDITIONAL_RESULT` иначе — как список свойств-карт для
+динамических результатов; до проверки на стенде следовать решению из врезки вверху.
 
 ## Проверка результата
 - Действие видно в разделе «Задания» дизайнера БП (после сброса кэша).
@@ -226,7 +252,7 @@ D7-движке и роботах. Указывать оба безопасно 
 | Задание не появляется в попапе | `ACTIVITY` в `CreateTask` ≠ имени класса без `CBP` | привести в соответствие |
 | Задание не удаляется при отмене БП | нет `Cancel()` / `HandleFault()` | добавить оба, оба зовут `Unsubscribe()` |
 | Поле-пользователь сохраняется строкой | не использован `CBPHelper` | конвертировать в обе стороны |
-| `Call to FaultActivity() on null` | `$this->Execution` в действии не существует | прерывать через `throw new Exception(...)` — движок вызовет `HandleFault` |
+| `Call to FaultActivity() on null` | `$this->Execution` в действии не существует | прерывать через `throw new Exception(...)` — движок вызовет `HandleFault` (эмпирика; штатный путь по книге — статус `Faulting`, см. [[entity-cbp-activity]]) |
 | **Свой JS в диалоге настроек не отрабатывает** | диалог грузится AJAX-ом, inline `<script>` исполняется ненадёжно (особенно в редакторе автоматизации CRM) | лёгкий случай — progressive enhancement (`<textarea>` + билдер поверх); надёжно — вынести сложное редактирование на отдельную страницу |
 | **Нужна загрузка файлов в настройках действия** | диалог сохраняется AJAX-ом и multipart не принимает в принципе | отдельная админ-страница с обычным multipart-POST и `CFile::SaveFile`; действие хранит только ID сущности |
 | **Админ-страница из `/local/admin/` даёт 404** | Bitrix не роутит `/local/admin/` по URL | реальную страницу класть в `/local/admin/`, а в `/bitrix/admin/<file>.php` — тонкий загрузчик `require($_SERVER['DOCUMENT_ROOT'].'/local/admin/<file>.php');`; снимать при удалении модуля; само-ссылки строить от `$_SERVER['SCRIPT_NAME']` |
@@ -239,5 +265,8 @@ D7-движке и роботах. Указывать оба безопасно 
 ## Связанное
 - [[pattern-robots-vs-bizproc-decision]] — нужен ли вообще БП
 - [[recipe-module-structure-and-install]] — как поставляется действие
+- [[entity-cbp-task-service]] — методы и поля сервиса заданий
+- [[entity-bizproc-activity-description]] — паспорт действия `.description.php` по книге
+- [[antipattern-bizproc-php-code-activity]] — почему своё действие, а не «PHP код»
 
 [← Бизнес-процессы](_index-bizproc.md)

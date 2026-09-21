@@ -4,19 +4,27 @@ type: entity
 module: bizproc
 edition: box
 status: verified
-provenance: documented
-verified: "2026-06-01 / документация модуля bizproc (dev.1c-bitrix.ru, курс 57)"
+provenance: mixed
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы — Действия, Окружение, PHP код, Свои действия; прерывание через throw и inline-скрипты диалога — эмпирика команды"
 tags: [bizproc, активити, класс, диалог-настроек, журнал]
 sources: ["[[source-devbook-bizproc]]"]
-related: ["[[concept-bizproc-engine]]", "[[recipe-bizproc-custom-task-activity]]", "[[entity-bizproc-field-type]]", "[[entity-cbp-activity-condition]]", "[[entity-main-result]]"]
+related: ["[[concept-bizproc-engine]]", "[[recipe-bizproc-custom-task-activity]]", "[[entity-bizproc-field-type]]", "[[entity-cbp-activity-condition]]", "[[entity-main-result]]", "[[entity-bizproc-activity-description]]"]
 aliases: ["bitrix24-cbp-activity"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `CBPActivity` и `BaseActivity`
 
 **Что это:** базовые классы любого действия бизнес-процесса. `CBPActivity` — корневой (старый
-C-API), `\Bitrix\Bizproc\Activity\BaseActivity` — его D7-наследник с удобствами.
+C-API), `\Bitrix\Bizproc\Activity\BaseActivity` — его D7-наследник с удобствами
+([Действия](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html),
+[Свои действия](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Svoi_dejstvia.html)).
+
+> **Сверено с книгой 2026-09-21.** Атрибуция исправлена (материал — из книги; курс 57 она даёт только
+> как ссылку). Добавлены: классический диалог настроек, окружение по книге (параметры, геттер
+> `getRuntimeProperty`, `DocumentService` без проверки прав), условия возврата результата, код на cron.
+> Прерывание через `throw` и ненадёжность inline-скриптов помечены как эмпирика команды; штатный путь по
+> книге — статус `Faulting` / `ErrorCollection`.
 
 ## Ключевые факты
 | Поле | Значение |
@@ -50,11 +58,25 @@ class CBPMyActivity extends \CBPActivity
 **Возврат `Execute()`:** `Closed` — завершено; `Executing` — ещё работает (событийные действия);
 `Faulting` — критическая ошибка, процесс прекращается.
 
+**Классический диалог настроек** (без `BaseActivity`) — статические `GetPropertiesDialog(...)`
+(10 параметров; форма рисуется через `CBPRuntime::ExecuteResourceFile`) и
+`GetPropertiesDialogValues(...)` (8 параметров; действие в шаблоне находят через
+`CBPWorkflowTemplateLoader::FindActivityByName`, метод возвращает `bool`). Разметка —
+[[entity-bizproc-activity-description|рядом с `.description.php`]], в `properties_dialog.php`.
+
 ## Доступ к окружению
 
-`parseValue($value, $convertToType = null)` — разбор выражений; `getVariable` / `setVariable`;
-`getConstant`; `getDocumentId()` / `getDocumentType()`; `getWorkflowTemplateId()`;
-`getRootActivity()`; сервисы — `$this->workflow->GetService('DocumentService' | 'TrackingService')`.
+([Окружение](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Okruzenie.html))
+- `parseValue($value, $convertToType = null)` — разбор выражений (функции, калькулятор, несколько
+  выражений в строке); универсальный геттер `getRuntimeProperty($object, $field, $ownerActivity)` →
+  `[описание, значение]` с источниками `\Bitrix\Bizproc\Workflow\Template\SourceType::*`.
+- Параметры шаблона — `$this->getRootActivity()->ИмяПараметра`; переменные — `getVariable` /
+  `setVariable` (множественные значения — массивом, пользователи — `user_N`); константы — только
+  `getConstant`.
+- Документ — `$this->workflow->getService('DocumentService')->getDocument($this->getDocumentId())`:
+  сервис **кэширует, грузит лениво и не проверяет права** — проверку прав делайте сами.
+- Прочее: `getDocumentId()` / `getDocumentType()`, `getWorkflowTemplateId()`, `getTemplateUserId()`,
+  `getRootActivity()`; глобальные переменные и константы — [[entity-bizproc-globals-manager]].
 
 ## Журнал процесса
 
@@ -62,8 +84,10 @@ class CBPMyActivity extends \CBPActivity
 \CBPActivity::WriteToTrackingService($message = '', $modifiedBy = 0, $trackingType = -1): void
 ```
 
-Отображаемые типы `CBPTrackingType`: `Error`, `Report`, `Custom`, `FaultActivity`. Остальные
-константы в журнале не видны, но разделять их семантически полезно.
+`$modifiedBy = 0` — система. Текст сообщения сам проходит подстановку выражений. В журнале видны
+четыре типа `CBPTrackingType`: `Error`, `Report`, `Custom`, `FaultActivity` — и выглядят они
+одинаково; констант в классе больше, но остальные в журнале не показываются
+([журналирование](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/PHP_kod.html#zurnalirovanie)).
 
 ## `BaseActivity` — что добавляет D7-наследник
 
@@ -74,8 +98,12 @@ class CBPMyActivity extends \CBPActivity
 | `getFileName(): string` | обязательный статический метод, возвращает `__FILE__` |
 | `$this->log()` / `$this->logError()` | сахар над `WriteToTrackingService` |
 | `getPropertiesDialogMap()` | декларативное описание формы настроек вместо HTML |
-| `checkProperties(): ErrorCollection` | отдельная стадия валидации |
-| `$this->preparedProperties[<key>]` | альтернативный способ вернуть результат |
+| `checkProperties(): ErrorCollection` | проверки параметров **во время выполнения** (с доступом к `$preparedProperties`), не валидация формы при сохранении |
+| `$this->preparedProperties[<key>]` | способ вернуть результат; ключ должен быть объявлен в `RETURN` `.description.php`, тип — через `SetPropertiesTypes()` |
+
+Результат можно вернуть и как `$this->Key` — тогда в `arProperties` ключ должен быть `null`. Про
+`RETURN` и `ADDITIONAL_RESULT` книга противоречит сама себе —
+[[entity-bizproc-activity-description]].
 
 ```php
 protected function internalExecute(): \Bitrix\Main\ErrorCollection
@@ -119,12 +147,17 @@ public static function getPropertiesDialogMap(?PropertiesDialog $dialog = null):
   целиком, иначе потеряете модуль родителя.
 - Если модуль из `$requiredModules` не подключился, действие закрывается со статусом `Closed`, а
   `internalExecute()` **не вызывается вовсе** — снаружи выглядит как «действие ничего не сделало».
-- **`$this->Execution` в действии не существует.** Прерывать через `throw new Exception(...)` —
-  движок поймает и вызовет `HandleFault`. Вызов `$this->Execution->FaultActivity()` даст
-  «Call to a member function on null».
+- **Код может выполняться на cron:** текущего пользователя и ID сайта может не быть или они окажутся
+  чужими — не полагайтесь на глобальные `$USER` и `SITE_ID`
+  ([правила](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/PHP_kod.html#pravila)).
+- **Штатно ошибку возвращают** статусом `Faulting` из `Execute()`, а в `BaseActivity` — через
+  `ErrorCollection` (книга). **Эмпирика команды:** `$this->Execution` в действии не существует;
+  прерывать можно через `throw new Exception(...)` — движок поймает и вызовет `HandleFault`, а вызов
+  `$this->Execution->FaultActivity()` даст «Call to a member function on null». Прерывают ли ошибки
+  `ErrorCollection` сам процесс — по книге неочевидно, проверить на стенде.
 - Диалог настроек грузится AJAX-ом: **inline `<script>` исполняется ненадёжно**, особенно в
-  редакторе автоматизации CRM. Сложное редактирование выносить на отдельную страницу — подробно
-  в [[recipe-bizproc-custom-task-activity]].
+  редакторе автоматизации CRM (эмпирика команды). Сложное редактирование выносить на отдельную
+  страницу — подробно в [[recipe-bizproc-custom-task-activity]].
 
 ## Связанное
 - [[concept-bizproc-engine]] — типы активити и где они лежат

@@ -8,9 +8,9 @@ provenance: mixed
 verified: "2026-09-16 / Bitrix24 cloud: 11 экспортов шаблонов роботов СПА (VERSION 2) + apidocs.bitrix24.ru"
 tags: [бизнес-процессы, bpt, экспорт, импорт, шаблон, роботы, формат]
 sources: []
-related: ["[[entity-bizproc-template-rest-methods]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[pattern-robots-vs-bizproc-decision]]"]
+related: ["[[entity-bizproc-template-rest-methods]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[pattern-robots-vs-bizproc-decision]]", "[[concept-bizproc-activity-catalog]]"]
 aliases: []
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # Формат шаблона БП (.bpt): устройство и чтение
@@ -106,6 +106,21 @@ php tools/bpt/bpt.php encode bp-154.bpt.json -o bp-154.bpt --force
 ```
 
 Проверено: `decode` → `encode` воспроизводит все 11 файлов байт-в-байт.
+
+### Сборка из спецификации и обратный разбор
+Собирать `.bpt` вручную не нужно: процесс описывается спецификацией в YAML (формат —
+[`tools/bpt/SPEC.md`](../../../tools/bpt/SPEC.md)), а свойства действий берутся из
+[[concept-bizproc-activity-catalog|каталога действий]].
+
+```bash
+php tools/bpt/bpt.php compile spec.yaml --portal=portal.yaml -o process.bpt  # спецификация → .bpt
+php tools/bpt/bpt.php decompile bp-154.bpt                                   # .bpt → спецификация
+php tools/bpt/bpt.php render bp-154.bpt                                      # схема Mermaid для ревью
+php tools/bpt/bpt.php snapshot bp-154.bpt -o portal.yaml                     # поля и стадии портала
+```
+
+Проверено на корпусе из 14 экспортов: разбор в спецификацию и обратная сборка воспроизводят
+каждый шаблон по смыслу — и напрямую, и через снимок портала с плейсхолдерами (2026-09-21).
 
 ## Почему важно при внедрении
 - **Перенос между порталами.** В логике 10 из 11 файлов зашиты ID портала: смарт-процессы, стадии,

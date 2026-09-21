@@ -8,15 +8,18 @@ provenance: mixed
 verified: ""
 tags: [бизнес-процессы, ai, claude-code, агент, bpt, генерация, mcp, тестирование]
 sources: []
-related: ["[[concept-bizproc-bpt-format]]", "[[entity-bizproc-template-rest-methods]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[pattern-robots-vs-bizproc-decision]]", "[[recipe-rest-oauth-app-setup]]"]
+related: ["[[concept-bizproc-bpt-format]]", "[[entity-bizproc-template-rest-methods]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[pattern-robots-vs-bizproc-decision]]", "[[recipe-rest-oauth-app-setup]]", "[[concept-bizproc-activity-catalog]]"]
 aliases: []
-updated: "2026-09-16"
+updated: "2026-09-21"
 ---
 
 # AI-генерация бизнес-процессов: агент проектирует, код собирает
 
-> **Черновик.** Схема выведена из разбора 11 реальных шаблонов и документации; пилотом пока не
-> подтверждена.
+> **Черновик.** Схема выведена из разбора реальных шаблонов и документации; пилотом на портале пока
+> не подтверждена. **Сделано (2026-09-21):** шаги 2–3 — [[concept-bizproc-activity-catalog|каталог
+> действий]] (25 типов) и инструменты в `tools/bpt`: сборка из спецификации, обратный разбор,
+> проверки, снимок портала и схема. Разбор и сборка воспроизводят все 14 шаблонов корпуса.
+> Дальше — живой снимок и загрузка через REST, навык Claude Code, хуки.
 
 ## Проблема и контекст
 Цель — чтобы ИИ-агент (Claude Code) сам проектировал и настраивал бизнес-процессы по ТЗ, опираясь
@@ -60,7 +63,9 @@ updated: "2026-09-16"
 1. **Корпус.** Собрать 30–50 экспортов разных видов и обезличить их. Прогнать
    `php tools/bpt/bpt.php analyze` — получится перечень типов действий и их свойств.
 2. **Каталог действий.** Для каждого типа — свойства, значения по умолчанию, эталонный пример.
-   Модель использует **только** действия из каталога.
+   Модель использует **только** действия из каталога. Сделано:
+   [[concept-bizproc-activity-catalog|каталог действий]], формат спецификации — в
+   [`tools/bpt/SPEC.md`](../../../tools/bpt/SPEC.md).
 3. **Инструменты — это код, не модель:** разбор и сборка `.bpt`
    ([`tools/bpt`](../../../tools/bpt/README.md)), компилятор спецификации, проверки (ссылки,
    объявления, запрещённые действия, «сырые» ID), схема процесса в Mermaid для ревью.
@@ -77,14 +82,23 @@ updated: "2026-09-16"
    отрабатывает → ревьюер согласен.
 9. **Пилот:** один смарт-процесс, только шаблоны дизайнера.
 
-Пример спецификации (синтаксис условный):
+Пример спецификации (формат — [`tools/bpt/SPEC.md`](../../../tools/bpt/SPEC.md), полный пример —
+`tools/bpt/examples/invoice-approval.bizproc.yaml`):
 ```yaml
-process: Согласование счёта
-document: smart:Счета поставщиков          # → DYNAMIC_xxx из снимка портала
+bizproc: 1
+name: Согласование счёта
+kind: designer
 steps:
-  - approve: {id: fin, users: [role:Финансист], timeout: 2d}
-    on_yes: [{change_stage: Оплата}]         # → DTxxx_yy:UC_…
-    on_no:  [{notify: {to: [author], text: "Отклонено: {{fin.comment}}"}}]
+  - approve:
+      id: fin
+      Users: ["{{group:Бухгалтерия}}"]              # → ID группы из снимка портала
+      Name: "Согласуйте счёт {=Document:TITLE}"
+      on_yes:
+        - change_stage: {TargetStatus: "{{stage:Общая/Клиент}}"}
+      on_no:
+        - notify:
+            MessageSite: "Отклонено: {=@fin:Comments}"   # ссылка на результат шага
+            MessageUserTo: ["{{user:Иванов Иван}}"]
 ```
 
 | Механизм Claude Code | Роль |

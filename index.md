@@ -116,6 +116,7 @@
 - [[concept-coding-standards|Код-стайл и безопасность]] · Разработка · box
 - [[concept-testing-approach|Подход к тестированию]] · Разработка · box
 - [[concept-bizproc-bpt-format|Формат шаблона БП (.bpt)]] · Бизнес-процессы · both
+- [[concept-bizproc-activity-catalog|Каталог действий БП (25 типов)]] · Бизнес-процессы · both
 - [[concept-crm-universal-api|Universal API CRM: Container → Factory → Item]] · CRM · box
 - [[concept-crm-dictionaries|Справочники CRM: новое читает, старое пишет]] · CRM · box
 - [[concept-request-lifecycle|Жизненный цикл HTTP-запроса]] · Разработка · box
@@ -177,7 +178,7 @@
 
 ## По статусу
 
-- **verified:** 112 страниц из 121 (`verified`: 2026-06-01 … 2026-09-18).
+- **verified:** 113 страниц из 122 (`verified`: 2026-06-01 … 2026-09-21).
 - **draft:** 9 страниц, по трём разным причинам —
   **методические каркасы**, которые уточняются после первого применения на проекте
   ([[checklist-data-migration]], [[checklist-golive-deployment]], [[checklist-user-adoption]],

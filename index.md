@@ -22,13 +22,13 @@
 - [Права доступа](wiki/modules/permissions/_index-permissions.md) — роли, права, экстранет
 - [Администрирование](wiki/modules/administration/_index-administration.md) — портал, тарифы, домены, безопасность
 - [Смарт-процессы (СПА)](wiki/modules/smart-process/_index-smart-process.md) — типы, поля, стадии, карточка элемента
-- [Задачи и проекты](wiki/modules/tasks-projects/_index-tasks-projects.md) — задачи, проекты, эффективность
+- [Задачи и проекты](wiki/modules/tasks-projects/_index-tasks-projects.md) — задачи, проекты, эффективность, API задач V2
 - [Коммуникации](wiki/modules/communications/_index-communications.md) — живая лента, уведомления
 - _Планируются:_ Телефония · Сайты и магазины · Совместная работа · AI / CoPilot · HR ·
   Приложения маркетплейса
 
 ### Разработка (коробка)
-- [Ядро D7](wiki/development/core-d7/_index-core-d7.md) — ORM, события, Result/Error, DI, размещение кода
+- [Ядро D7](wiki/development/core-d7/_index-core-d7.md) — ORM, события, Result/Error, DI, размещение кода, структура решения в `/local`
 - [Свои модули](wiki/development/modules-custom/_index-modules-custom.md) — структура, установка, версии, дистрибуция
 - [Производительность](wiki/development/performance/_index-performance.md) — кэширование, индексы, масштабирование
 - [Миграции](wiki/development/migrations/_index-migrations.md) — sprint.migration, обновления, перенос
@@ -69,6 +69,7 @@
 - [[pattern-rest-webhooks-and-events|Вебхуки и события для интеграций]] · REST · both
 - [[pattern-events-over-core-modification|Расширение через события]] · Разработка · box
 - [[pattern-module-based-development-standard|Модульная разработка: когда и как]] · Разработка · box
+- [[pattern-local-solution-structure|Решение в /local/php_interface: структура проекта]] · Разработка · box
 - [[pattern-module-library-monorepo|Библиотека модулей агентства (монорепо)]] · Разработка · box
 - [[pattern-module-self-disabling-guard|Сторож модуля: портал важнее модуля]] · Разработка · box
 - [[pattern-agents-vs-cron|Агенты или cron: выбор фонового запуска]] · Разработка · box
@@ -84,6 +85,7 @@
 - [[antipattern-everything-in-one-funnel|Всё в одной воронке]] · CRM · both
 - [[antipattern-box-core-modification|Правка ядра коробки]] · Разработка · box
 - [[antipattern-bizproc-hardcoded-portal-ids|Зашитые ID портала в шаблонах БП]] · Бизнес-процессы · both
+- [[antipattern-bizproc-php-code-activity|Действие «PHP код» в шаблонах БП]] · Бизнес-процессы · box
 - [[antipattern-ajax-controller-lowercase-name|Строчное имя контроллера в AJAX-действии]] · Разработка · box
 - [[antipattern-cli-php-as-root|Консольный PHP от root портит кэш портала]] · Разработка · box
 
@@ -95,15 +97,24 @@
 - [[recipe-migrations-as-code|Миграции как код]] · Разработка · box
 - [[recipe-composer-third-party-libraries|Сторонние Composer-пакеты (dompdf, PhpWord)]] · Разработка · box
 - [[recipe-d7-orm-event-subscription|Подписка модуля на событие D7 ORM]] · Разработка · box
+- [[recipe-cli-script-bootstrap|Консольный и cron-скрипт: подключение ядра]] · Разработка · box · черновик
+- [[recipe-d7-custom-validation-rule|Свой валидатор и правило валидации D7]] · Разработка · box · черновик
+- [[recipe-custom-list-page-filter-grid|Своя страница-список: фильтр, грид, тулбар]] · Разработка · box · черновик
 - [[recipe-safe-module-deploy|Безопасная заливка модуля: guard, линт, откат]] · Разработка · box
 - [[recipe-git-deploy-to-production|Доставка правки на прод через git]] · Разработка · box
 - [[recipe-mysql-connection-refused|MySQL (2002) Connection refused]] · Разработка · box
 - [[recipe-crm-history-all-fields|История смарт-процесса: все поля + источник]] · CRM · box
 - [[recipe-crm-card-editor-js-access|Карточка CRM из JS: редактор и модель]] · CRM · box
 - [[recipe-crm-hide-card-block-js|Скрыть блок в карточке смарт-процесса]] · CRM · box
+- [[recipe-crm-legacy-entity-crud|Лид, контакт, компания, сделка через CCrm*]] · CRM · box · черновик
+- [[recipe-crm-lead-conversion|Конвертация лида из кода]] · CRM · box · черновик
+- [[recipe-crm-todo-activity|Универсальное дело (ToDo) из кода]] · CRM · box · черновик
 - [[recipe-smart-process-programmatic-creation|Создать смарт-процесс и поля из инсталлятора]] · СПА · box
+- [[recipe-smart-process-factory-customization|Своя фабрика смарт-процесса]] · СПА · box · черновик
 - [[recipe-bizproc-custom-task-activity|Своё действие БП с заданием (CBPTaskService)]] · БП · box
+- [[recipe-tasks-v2-commands|Команды задач V2: операции и ловушки]] · Задачи · box · черновик
 - [[recipe-custom-left-menu-section|Свой раздел в левом меню (CustomSection)]] · Администрирование · box
+- [[recipe-intranet-absence-import|Запись отсутствий из кода (импорт отпусков)]] · Администрирование · box · черновик
 - [[recipe-post-to-livefeed|Пост в живую ленту из PHP]] · Коммуникации · box
 
 ### Концепты
@@ -120,12 +131,14 @@
 - [[concept-crm-universal-api|Universal API CRM: Container → Factory → Item]] · CRM · box
 - [[concept-crm-dictionaries|Справочники CRM: новое читает, старое пишет]] · CRM · box
 - [[concept-request-lifecycle|Жизненный цикл HTTP-запроса]] · Разработка · box
+- [[concept-deferred-functions-and-page-areas|Отложенные функции и зоны страницы]] · Разработка · box · черновик
 - [[concept-orm-datamanager-events|События ORM DataManager]] · Разработка · box
 - [[concept-service-locator|ServiceLocator: регистрация и подмена сервисов]] · Разработка · box
 - [[concept-validation-d7|Валидация D7: PHP-атрибуты]] · Разработка · box
 - [[concept-ui-subsystem|UI-подсистема: тулбар, фильтр, грид, кнопки]] · Разработка · box
 - [[concept-bizproc-engine|Устройство движка БП: шаблон, инстанс, активити]] · БП · box
 - [[concept-org-structure|Оргструктура портала]] · Администрирование · both
+- [[concept-tasks-api-v2|API задач в коробке: поколения и командный V2]] · Задачи · box
 
 ### Сущности: термины внедрения (глоссарий)
 - [[entity-smart-process|Смарт-процесс (СПА)]]
@@ -139,9 +152,11 @@
 **CRM** — [[entity-crm-container|Container]] · [[entity-crm-factory|Factory]] ·
 [[entity-crm-item|Item]] · [[entity-crm-operation|Operation + Action]] ·
 [[entity-crm-settings|<Type>Settings]] · [[entity-ccrm-status|CCrmStatus / StatusTable]] ·
-[[entity-ccrm-owner-type|CCrmOwnerType]] · [[entity-ccrm-field-multi|CCrmFieldMulti]]
+[[entity-ccrm-owner-type|CCrmOwnerType]] · [[entity-ccrm-field-multi|CCrmFieldMulti]] ·
+[[entity-crm-legacy-events|События старого ядра CRM]]
 
 **Бизнес-процессы** — [[entity-cbp-activity|CBPActivity / BaseActivity]] ·
+[[entity-bizproc-activity-description|.description.php]] (черновик) ·
 [[entity-cbp-activity-condition|CBPActivityCondition]] · [[entity-cbp-task-service|CBPTaskService]] ·
 [[entity-bizproc-field-type|FieldType]] · [[entity-bizproc-globals-manager|GlobalsManager]]
 
@@ -173,20 +188,30 @@
 - [[source-devbook-bizproc|Книга разработчика: бизнес-процессы]] · box
 - [[source-devbook-ui|Книга разработчика: UI-подсистема]] · box
 - [[source-devbook-intranet|Книга разработчика: интранет]] · box
+- [[source-devbook-tasks|Книга разработчика: модуль задач]] · box
+
+Все семь конспектов «Книги разработчика» сверены постранично с сайтом книги 2026-09-21; снимок-манифест
+страниц — `raw/sources/2026-09-21-bx24devbook-manifest.md`.
 
 ---
 
 ## По статусу
 
-- **verified:** 113 страниц из 122 (`verified`: 2026-06-01 … 2026-09-21).
-- **draft:** 9 страниц, по трём разным причинам —
+- **verified:** 118 страниц из 138 (`verified`: 2026-06-01 … 2026-09-21).
+- **draft:** 20 страниц, по четырём разным причинам —
   **методические каркасы**, которые уточняются после первого применения на проекте
   ([[checklist-data-migration]], [[checklist-golive-deployment]], [[checklist-user-adoption]],
   [[checklist-support-handover]], [[checklist-permissions-audit]],
   [[checklist-tasks-regulations]], [[pattern-smart-process-vs-deal-fields]]);
   **не подтверждено пилотом** ([[pattern-bizproc-ai-assisted-generation]]);
   **не удалось сверить с первоисточником** ([[entity-module-manager]] — справочник D7 не отдал
-  содержимое страницы).
+  содержимое страницы);
+  **написано по «Книге разработчика», на стенде не проверялось** — 11 страниц сверки 2026-09-21
+  ([[concept-deferred-functions-and-page-areas]], [[recipe-cli-script-bootstrap]],
+  [[recipe-d7-custom-validation-rule]], [[recipe-custom-list-page-filter-grid]],
+  [[recipe-crm-legacy-entity-crud]], [[recipe-crm-lead-conversion]], [[recipe-crm-todo-activity]],
+  [[recipe-smart-process-factory-customization]], [[recipe-tasks-v2-commands]],
+  [[recipe-intranet-absence-import]], [[entity-bizproc-activity-description]]).
 - **deprecated:** —
 
 > При устаревании практики ставь `status: deprecated` и ссылку на замену; `/wiki:lint` следит за
@@ -196,12 +221,12 @@
 
 ## По редакции
 
-- **box (92 страницы):** ветка разработки `development/*`, коробочная часть модулей и справочник
-  по 43 классам и компонентам ядра.
+- **box (108 страниц):** ветка разработки `development/*`, коробочная часть модулей и справочник
+  по 42 классам, файлам и компонентам ядра.
 - **cloud (3 страницы):** [[entity-bizproc-template-rest-methods]],
   [[pattern-rest-batch-and-limits]], [[pattern-rest-reliable-delivery]] — сверено через MCP
   по документации облака.
-- **both (26 страниц):** практики внедрения, не зависящие от редакции, — playbooks жизненного
+- **both (27 страниц):** практики внедрения, не зависящие от редакции, — playbooks жизненного
   цикла, права, задачи, смарт-процессы.
 
 > Перекос в сторону `box` сохраняется: он следствие того, что перенесённый архив был про

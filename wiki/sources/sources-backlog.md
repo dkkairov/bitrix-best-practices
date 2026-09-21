@@ -5,11 +5,11 @@ module: sources
 edition: both
 status: verified
 provenance: documented
-verified: "2026-06-19"
+verified: "2026-09-21"
 tags: [источники, бэклог, ингест, очередь]
 sources: []
-related: ["[[source-b24-crm-deal-add]]"]
-updated: "2026-09-18"
+related: ["[[source-b24-crm-deal-add]]", "[[source-devbook-dev-rules]]"]
+updated: "2026-09-21"
 ---
 
 # Бэклог источников
@@ -28,32 +28,69 @@ updated: "2026-09-18"
 | # | Источник | Тип | Куда мапится | Приоритет | План ингеста |
 |---|----------|-----|--------------|-----------|--------------|
 | 1 | [Курс 43 «Разработчик Bitrix Framework»](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43) (урок [Пространства имён](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=3524)) | содержание (серия уроков) | [development/](../development/core-d7/_index-core-d7.md) | **P1** | поурочно; ингещены: пространства имён (S-SS02), модули (S-SS03); далее ORM/события |
-| 2 | [bx24devbook — Книга разработчика](https://bx24devbook.website.yandexcloud.net/Dokumentacia/Spravocnik.html) | содержание (многоглавный) | [development/](../development/core-d7/_index-core-d7.md) + [modules/](../modules/crm/_index-crm.md) | **P1** | по главам (см. карту ниже). Часть глав уже отражена в страницах, перенесённых 2026-09-18 — но **без конспектов в `wiki/sources/`**: снимки глав остались во внешнем архиве, `raw/` у нас их не содержит |
+| 2 | [bx24devbook — Книга разработчика](https://bx24devbook.website.yandexcloud.net/) | содержание (многоглавный), **эталон** (`CLAUDE.md` §9) | [development/](../development/core-d7/_index-core-d7.md) + [modules/](../modules/crm/_index-crm.md) | **сделано** | **пройдена целиком 2026-09-21** — 97 страниц, все разделы навигации: семь конспектов `source-devbook-*`, снимок-манифест `raw/sources/2026-09-21-bx24devbook-manifest.md`. Дальше — пересверка только страниц, у которых изменился хэш в манифесте |
 | 3 | [awesome-bitrix](https://github.com/awesomebitrix/awesome-bitrix) | каталог-указатель | мета (порождает под-источники) | **P2** | разобрать по категориям → завести под-источники |
 | 4 | [api_help (старое ядро)](https://dev.1c-bitrix.ru/api_help/) | каталог-указатель (legacy) | [development/](../development/core-d7/_index-core-d7.md) | **P3** | по требованию: только когда нужен конкретный метод старого ядра; сначала смотреть D7/devbook/MCP |
 
-> **Долг по источникам — закрыт частично (2026-09-18).** При переносе архивной вики факты
-> пришли пересобранными страницами, а не через `ingest`. Заведены **шесть кластерных
-> конспектов** (по разделу книги, а не по главе): правила разработки, ядро D7, CRM, БП, UI,
-> интранет. Поле `sources` проставлено на **50 страницах**, которые на них опираются.
+> **Долг по «Книге разработчика» закрыт (2026-09-21).** История: 2026-09-18 при переносе архивной
+> вики заведены шесть кластерных конспектов — по тому, что взято в вики, без перечитывания книги;
+> `sources` проставлен на 50 страницах. 2026-09-21 книга пройдена постранично с сайта: конспекты
+> переписаны (ссылки на страницы с якорями, карта «страница книги → страница вики», таблица сверки),
+> добавлен конспект модуля задач, расхождения помечены по §6 на самих страницах.
 >
-> Что осталось:
-> - **снимки глав в `raw/` не копировались** — объёмный сторонний текст, а для
->   прослеживаемости достаточно ссылки на первоисточник в конспекте; добрать точечно при
->   следующем `ingest`, если понадобится;
-> - конспекты описывают, **что взято в вики**, а не пересказывают главы: первичный источник
->   при переносе не перечитывался, и это сказано в каждом из них;
+> Что остаётся:
+> - **текст глав в `raw/` не копируем** — авторский текст; вместо него снимок-манифест с адресами,
+>   якорями и хэшами, по которому видно, что книга изменилась;
 > - у **эмпирических** страниц `sources` намеренно пуст: они сами — источник, происхождение
->   указано в `verified`.
+>   указано в `verified`;
+> - проверки на стенде — список ниже.
 
-## Карта глав devbook → страницы вики
-- Ядро, URI, страницы, шаблоны → [development/core-d7](../development/core-d7/_index-core-d7.md), templates-design
-- Git, структура `/local/`, миграции → [development/migrations](../development/migrations/_index-migrations.md), [core-d7](../development/core-d7/_index-core-d7.md)
-- Технологии: отложенные функции, агенты, события, service locator, валидация → [core-d7](../development/core-d7/_index-core-d7.md), [performance](../development/performance/_index-performance.md)
-- UI-компоненты: тулбары, фильтры, кнопки, таблицы → development/components
-- Модуль CRM (лиды, сделки, СПА, заказы) → [modules/crm](../modules/crm/_index-crm.md), smart-process
-- Интранет (оргструктура, сотрудники) → modules/hr, collaboration
-- Бизнес-процессы (свои действия) → [modules/bizproc](../modules/bizproc/_index-bizproc.md)
+## Карта разделов devbook → страницы вики
+Подробная карта «страница книги → страница вики» — в каждом конспекте `source-devbook-*`.
+- С чего начать, Документация, Разработка (введение, GIT, структура `/local`, технологии, свой код)
+  → [core-d7](../development/core-d7/_index-core-d7.md),
+  [modules-custom](../development/modules-custom/_index-modules-custom.md),
+  [server-admin](../development/server-admin/_index-server-admin.md) —
+  [[source-devbook-dev-rules]], [[source-devbook-core-d7]]
+- Общие сведения (uri, ядро, страница, шаблон) → [core-d7](../development/core-d7/_index-core-d7.md),
+  [templates-design](../development/templates-design/_index-templates-design.md) —
+  [[source-devbook-core-d7]], [[source-devbook-ui]]
+- Разработка → UI (тулбар, кнопки, фильтр, таблицы) →
+  [templates-design](../development/templates-design/_index-templates-design.md) — [[source-devbook-ui]]
+- Модуль CRM (словари, Universal API, сущности, смарт-процессы, дела) →
+  [crm](../modules/crm/_index-crm.md), [smart-process](../modules/smart-process/_index-smart-process.md) —
+  [[source-devbook-crm]]
+- Модуль Интранет (оргструктура, отсутствия, темы) →
+  [administration](../modules/administration/_index-administration.md) — [[source-devbook-intranet]]
+- Модуль Бизнес-процессы (действия, окружение, PHP код, свои действия и условия) →
+  [bizproc](../modules/bizproc/_index-bizproc.md) — [[source-devbook-bizproc]]
+- Модуль Задачи (провайдеры, команды V2) → [tasks-projects](../modules/tasks-projects/_index-tasks-projects.md) —
+  [[source-devbook-tasks]]
+
+## Очередь после сверки с книгой (2026-09-21)
+
+**Проверки на стенде** (коробка в Docker) — снять `draft` или поправить страницы:
+- 11 черновиков, написанных по книге без прогона: [[concept-deferred-functions-and-page-areas]],
+  [[recipe-cli-script-bootstrap]], [[recipe-d7-custom-validation-rule]],
+  [[recipe-custom-list-page-filter-grid]], [[recipe-crm-legacy-entity-crud]],
+  [[recipe-crm-lead-conversion]], [[recipe-crm-todo-activity]],
+  [[recipe-smart-process-factory-customization]], [[recipe-tasks-v2-commands]],
+  [[recipe-intranet-absence-import]], [[entity-bizproc-activity-description]].
+- Вопросы с расхождением «книга ↔ практика команды»: базовый класс задания БП (`CBPActivity` или
+  `CBPCompositeActivity`, [[recipe-bizproc-custom-task-activity]]); видимость результатов при
+  `RETURN`/`ADDITIONAL_RESULT`; прерывают ли процесс ошибки `ErrorCollection` ([[entity-cbp-activity]]);
+  перенос глобалов между порталами ([[entity-bizproc-globals-manager]]).
+- Возможное устаревание (§6): модель оргструктуры на свежей коробке — инфоблок или `humanresources`
+  ([[concept-org-structure]]).
+
+**Пробелы, найденные при сверке (P2/P3):**
+| Тема | Будущая страница | Приоритет |
+|------|------------------|-----------|
+| Панель групповых действий грида | `entity-grid-action-panel` | P2 |
+| Валидация в контроллерах D7 | `recipe-d7-controller-validation` | P2 |
+| Своё действие БП на `BaseActivity` (без задания) | `recipe-bizproc-custom-activity-baseactivity` | P2 |
+| Смарт-счета в коробке | `entity-crm-smart-invoice` | P2 |
+| Поиск задач и доступ (провайдеры) | `recipe-tasks-search-and-access` | P3 |
 
 ## Под-источники из awesome-bitrix (категория → раздел вики)
 - Учебные курсы → [playbooks](../cross-cutting/playbooks/_index-playbooks.md) / development

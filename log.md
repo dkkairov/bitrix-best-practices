@@ -7,6 +7,38 @@
 
 ## 2026-09
 
+- **2026-09-21 — ingest (батч): сверка вики с «Книгой разработчика Bitrix24» (§6, §9)** — Книга
+  (https://bx24devbook.website.yandexcloud.net/) пройдена целиком: 97 страниц, все разделы. В `raw/`
+  — снимок-манифест без текста (адреса, якоря, хэши): `raw/sources/2026-09-21-bx24devbook-manifest.md`.
+  Шесть конспектов `source-devbook-*`, сделанных переносом из архива, переписаны по сайту (ссылки на
+  страницы с якорями, карта страниц, таблица сверки); новый [[source-devbook-tasks]]. Текст книги не
+  копировали — пересказ; проверка n-граммами по 12 слов нашла совпадения только в идентификаторах.
+  **Решения пользователя:** «модулем или нет?» остаётся первым вопросом, ветка «решение» — новая
+  [[pattern-local-solution-structure]] (структура `/local/php_interface` по книге), модульный
+  стандарт помечен как практика команды, `CLAUDE.md` не менялся; объём — все пробелы P1. Composer —
+  решён отдельно (запись ниже). **Исправлено (главное):** пример `OnAfterCrmDealAdd` через
+  `addEventHandler` → `…Compatible` (4 места); правила `urlrewrite` — в корневом `/urlrewrite.php`;
+  «точное время → агент» (периодические агенты догоняют пропуски, с main 20.5.0 — фоновые работы);
+  `disableAllChecks()` выключает 4 проверки; флаги СПА меняются без удаления типа; меню строки грида —
+  `actions`; поиск по телефону — через индекс дубликатов; тезис о событиях ORM, ложно приписанный
+  книге; `UserAbsence::getIblockId()` — общий ID; тулбар и зоны страницы; пара для `RETURN` —
+  `SetPropertiesTypes()`. **Помечено как осознанная практика команды:** cron как база фоновых задач,
+  подмена одной фабрики вместо контейнера, задание БП на `CBPActivity` (в книге —
+  `CBPCompositeActivity`), `addEventHandler` для ORM, `addAction` с третьим аргументом, `isTrackable()`,
+  имена сервисов строчными через точку, `includeModule('ui')`. **Возможное устаревание:**
+  оргструктура на инфоблоке при наличии `humanresources.node.*` в REST (MCP) —
+  [[concept-org-structure]]. **Новые страницы (16):** [[pattern-local-solution-structure]],
+  [[concept-deferred-functions-and-page-areas]], [[recipe-cli-script-bootstrap]],
+  [[recipe-d7-custom-validation-rule]], [[recipe-custom-list-page-filter-grid]],
+  [[entity-crm-legacy-events]], [[recipe-crm-legacy-entity-crud]], [[recipe-crm-lead-conversion]],
+  [[recipe-crm-todo-activity]], [[recipe-smart-process-factory-customization]],
+  [[concept-tasks-api-v2]], [[recipe-tasks-v2-commands]], [[recipe-intranet-absence-import]],
+  [[entity-bizproc-activity-description]], [[antipattern-bizproc-php-code-activity]],
+  [[source-devbook-tasks]]; 11 из них — черновики до проверки на стенде. Обновлено 92 файла вики
+  (кластеры: правила и `/local`, CRM, ядро и задачи, UI, интранет, БП), хабы, `index.md` (138 страниц:
+  118 verified, 20 draft), [[sources-backlog]] (долг по книге закрыт, очередь проверок и пробелов
+  P2/P3). Ссылки: 0 битых, 0 орфанов; 457 ссылок на книгу — страницы и якоря существуют.
+
 - **2026-09-21 — корпус БП: экспорты из дизайнера коробки, а не роботы облака (§6)** — Команда
   прислала экспорт пустого шаблона и небольшого согласования и уточнила: всё выгружено из дизайнера
   БП кнопкой «Экспорт», клиенты — на коробке. Корень `Bizproc Automation template`, который мы

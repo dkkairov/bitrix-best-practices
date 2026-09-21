@@ -3,6 +3,8 @@
 Разбор, сборка, проверка и генерация шаблонов БП Bitrix24. Формат файла описан в вики:
 [concept-bizproc-bpt-format](../../wiki/modules/bizproc/concept-bizproc-bpt-format.md); формат
 спецификации процесса — в [SPEC.md](SPEC.md); принятые решения — в [DESIGN.md](DESIGN.md).
+Порядок работы агента с утилитой по ТЗ — навык Claude Code
+[`building-bizproc-templates`](../../.claude/skills/building-bizproc-templates/SKILL.md).
 
 **Требования:** PHP ≥ 8.1 с расширениями `zlib`, `json`, `mbstring`; для спецификаций в YAML —
 расширение `yaml` (без него спецификации читаются и пишутся в JSON). Запуск — из корня репозитория.

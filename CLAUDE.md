@@ -52,6 +52,7 @@ wiki/cross-cutting/     playbooks (жизненный цикл), patterns, antip
 wiki/glossary/          сущности и термины (entity-страницы)
 wiki/sources/           конспекты источников (source-summary)
 tools/<name>/           утилиты (напр. tools/bpt — разбор/сборка/проверка шаблонов БП .bpt)
+work/                   рабочие файлы по клиентам (спецификации, снимки, сборки) — в .gitignore
 ```
 
 Клиентские артефакты (`*.bpt` и их разбор) в git **не кладём** — они в `.gitignore`; в репозиторий

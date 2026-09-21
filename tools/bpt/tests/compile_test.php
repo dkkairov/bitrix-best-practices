@@ -234,8 +234,8 @@ test('Пример: собирается, разбирается и рисует
     assertSame('ApproveActivity', $approve['Type']);
     assertSame(['group_g7'], $approve['Properties']['Users']);
     $yes = $approve['Children'][0]['Children'];
-    assertSame('DT1000_10:CLIENT', $yes[0]['Properties']['TargetStatus']);
-    assertTrue(str_contains($yes[1]['Properties']['EventText'], "{={$approve['Name']}:Comments}"), 'ссылка на шаг');
+    assertTrue(str_contains($yes[0]['Properties']['EventText'], "{={$approve['Name']}:Comments}"), 'ссылка на шаг');
+    assertSame('DT1000_10:CLIENT', $yes[1]['Properties']['TargetStatus']);   // смена стадии — последней
 
     $back = (new Decompiler($catalog, $snapshot, true))->decompile($built['bpt']);
     $again = (new Compiler($catalog, $snapshot))->compile($back['spec']);

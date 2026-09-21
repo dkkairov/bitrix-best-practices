@@ -28,15 +28,16 @@ steps:
       Name: "Согласуйте счёт {=Document:TITLE}"
       Description: "Сумма: {=Variable:amount > printable}"
       TimeoutDuration: "172800"        # двое суток в секундах
+      # «Сменить стадию» — последний шаг ветки: так во всех 40 случаях корпуса.
       on_yes:
-        - change_stage:
-            TargetStatus: "{{stage:Общая/Клиент}}"
         - crm_event:
             EventText: "Счёт согласован. Комментарий: {=@fin:Comments}"
             EventUser: ["{=@fin:LastApprover}"]
-      on_no:
         - change_stage:
-            TargetStatus: "{{stage:Общая/Доработка}}"
+            TargetStatus: "{{stage:Общая/Клиент}}"
+      on_no:
         - notify:
             MessageSite: "Счёт отклонён: {=@fin:Comments}"
             MessageUserTo: ["{{user:Иванов Иван}}"]
+        - change_stage:
+            TargetStatus: "{{stage:Общая/Доработка}}"

@@ -15,6 +15,9 @@ final class Compiler
     private const META_KEYS = ['id', 'title', 'off', 'comment', 'name', 'raw',
         'on_yes', 'on_no', 'steps', 'branches', 'when', 'else'];
 
+    /** Заголовок последовательности по умолчанию — так пишет дизайнер (экспорты 2026-09). */
+    public const SEQUENCE_TITLE = 'Последовательность действий';
+
     private array $errors = [];
     private array $warnings = [];
     private array $usedNames = [];
@@ -38,10 +41,9 @@ final class Compiler
         $this->steps = [];
         $this->nodeLabels = [];
 
-        $kind = (string) ($spec['kind'] ?? 'designer');
-        if (!in_array($kind, ['designer', 'robots'], true)) {
-            $this->error('kind', "должно быть designer или robots, получено «{$kind}»");
-            $kind = 'designer';
+        if (isset($spec['kind'])) {
+            $this->warning('kind', 'ключ kind больше не используется: по .bpt шаблон роботов не отличить'
+                . ' от шаблона дизайнера — удалите его');
         }
         $name = trim((string) ($spec['name'] ?? ''));
         if ($name === '') {
@@ -52,13 +54,13 @@ final class Compiler
         }
 
         $this->checkSpecPortalIds($spec);
-        $children = $this->buildSteps($spec['steps'] ?? [], 'steps', $kind);
+        $children = $this->buildSteps($spec['steps'] ?? [], 'steps');
         $root = [
             'Type'       => 'SequentialWorkflowActivity',
             'Name'       => 'Template',
             'Activated'  => 'Y',
             'Node'       => null,
-            'Properties' => ['Title' => $kind === 'robots' ? Analyzer::AUTOMATION_TITLE : $name]
+            'Properties' => ['Title' => (string) ($spec['root_title'] ?? Analyzer::ROOT_TITLE)]
                 + $this->catalog->defaults('SequentialWorkflowActivity'),
             'Children'   => $children,
         ];
@@ -177,7 +179,7 @@ final class Compiler
     }
 
     /** @return array[] узлы-действия */
-    private function buildSteps(mixed $steps, string $path, string $kind): array
+    private function buildSteps(mixed $steps, string $path): array
     {
         if (!is_array($steps)) {
             $this->error($path, 'ожидается список шагов');
@@ -185,7 +187,7 @@ final class Compiler
         }
         $nodes = [];
         foreach (array_values($steps) as $i => $step) {
-            $node = $this->buildStep($step, "{$path}[{$i}]", $kind);
+            $node = $this->buildStep($step, "{$path}[{$i}]");
             if ($node !== null) {
                 $nodes[] = $node;
             }
@@ -193,7 +195,7 @@ final class Compiler
         return $nodes;
     }
 
-    private function buildStep(mixed $step, string $path, string $kind): ?array
+    private function buildStep(mixed $step, string $path): ?array
     {
         if (!is_array($step) || count($step) !== 1) {
             $this->error($path, 'шаг должен быть объектом с одним действием, например «- change_stage: {…}»');
@@ -236,7 +238,7 @@ final class Compiler
         $props = $this->substitute($props, $label);
 
         $node = $this->makeNode($type, $props, $meta, $label, $path);
-        $node['Children'] = $this->buildChildren($type, $meta, $label, $path, $kind);
+        $node['Children'] = $this->buildChildren($type, $meta, $label, $path);
         return $node;
     }
 
@@ -305,15 +307,15 @@ final class Compiler
     }
 
     /** Дети действия зависят от его формы вложенности в каталоге. */
-    private function buildChildren(string $type, array $meta, string $label, string $path, string $kind): array
+    private function buildChildren(string $type, array $meta, string $label, string $path): array
     {
         return match ($this->catalog->shape($type)) {
-            'ifelse'           => $this->buildBranches($meta, $label, $path, $kind),
-            'parallel'         => $this->buildParallel($meta, $label, $path, $kind),
-            'loop', 'block'    => [$this->makeSequence($meta['steps'] ?? [], "{$path}.steps", $kind)],
+            'ifelse'           => $this->buildBranches($meta, $label, $path),
+            'parallel'         => $this->buildParallel($meta, $label, $path),
+            'loop', 'block'    => [$this->makeSequence($meta['steps'] ?? [], "{$path}.steps")],
             'waiting-branches' => [
-                $this->makeSequence($meta['on_yes'] ?? [], "{$path}.on_yes", $kind),
-                $this->makeSequence($meta['on_no'] ?? [], "{$path}.on_no", $kind),
+                $this->makeSequence($meta['on_yes'] ?? [], "{$path}.on_yes"),
+                $this->makeSequence($meta['on_no'] ?? [], "{$path}.on_no"),
             ],
             default            => $this->noChildren($meta, $label),
         };
@@ -330,7 +332,7 @@ final class Compiler
     }
 
     /** Ветки условия: IfElseBranchActivity с условием и шагами напрямую, без последовательности. */
-    private function buildBranches(array $meta, string $label, string $path, string $kind): array
+    private function buildBranches(array $meta, string $label, string $path): array
     {
         $branches = $meta['branches'] ?? null;
         if (!is_array($branches) || count($branches) < 2) {
@@ -353,13 +355,13 @@ final class Compiler
                 'Activated'  => ($branch['off'] ?? false) ? 'N' : 'Y',
                 'Node'       => null,
                 'Properties' => $props,
-                'Children'   => $this->buildSteps($branch['steps'] ?? [], "{$branchPath}.steps", $kind),
+                'Children'   => $this->buildSteps($branch['steps'] ?? [], "{$branchPath}.steps"),
             ];
         }
         return $nodes;
     }
 
-    private function buildParallel(array $meta, string $label, string $path, string $kind): array
+    private function buildParallel(array $meta, string $label, string $path): array
     {
         $branches = $meta['branches'] ?? null;
         if (!is_array($branches) || count($branches) < 2) {
@@ -368,7 +370,7 @@ final class Compiler
         }
         $nodes = [];
         foreach (array_values($branches) as $i => $branch) {
-            $nodes[] = $this->makeSequence($branch, "{$path}.branches[{$i}]", $kind);
+            $nodes[] = $this->makeSequence($branch, "{$path}.branches[{$i}]");
         }
         return $nodes;
     }
@@ -377,7 +379,7 @@ final class Compiler
      * Последовательность действий. На входе либо список шагов, либо объект
      * {title, name, off, steps} — так сохраняются свои заголовки веток.
      */
-    private function makeSequence(mixed $branch, string $path, string $kind): array
+    private function makeSequence(mixed $branch, string $path): array
     {
         $meta = [];
         $steps = $branch;
@@ -385,15 +387,14 @@ final class Compiler
             $meta = $branch;
             $steps = $branch['steps'] ?? [];
         }
-        $title = isset($meta['title']) ? (string) $meta['title']
-            : ($kind === 'robots' ? 'Automation sequence' : 'Последовательность действий');
+        $title = isset($meta['title']) ? (string) $meta['title'] : self::SEQUENCE_TITLE;
         return [
             'Type'       => 'SequenceActivity',
             'Name'       => $this->makeName($meta, $path, $path),
             'Activated'  => ($meta['off'] ?? false) ? 'N' : 'Y',
             'Node'       => null,
             'Properties' => ['Title' => $title],
-            'Children'   => $this->buildSteps($steps, "{$path}.steps", $kind),
+            'Children'   => $this->buildSteps($steps, "{$path}.steps"),
         ];
     }
 

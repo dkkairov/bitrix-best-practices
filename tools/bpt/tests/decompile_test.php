@@ -26,11 +26,23 @@ test('Разбор: собранное разбирается обратно и 
 
 test('Разбор: значения по умолчанию опускаются', function () {
     $r = (new Decompiler(Catalog::load()))->decompile(BptFile::read(fixtureBpt())['data']);
-    $step = $r['spec']['steps'][0]['parallel']['branches'][0][0];
+    $step = $r['spec']['steps'][0]['parallel']['branches'][0]['steps'][0];
     assertTrue(isset($step['change_stage']['TargetStatus']), 'значимое свойство на месте');
     assertTrue(!isset($step['change_stage']['ModifiedBy']), 'ModifiedBy по умолчанию не пишется');
     assertTrue(!isset($step['change_stage']['title']), 'заголовок по умолчанию не пишется');
-    assertSame('robots', $r['spec']['kind']);
+    assertTrue(!isset($r['spec']['kind']), 'вида шаблона в спецификации нет');
+    assertTrue(!isset($r['spec']['root_title']), 'заголовок корня по умолчанию не пишется');
+    // «Automation sequence» — не значение по умолчанию, поэтому сохраняется у ветки явно
+    assertSame('Automation sequence', $r['spec']['steps'][0]['parallel']['branches'][1]['title'] ?? null);
+});
+
+test('Разбор: свой заголовок корня сохраняется в root_title', function () {
+    $data = fixtureData();
+    $data['TEMPLATE'][0]['Properties']['Title'] = 'Последовательный бизнес-процесс';
+    $r = (new Decompiler(Catalog::load()))->decompile($data);
+    assertSame('Последовательный бизнес-процесс', $r['spec']['root_title']);
+    $again = (new Compiler(Catalog::load()))->compile($r['spec']);
+    assertSame('Последовательный бизнес-процесс', $again['bpt']['TEMPLATE'][0]['Properties']['Title']);
 });
 
 test('Разбор: висячая ссылка сохраняется и предупреждает', function () {
@@ -43,7 +55,7 @@ test('Разбор: висячая ссылка сохраняется и пре
 test('Разбор: со снимком идентификаторы становятся плейсхолдерами', function () {
     $snapshot = Snapshot::fromBpt(BptFile::read(fixtureBpt())['data']);
     $r = (new Decompiler(Catalog::load(), $snapshot))->decompile(BptFile::read(fixtureBpt())['data']);
-    $step = $r['spec']['steps'][0]['parallel']['branches'][0][0];
+    $step = $r['spec']['steps'][0]['parallel']['branches'][0]['steps'][0];
     assertSame('{{stage:Общая/Клиент}}', $step['change_stage']['TargetStatus']);
 });
 
@@ -58,6 +70,6 @@ test('Разбор: неизвестный тип и свойство не те�
     $text = implode(' ', $r['warnings']);
     assertTrue(str_contains($text, 'НовоеДействие'), "новый тип: {$text}");
     assertTrue(str_contains($text, 'Выдумка'), "свойство вне каталога: {$text}");
-    $step = $r['spec']['steps'][0]['parallel']['branches'][0][0];
+    $step = $r['spec']['steps'][0]['parallel']['branches'][0]['steps'][0];
     assertSame(['Выдумка' => 'x'], $step['change_stage']['raw']);
 });

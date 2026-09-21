@@ -5,7 +5,7 @@ module: bizproc
 edition: both
 status: verified
 provenance: empirical
-verified: "2026-09-21 / Bitrix24 cloud: корпус 14 экспортов шаблонов роботов СПА (VERSION 2)"
+verified: "2026-09-21 / коробка клиента (версия не зафиксирована): корпус 16 экспортов из дизайнера БП (VERSION 2)"
 tags: [бизнес-процессы, действия, активити, каталог, bpt, генерация, роботы]
 sources: []
 related: ["[[concept-bizproc-bpt-format]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[concept-bizproc-engine]]", "[[entity-cbp-activity]]", "[[antipattern-bizproc-hardcoded-portal-ids]]"]
@@ -21,6 +21,10 @@ updated: "2026-09-21"
 каталог собран по корпусу экспортов и проверяется на нём тестом. Источник истины —
 [`tools/bpt/catalog/activities.php`](../../../tools/bpt/catalog/activities.php); эта таблица —
 его печать (`php tools/bpt/bpt.php catalog`).
+
+> **Изменено 2026-09-21.** Корпус раньше описывался как «шаблоны роботов смарт-процессов в облаке».
+> Команда уточнила: это экспорты из дизайнера БП с коробки клиента. Добавлены два новых экспорта
+> (пустой шаблон и согласование), счётчики пересчитаны; новых типов и свойств нет.
 
 ## Зачем он нужен
 - **Сборка из спецификации.** Сборщик берёт из каталога значения по умолчанию и отвергает
@@ -59,27 +63,27 @@ updated: "2026-09-21"
 
 | Тип | Алиас | Вложенность | Свойства | Возвращает | В корпусе |
 |-----|-------|-------------|----------|------------|-----------|
-| `SequentialWorkflowActivity`<br>Последовательный бизнес-процесс | — | root | `Permission`=[] | — | 14 |
-| `SequenceActivity`<br>Последовательность действий | — | sequence | — | — | 123 |
-| `IfElseBranchActivity`<br>Ветка | — | branch | `fieldcondition`, `propertyvariablecondition`, `mixedcondition`, `truecondition` | — | 262 |
-| `IfElseActivity`<br>Условие | `if` | ifelse | — | — | 112 |
+| `SequentialWorkflowActivity`<br>Последовательный бизнес-процесс | — | root | `Permission`=[] | — | 16 |
+| `SequenceActivity`<br>Последовательность действий | — | sequence | — | — | 125 |
+| `IfElseBranchActivity`<br>Ветка | — | branch | `fieldcondition`, `propertyvariablecondition`, `mixedcondition`, `truecondition` | — | 264 |
+| `IfElseActivity`<br>Условие | `if` | ifelse | — | — | 113 |
 | `ParallelActivity`<br>Параллельное выполнение | `parallel` | parallel | — | — | 21 |
 | `WhileActivity`<br>Цикл | `while` | loop | `fieldcondition`, `propertyvariablecondition`, `mixedcondition`, `truecondition` | — | 11 |
 | `EmptyBlockActivity`<br>Блок действий | `block` | block | — | — | 28 |
 | `SetFieldActivity`<br>Изменение документа | `set_field` | leaf | `FieldValue`!, `ModifiedBy`=[], `MergeMultipleFields`=N | — | 210 |
 | `SetVariableActivity`<br>Изменение переменных | `set_var` | leaf | `VariableValue`! | — | 62 |
-| `CrmChangeStatusActivity`<br>Сменить стадию | `change_stage` | leaf | `TargetStatus`!, `ModifiedBy`=[] | — | 40 |
+| `CrmChangeStatusActivity`<br>Сменить стадию | `change_stage` | leaf | `TargetStatus`!, `ModifiedBy`=[] | — | 43 |
 | `CrmSetObserverField`<br>Изменить наблюдателей | `observers` | leaf | `ActionOnObservers`=add, `Observers`! | — | 9 |
 | `CrmGetDynamicInfoActivity`<br>Получить информацию об элементе смарт-процесса | `get_smart_item` | leaf | `DynamicTypeId`!, `ReturnFields`!, `OnlyDynamicEntities`=Y, `DynamicFilterFields`=[], `DynamicEntityFields`=[] | по `ReturnFields` | 7 |
 | `CrmGetRelationsInfoActivity`<br>Получить информацию о привязанном элементе | `get_parent_item` | leaf | `ParentTypeId`!, `ParentEntityFields`=[] | по `ParentEntityFields` | 1 |
 | `CrmEventAddActivity`<br>Запись события в crm | `crm_event` | leaf | `EventType`=INFO, `EventText`!, `EventUser`=[] | — | 99 |
 | `CrmTimelineCommentAdd`<br>Добавить комментарий в элемент | `timeline_comment` | leaf | `CommentText`!, `CommentUser`=[] | — | 24 |
 | `IMNotifyActivity`<br>Уведомление пользователя | `notify` | leaf | `MessageSite`!, `MessageOut`=, `MessageType`=2, `MessageUserFrom`=[], `MessageUserTo`! | — | 20 |
-| `ImMessageActivity`<br>Отправить сообщение сотруднику в чат | `chat_message` | leaf | `MessageUserFrom`=, `MessageUserTo`!, `MessageTemplate`=notify, `MessageFields`! | — | 2 |
+| `ImMessageActivity`<br>Отправить сообщение сотруднику в чат | `chat_message` | leaf | `MessageUserFrom`=, `MessageUserTo`!, `MessageTemplate`=notify, `MessageFields`! | — | 3 |
 | `Task2Activity`<br>Поставить задачу | `task` | leaf | `Fields`!, `HoldToClose`=N, `AUTO_LINK_TO_CRM_ENTITY`=Y, `AsChildTask`=, `CheckListItems`=[], `TimeEstimateHour`=, `TimeEstimateMin`= | — | 6 |
 | `RobotDelayActivity`<br>Пауза робота | `delay` | leaf | `TimeoutTime`!, `TimeoutTimeIsLocal`=N, `WriteToLog`=Y, `WaitWorkDayUser`=[] | — | 13 |
 | `StartWorkflowActivity`<br>Запустить бизнес-процесс | `start_workflow` | leaf | `DocumentId`!, `TemplateId`!, `UseSubscription`=N, `TemplateParameters`=[] | — | 4 |
-| `ApproveActivity`<br>Утверждение документа *(заголовок под вопросом)* | `approve` | waiting-branches | `Users`!, `Name`!, `Description`=, `StatusMessage`=, `SetStatusMessage`=Y, `ShowComment`=Y, `CommentRequired`=N, `CommentLabelMessage`=Пояснение, `TimeoutDuration`=, `TimeoutDurationType`=s, `OverdueDate`=, `AccessControl`=N, `DelegationType`=1, `ApproveType`=all, `ApproveMinPercent`=50, `ApproveWaitForAll`=N, `Parameters`=, `TaskButton1Message`=Утвердить, `TaskButton2Message`=Отклонить | Comments, LastApprover | 8 |
+| `ApproveActivity`<br>Утверждение документа *(заголовок под вопросом)* | `approve` | waiting-branches | `Users`!, `Name`!, `Description`=, `StatusMessage`=, `SetStatusMessage`=Y, `ShowComment`=Y, `CommentRequired`=N, `CommentLabelMessage`=Пояснение, `TimeoutDuration`=, `TimeoutDurationType`=s, `OverdueDate`=, `AccessControl`=N, `DelegationType`=1, `ApproveType`=all, `ApproveMinPercent`=50, `ApproveWaitForAll`=N, `Parameters`=, `TaskButton1Message`=Утвердить, `TaskButton2Message`=Отклонить | Comments, LastApprover | 9 |
 | `ReviewActivity`<br>Ознакомление *(заголовок под вопросом)* | `review` | waiting | `Users`!, `Name`!, `Description`=, `StatusMessage`=, `SetStatusMessage`=Y, `ShowComment`=Y, `CommentRequired`=N, `CommentLabelMessage`=Комментарий, `TimeoutDuration`=, `TimeoutDurationType`=s, `OverdueDate`=, `AccessControl`=N, `DelegationType`=1, `ApproveType`=all, `Parameters`=, `TaskButtonMessage`=Принято | Comments, LastReviewer | 18 |
 | `RequestInformationActivity`<br>Запрос дополнительной информации *(заголовок под вопросом)* | `request_info` | waiting | `Users`!, `Name`!, `Description`=, `StatusMessage`=, `SetStatusMessage`=Y, `ShowComment`=Y, `CommentRequired`=N, `CommentLabelMessage`=Пояснение, `TimeoutDuration`=, `TimeoutDurationType`=s, `OverdueDate`=, `AccessControl`=N, `DelegationType`=1, `RequestedInformation`!, `TaskButtonMessage`=Принято | Comments, InfoUser | 6 |
 | `RequestInformationOptionalActivity`<br>Запрос информации с возможностью отклонить *(заголовок под вопросом)* | `request_info_optional` | waiting-branches | `Users`!, `Name`!, `Description`=, `StatusMessage`=, `SetStatusMessage`=Y, `ShowComment`=Y, `CommentRequired`=N, `CommentLabelMessage`=Пояснение, `TimeoutDuration`=, `TimeoutDurationType`=s, `OverdueDate`=, `AccessControl`=N, `DelegationType`=1, `RequestedInformation`!, `TaskButtonMessage`=Принято, `CancelType`=any, `TaskButtonCancelMessage`=Отклонить, `SaveVariables`=N | Comments, InfoUser | 3 |
@@ -90,8 +94,8 @@ updated: "2026-09-21"
   `4`, связка в условиях `"0"`/`"1"` — по наблюдениям «и»/«или».
 - **Кнопки утверждения** в корпусе всегда переименованы, поэтому значения по умолчанию
   («Утвердить», «Отклонить») — нейтральные подписи, а не наблюдение.
-- **Корпус — только роботы смарт-процессов** в облаке. Действий из обычного дизайнера, списков,
-  задач и коробки (кроме запрещённого PHP-кода) здесь пока нет.
+- **Корпус — шаблоны смарт-процессов одной коробки.** Действий для списков, задач и других
+  документов, облачных экспортов и своих действий из `/local/activities/` здесь пока нет.
 
 ## Как пополнять
 1. Положить новые экспорты в папку корпуса и запустить
@@ -102,8 +106,9 @@ updated: "2026-09-21"
 4. Обновить эту таблицу (`php tools/bpt/bpt.php catalog`) и дату `verified`.
 
 ## Облако vs коробка
-Корпус — облачные экспорты. В коробке набор действий шире (свои действия в `/local/activities/`,
-PHP-код), а устройство действий описано в [[concept-bizproc-engine|Устройство движка БП]] и
+Корпус — экспорты коробки. В облаке набор действий может отличаться: облачные экспорты мы пока не
+разбирали. В коробке, кроме того, бывают свои действия в `/local/activities/` и PHP-код. Устройство
+действий описано в [[concept-bizproc-engine|Устройство движка БП]] и
 [[entity-cbp-activity|CBPActivity и BaseActivity]]. Действие «Выполнение PHP-кода» в каталоге
 помечено запрещённым: сборщик его не генерирует.
 

@@ -29,19 +29,20 @@ final class Decompiler
         $this->counter = 0;
 
         $root = $bpt['TEMPLATE'][0];
-        $kind = ($root['Properties']['Title'] ?? '') === Analyzer::AUTOMATION_TITLE ? 'robots' : 'designer';
         $this->assignIds($root, $bpt);
 
-        $spec = ['bizproc' => 1, 'name' => (string) ($root['Properties']['Title'] ?? 'Процесс'), 'kind' => $kind];
-        if ($kind === 'robots') {
-            $spec['name'] = 'Роботы стадии';   // у шаблона роботов служебный заголовок, не имя процесса
+        // Имени процесса в .bpt нет (оно задаётся при загрузке); у корня — служебный заголовок.
+        $spec = ['bizproc' => 1, 'name' => 'Процесс'];
+        $rootTitle = (string) ($root['Properties']['Title'] ?? '');
+        if ($rootTitle !== Analyzer::ROOT_TITLE) {
+            $spec['root_title'] = $rootTitle;
         }
         foreach (['parameters' => 'PARAMETERS', 'variables' => 'VARIABLES', 'constants' => 'CONSTANTS'] as $key => $section) {
             if (!empty($bpt[$section])) {
                 $spec[$key] = $this->rewrite($bpt[$section]);
             }
         }
-        $spec['steps'] = $this->stepsFrom($root['Children'] ?? [], $kind);
+        $spec['steps'] = $this->stepsFrom($root['Children'] ?? []);
 
         return ['spec' => $spec, 'warnings' => $this->warnings];
     }
@@ -74,18 +75,18 @@ final class Decompiler
     }
 
     /** @return array[] шаги спецификации */
-    private function stepsFrom(array $children, string $kind): array
+    private function stepsFrom(array $children): array
     {
         $steps = [];
         foreach ($children as $child) {
             if (is_array($child)) {
-                $steps[] = $this->stepFrom($child, $kind);
+                $steps[] = $this->stepFrom($child);
             }
         }
         return $steps;
     }
 
-    private function stepFrom(array $node, string $kind): array
+    private function stepFrom(array $node): array
     {
         $type = (string) $node['Type'];
         $known = $this->catalog->has($type);
@@ -144,12 +145,12 @@ final class Decompiler
             $this->warnings[] = "{$type}: свойства вне каталога сохранены в raw: " . implode(', ', array_keys($raw));
         }
 
-        $body += $this->childrenFrom($node, $shape, $kind);
+        $body += $this->childrenFrom($node, $shape);
         return [$alias => $body];
     }
 
     /** Дети действия в терминах спецификации: steps, branches, on_yes/on_no. */
-    private function childrenFrom(array $node, string $shape, string $kind): array
+    private function childrenFrom(array $node, string $shape): array
     {
         $children = array_values(array_filter($node['Children'] ?? [], 'is_array'));
         switch ($shape) {
@@ -178,23 +179,23 @@ final class Decompiler
                             $item['when'] = $when;
                         }
                     }
-                    $item['steps'] = $this->stepsFrom($branch['Children'] ?? [], $kind);
+                    $item['steps'] = $this->stepsFrom($branch['Children'] ?? []);
                     $branches[] = $item;
                 }
                 return ['branches' => $branches];
 
             case 'parallel':
-                return ['branches' => array_map(fn (array $seq) => $this->sequenceFrom($seq, $kind), $children)];
+                return ['branches' => array_map(fn (array $seq) => $this->sequenceFrom($seq), $children)];
 
             case 'waiting-branches':
                 return [
-                    'on_yes' => $this->sequenceFrom($children[0] ?? [], $kind),
-                    'on_no'  => $this->sequenceFrom($children[1] ?? [], $kind),
+                    'on_yes' => $this->sequenceFrom($children[0] ?? []),
+                    'on_no'  => $this->sequenceFrom($children[1] ?? []),
                 ];
 
             case 'loop':
             case 'block':
-                return ['steps' => $this->sequenceFrom($children[0] ?? [], $kind)];
+                return ['steps' => $this->sequenceFrom($children[0] ?? [])];
 
             default:
                 return [];
@@ -205,14 +206,14 @@ final class Decompiler
      * Последовательность: обычно просто список шагов, но если у неё свой заголовок
      * или имя нужно сохранить — объект {title, name, steps}.
      */
-    private function sequenceFrom(array $sequence, string $kind): array
+    private function sequenceFrom(array $sequence): array
     {
         if ($sequence === []) {
             return [];
         }
-        $steps = $this->stepsFrom($sequence['Children'] ?? [], $kind);
+        $steps = $this->stepsFrom($sequence['Children'] ?? []);
         $title = (string) ($sequence['Properties']['Title'] ?? '');
-        $default = $kind === 'robots' ? 'Automation sequence' : 'Последовательность действий';
+        $default = Compiler::SEQUENCE_TITLE;
         if ($title === $default && !$this->keepNames) {
             return $steps;
         }

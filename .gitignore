@@ -26,3 +26,10 @@ desktop.ini
 *.portal.yaml
 *.portal.json
 !tools/bpt/examples/*.portal.yaml
+
+# Рабочие файлы по клиентам (спецификации, снимки, собранные шаблоны) — не в git
+work/
+
+# Ключи и доступы (вебхуки, приложения тестового портала) — только локально (CLAUDE.md §4.4)
+.env
+.env.*

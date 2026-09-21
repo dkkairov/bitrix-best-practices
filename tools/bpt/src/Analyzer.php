@@ -8,7 +8,12 @@ declare(strict_types=1);
 
 final class Analyzer
 {
-    public const AUTOMATION_TITLE = 'Bizproc Automation template';
+    /**
+     * Заголовок корня, который пишет дизайнер в новом шаблоне (экспорт пустого шаблона, 2026-09-21).
+     * Такой же у шаблонов роботов, поэтому вид шаблона по нему не определить; в старых шаблонах
+     * встречается «Последовательный бизнес-процесс».
+     */
+    public const ROOT_TITLE = 'Bizproc Automation template';
 
     /** Действия, которые нельзя генерировать и переносить без отдельного решения. */
     public const FORBIDDEN_TYPES = [
@@ -74,7 +79,7 @@ final class Analyzer
         $total = strlen($logicJson) + $docFieldsBytes;
         return [
             'file'                  => basename($file),
-            'kind'                  => ($root['Properties']['Title'] ?? '') === self::AUTOMATION_TITLE ? 'robots' : 'designer',
+            'root_title'            => (string) ($root['Properties']['Title'] ?? ''),
             'root_type'             => $root['Type'],
             'version'               => $data['VERSION'] ?? null,
             'compressed_bytes'      => $bpt['compressed'] ?? null,

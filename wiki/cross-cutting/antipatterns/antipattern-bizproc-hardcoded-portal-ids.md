@@ -5,12 +5,12 @@ module: bizproc
 edition: both
 status: verified
 provenance: empirical
-verified: "2026-09-16 / анализ 11 экспортов шаблонов роботов СПА (Bitrix24 cloud)"
+verified: "2026-09-21 / анализ экспортов из дизайнера БП, смарт-процессы коробки клиента (до 2026-09-21 ошибочно считались роботами облака)"
 tags: [бизнес-процессы, роботы, перенос, тиражирование, bpt, идентификаторы]
 sources: []
 related: ["[[concept-bizproc-bpt-format]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[entity-bizproc-template-rest-methods]]", "[[entity-smart-process]]"]
 aliases: []
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # Зашитые ID портала в шаблонах БП и роботов

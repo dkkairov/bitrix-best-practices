@@ -120,7 +120,7 @@ test('Сборщик: параллель, цикл и блок оборачив�
     [$parallel, $loop, $block] = $r['bpt']['TEMPLATE'][0]['Children'];
     assertSame('SequenceActivity', $parallel['Children'][0]['Type']);
     assertSame(2, count($parallel['Children']));
-    assertSame('Automation sequence', $parallel['Children'][0]['Properties']['Title']);   // kind: robots
+    assertSame('Последовательность действий', $parallel['Children'][0]['Properties']['Title']);
     assertSame('Вторая', $parallel['Children'][1]['Properties']['Title']);
     assertSame([['UF_X', 'empty', '', '0']], $loop['Properties']['fieldcondition']);
     assertSame(1, count($loop['Children']));
@@ -129,13 +129,24 @@ test('Сборщик: параллель, цикл и блок оборачив�
     assertSame('CrmChangeStatusActivity', $block['Children'][0]['Children'][0]['Type']);
 });
 
-test('Сборщик: заголовки последовательностей зависят от вида шаблона', function () {
-    $spec = minimalSpec([['block' => ['title' => 'Блок', 'steps' => []]]]);
-    $spec['kind'] = 'designer';
+test('Сборщик: заголовок корня — как у дизайнера, свой — через root_title', function () {
+    $spec = minimalSpec();
     $r = (new Compiler(Catalog::load()))->compile($spec);
-    assertSame('Последовательность действий',
-        $r['bpt']['TEMPLATE'][0]['Children'][0]['Children'][0]['Properties']['Title']);
-    assertSame('Тест', $r['bpt']['TEMPLATE'][0]['Properties']['Title']);   // корень дизайнера — имя процесса
+    assertSame('Bizproc Automation template', $r['bpt']['TEMPLATE'][0]['Properties']['Title']);
+    assertTrue(!str_contains(implode(' ', $r['warnings']), 'kind'), 'без kind нет предупреждения');
+
+    $spec['root_title'] = 'Последовательный бизнес-процесс';   // так корень назван в старых шаблонах
+    $r = (new Compiler(Catalog::load()))->compile($spec);
+    assertSame('Последовательный бизнес-процесс', $r['bpt']['TEMPLATE'][0]['Properties']['Title']);
+});
+
+test('Сборщик: устаревший ключ kind — только предупреждение', function () {
+    $spec = minimalSpec();
+    $spec['kind'] = 'robots';
+    $r = (new Compiler(Catalog::load()))->compile($spec);
+    assertSame([], $r['errors']);
+    assertTrue(str_contains(implode(' ', $r['warnings']), 'kind'), 'предупреждение про kind');
+    assertSame('Bizproc Automation template', $r['bpt']['TEMPLATE'][0]['Properties']['Title']);
 });
 
 test('Сборщик: действие с двумя исходами', function () {
@@ -234,8 +245,8 @@ test('Пример: собирается, разбирается и рисует
     assertSame('ApproveActivity', $approve['Type']);
     assertSame(['group_g7'], $approve['Properties']['Users']);
     $yes = $approve['Children'][0]['Children'];
-    assertSame('DT1000_10:CLIENT', $yes[0]['Properties']['TargetStatus']);
-    assertTrue(str_contains($yes[1]['Properties']['EventText'], "{={$approve['Name']}:Comments}"), 'ссылка на шаг');
+    assertTrue(str_contains($yes[0]['Properties']['EventText'], "{={$approve['Name']}:Comments}"), 'ссылка на шаг');
+    assertSame('DT1000_10:CLIENT', $yes[1]['Properties']['TargetStatus']);   // смена стадии — последней
 
     $back = (new Decompiler($catalog, $snapshot, true))->decompile($built['bpt']);
     $again = (new Compiler($catalog, $snapshot))->compile($back['spec']);

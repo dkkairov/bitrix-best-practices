@@ -60,7 +60,7 @@ final class Mermaid
                 $exits = [];
                 foreach (array_values(array_filter($node['Children'] ?? [], 'is_array')) as $branch) {
                     $branchLabel = $this->label((string) ($branch['Properties']['Title'] ?? 'ветка'));
-                    $exits[] = $this->flow($branch['Children'] ?? [], [$id, $branchLabel], $depth + 1);
+                    $exits[] = $this->flow($branch['Children'] ?? [], ['from' => $id, 'label' => $branchLabel], $depth + 1);
                 }
                 return $this->flatten($exits, $id);
 
@@ -97,8 +97,8 @@ final class Mermaid
                 $this->lines[] = "{$id}[/\"{$title}\"/]";
                 $this->connect($from, $id, $off);
                 $children = array_values(array_filter($node['Children'] ?? [], 'is_array'));
-                $yes = $this->flow($children[0]['Children'] ?? [], [$id, 'да'], $depth + 1);
-                $no = $this->flow($children[1]['Children'] ?? [], [$id, 'нет'], $depth + 1);
+                $yes = $this->flow($children[0]['Children'] ?? [], ['from' => $id, 'label' => 'да'], $depth + 1);
+                $no = $this->flow($children[1]['Children'] ?? [], ['from' => $id, 'label' => 'нет'], $depth + 1);
                 return $this->flatten([$yes, $no], $id);
 
             case 'waiting':
@@ -116,13 +116,13 @@ final class Mermaid
         }
     }
 
-    /** @param string|array $from узел или пара [узел, подпись стрелки] */
+    /** @param string|array $from узел, подписанная стрелка ['from' => узел, 'label' => подпись] или их список */
     private function connect(string|array $from, string $to, bool $dashed = false, string $label = ''): void
     {
         foreach ($this->flattenList([$from], null) as $source) {
             $edgeLabel = $label;
             if (is_array($source)) {
-                [$source, $edgeLabel] = $source;
+                [$source, $edgeLabel] = [$source['from'], $source['label']];
             }
             $arrow = $dashed ? '-.->' : '-->';
             $this->lines[] = $edgeLabel !== ''
@@ -144,8 +144,8 @@ final class Mermaid
         foreach ($values as $value) {
             if (is_string($value)) {
                 $out[] = $value;
-            } elseif (is_array($value) && count($value) === 2 && is_string($value[0] ?? null) && is_string($value[1] ?? null)) {
-                $out[] = $value;   // пара [узел, подпись]
+            } elseif (is_array($value) && isset($value['from'])) {
+                $out[] = $value;   // подписанная стрелка ['from' => узел, 'label' => подпись]
             } elseif (is_array($value)) {
                 $out = array_merge($out, $this->flattenList($value, $fallback));
             }

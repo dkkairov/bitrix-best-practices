@@ -42,6 +42,21 @@ test('Схема: условие, параллель, цикл и блок', fun
     assertTrue(str_contains($mmd, 'subgraph'), 'блок — подграф');
 });
 
+test('Схема: обе ветки задания сходятся к следующему шагу', function () {
+    $r = (new Compiler(Catalog::load()))->compile(minimalSpec([
+        ['approve' => ['Users' => ['user_42'], 'Name' => 'Согласование',
+                       'on_yes' => [['change_stage' => ['TargetStatus' => 'DT1000_10:CLIENT']]],
+                       'on_no'  => [['change_stage' => ['title' => 'На доработку', 'TargetStatus' => 'DT1000_10:NEW']]]]],
+        ['crm_event' => ['EventText' => 'Готово']],
+    ]));
+    $mmd = (new Mermaid(Catalog::load()))->render($r['bpt']);
+    // Раньше пара выходов из двух веток принималась за «узел + подпись» и рисовалась одной стрелкой
+    assertTrue(!preg_match('/\|n\d+\|/', $mmd), "подпись стрелки не должна быть идентификатором узла: {$mmd}");
+    preg_match('/(n\d+)\["Запись события в crm"\]/u', $mmd, $m);
+    assertTrue(isset($m[1]), 'узел записи события найден');
+    assertSame(2, substr_count($mmd, "--> {$m[1]}"), 'в следующий шаг входят обе ветки');
+});
+
 test('Схема: кавычки и длинные заголовки не ломают разметку', function () {
     $long = str_repeat('очень длинный заголовок ', 10);
     $r = (new Compiler(Catalog::load()))->compile(minimalSpec([

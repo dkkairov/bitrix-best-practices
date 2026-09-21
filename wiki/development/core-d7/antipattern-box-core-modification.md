@@ -4,23 +4,26 @@ type: antipattern
 module: core-d7
 edition: box
 status: verified
-provenance: empirical
-verified: "2026-06-19 / Bitrix24 box"
+provenance: mixed
+verified: "2026-06-19 / Bitrix24 box; 2026-09-21 / сверено с «Книгой разработчика Bitrix24» (bx24devbook): Ядро продукта, Введение в разработку"
 tags: [коробка, ядро, события, local, разработка]
-sources: []
-related: ["[[checklist-box-performance]]"]
+sources: ["[[source-devbook-dev-rules]]", "[[source-devbook-core-d7]]"]
+related: ["[[checklist-box-performance]]", "[[concept-change-invasiveness-hierarchy]]", "[[pattern-events-over-core-modification]]", "[[pattern-local-solution-structure]]"]
 aliases: ["box-core-modification"]
-updated: "2026-06-20"
+updated: "2026-09-21"
 ---
 
 # Антипаттерн: правка ядра коробки
 
 ## Как выглядит
 Разработчик правит файлы в `/bitrix/modules/` (системные модули) или меняет поведение «прямо в
-ядре», чтобы добавить логику или поправить баг.
+ядре», чтобы добавить логику или поправить баг. Полный список «никогда» — в
+[[concept-change-invasiveness-hierarchy]].
 
 ## Почему это плохо
 - **Обновления затирают правки:** при апдейте платформы изменения теряются — регрессии на ровном месте.
+- **Владелец лицензии теряет право на техподдержку** — довод из книги, самый весомый для заказчика
+  ([Ядро продукта](https://bx24devbook.website.yandexcloud.net/Obsie_svedenia/Adro_produkta.html#adro-produkta)).
 - **Безопасность:** правки в ядре усложняют установку патчей безопасности.
 - **Поддержка:** другой разработчик не найдёт «магию», поведение нельзя воспроизвести.
 - **Совместимость:** ломаются гарантии совместимости с модулями и маркетплейсом.
@@ -32,11 +35,14 @@ updated: "2026-06-20"
 Использовать штатные точки расширения:
 1. **События ядра** (EventManager / обработчики) для вмешательства в логику.
 2. Код размещать в **`/local/`** (php_interface, модули, компоненты, шаблоны), не в `/bitrix/`.
-3. Свою функциональность оформлять как **отдельный модуль** с установкой и регистрацией событий.
+3. Переиспользуемую функциональность оформлять как **отдельный модуль** с установкой и регистрацией
+   событий; клиентский код — решением в `/local/php_interface` ([[pattern-local-solution-structure]]).
 4. Кастомизацию компонентов делать **копией в шаблон**, не правкой оригинала.
 
 ## Профилактика
-- Правило проекта: «`/bitrix/` — read-only. Всё своё — в `/local/` и через события».
+- Правило проекта: «`/bitrix/` — read-only. Всё своё — в `/local/` и через события». Эвристика книги:
+  менять можно только `/local/`, технический `/bitrix/.settings_extra.php` и файлы, добавленные самим
+  разработчиком ([Ядро продукта](https://bx24devbook.website.yandexcloud.net/Obsie_svedenia/Adro_produkta.html#osobye-fajly)).
 - Код-ревью отклоняет любые диффы внутри `/bitrix/modules/`.
 
 ## Связанное

@@ -5,18 +5,20 @@ module: core-d7
 edition: box
 status: verified
 provenance: documented
-verified: "2026-06-01 / Книга разработчика Bitrix24 (dev.1c-bitrix.ru)"
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Документация — Сам себе источник"
 tags: [разработка, research, debugging, grep, devtools]
 sources: ["[[source-devbook-dev-rules]]"]
-related: ["[[concept-change-invasiveness-hierarchy]]", "[[concept-bitrix-naming-conventions]]", "[[concept-dev-standards]]"]
+related: ["[[concept-change-invasiveness-hierarchy]]", "[[concept-bitrix-naming-conventions]]", "[[concept-dev-standards]]", "[[entity-admin-php-console]]"]
 aliases: ["bitrix24-issledovanie-platformy"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # Исследование платформы Bitrix24
 
 **TL;DR:** документация неполна и отстаёт, поэтому умение самому найти ответ в исходниках — не
-«продвинутый уровень», а базовая гигиена разработчика под коробку.
+«продвинутый уровень», а базовая гигиена разработчика под коробку. Четыре приёма ниже — из главы
+[«Сам себе источник»](https://bx24devbook.website.yandexcloud.net/Dokumentacia/Sam_sebe_istocnik.html)
+«Книги разработчика».
 
 ## Почему важно при внедрении
 
@@ -33,9 +35,17 @@ Linux и `grep` в рабочем окружении ([[checklist-dev-environmen
 REST-методы. Дальше идти по коду от регистрации к реализации.
 
 ```php
-// из консольного PHP с подключённым ядром
+// в «Командной PHP-строке» админки (это не CLI) — так в книге
+var_dump(\GetModuleEvents('rest', 'onRestServiceBuildDescription'));
+
+// вариант команды: третий аргумент true — сразу массив, удобнее читать
 print_r(\GetModuleEvents('rest', 'onRestServiceBuildDescription', true));
 ```
+
+> **Уточнено 2026-09-21 по книге.** Раньше здесь стояло «из консольного PHP». Книга выполняет этот
+> код в [[entity-admin-php-console|Командной PHP-строке]] — странице админки, а не в CLI
+> ([исследование через REST](https://bx24devbook.website.yandexcloud.net/Dokumentacia/Sam_sebe_istocnik.html#issledovanie-cerez-rest)).
+> Консольный PHP тоже годится, но только от владельца сайта — [[antipattern-cli-php-as-root]].
 
 ## Приём 2 — через кодовое имя сущности
 
@@ -60,7 +70,9 @@ grep -rin 'DEAL' /home/bitrix/www/bitrix/modules/crm/lib/
 
 **Когда:** нужно повлиять на поведение страницы. Ожидание через `setTimeout` — антипаттерн.
 
-JS-события публичной части не задокументированы, но проходят через `BX.onCustomEvent`:
+JS-события публичной части не задокументированы, но проходят через `BX.onCustomEvent`. Книга
+описывает алгоритм для отладчика Firefox («Set a logpoint»); logpoint есть и в DevTools Chromium —
+шаги те же:
 
 1. Открыть DevTools, ввести `BX.onCustomEvent` без скобок — увидеть имена аргументов
    (`eventObject, eventName, eventParams, secureParams` или минифицированные — использовать **те,

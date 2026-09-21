@@ -29,6 +29,7 @@ updated: "2026-09-18"
 - [[concept-service-locator|ServiceLocator: регистрация и подмена сервисов]]
 - [[concept-validation-d7|Валидация D7: PHP-атрибуты вместо простыней if]]
 - [[concept-code-namespaces-and-autoloading|Пространства имён, автозагрузка, размещение кода в /local/]]
+- [[pattern-local-solution-structure|Решение в /local/php_interface: структура клиентского проекта]]
 - [[recipe-composer-third-party-libraries|Сторонние Composer-пакеты (dompdf, PhpWord)]]
 - [[pattern-events-over-core-modification|Расширение через события]]
 - [[recipe-d7-orm-event-subscription|Подписка модуля на событие D7 ORM]]

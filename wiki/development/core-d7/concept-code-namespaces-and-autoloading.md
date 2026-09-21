@@ -5,12 +5,12 @@ module: core-d7
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-06-19 / Bitrix Framework (курс 43)"
+verified: "2026-06-19 / Bitrix Framework (курс 43); раздел «Где размещать свой код» — 2026-09-21 / сверено с «Книгой разработчика Bitrix24» (bx24devbook): Структура папки local"
 tags: [d7, namespaces, автозагрузка, local, разработка]
-sources: ["[[source-bxfw-course43-namespaces]]"]
-related: ["[[antipattern-box-core-modification]]", "[[recipe-module-structure-and-install]]"]
+sources: ["[[source-bxfw-course43-namespaces]]", "[[source-devbook-dev-rules]]"]
+related: ["[[antipattern-box-core-modification]]", "[[recipe-module-structure-and-install]]", "[[pattern-local-solution-structure]]", "[[entity-local-directory]]"]
 aliases: ["code-namespaces-and-autoloading"]
-updated: "2026-06-20"
+updated: "2026-09-21"
 ---
 
 # Организация кода: пространства имён и автозагрузка
@@ -60,8 +60,9 @@ Loc::getMessage('CODE'); // вместо \Bitrix\Main\Localization\Loc::getMessa
 
 ```text
 local/
-├── php_interface/        обработчики событий и низкоуровневая настройка
-│   ├── init.php          автоподключается ядром: регистрация событий, автозагрузка, сервисы
+├── php_interface/        точка входа проекта (структура решения — см. ниже)
+│   ├── init.php          автоподключается ядром: только автозагрузчик и подключение файлов
+│   ├── events.php        подписки на события; kernel.php — .env и сервисы; classes/ — классы
 │   └── <lang>/           языковые файлы (message.php) — опционально
 ├── modules/              свои модули (аналог /bitrix/modules/)
 │   └── vendor.module/    lib/ install/ lang/ options.php (структура — см. рецепт ниже)
@@ -70,15 +71,22 @@ local/
 ├── templates/            шаблоны сайта
 │   └── <template_id>/    header.php, footer.php, .style.css, components/
 ├── activities/           пользовательские действия бизнес-процессов (BP activity)
+├── blocks/               блоки для сайтов
 ├── js/                   JS-расширения (грузятся через \Bitrix\Main\UI\Extension::load)
-├── gadgets/              гаджеты рабочего стола (legacy)
-└── wizards/              мастера первичной настройки (опционально)
+└── gadgets/              гаджеты рабочего стола (legacy)
 ```
 
-- **Минимум для старта:** `php_interface/init.php` — точка входа для регистрации событий и автозагрузки.
-  Остальные папки заводят по мере надобности, заранее их создавать не нужно.
-- Свой функционал оформляйте отдельным модулем `vendor.module` с пространством имён `Vendor\Module` —
-  внутренняя структура модуля в [[recipe-module-structure-and-install|Структура модуля и установка]].
+> **Сверено с книгой 2026-09-21.** Список каталогов приведён к перечню «Книги разработчика»:
+> `activities`, `blocks`, `components`, `gadgets`, `js`, `modules`, `php_interface`, `templates`;
+> других каталогов книга заводить не рекомендует (исключение — `tools` для технических скриптов)
+> ([Структура папки local](https://bx24devbook.website.yandexcloud.net/Razrabotka/Struktura_papki_local/Osnovnoe.html#podderzivaemye-direktorii)).
+> Убран `wizards/` (в перечне книги его нет), добавлен `blocks/`. Подробно — [[entity-local-directory]].
+
+- **Минимум для старта:** `php_interface/init.php` — точка входа: автозагрузчик и подключение
+  `events.php`/`kernel.php`. Остальные папки заводят по мере надобности, заранее их создавать не нужно.
+- **Переиспользуемый** функционал оформляйте отдельным модулем `vendor.module` с пространством имён
+  `Vendor\Module` — [[recipe-module-structure-and-install|Структура модуля и установка]]. Код под
+  одного клиента — решением в `/local/php_interface`: [[pattern-local-solution-structure]].
 
 ## Как применять (чек-лист)
 - [ ] Свой код — в `/local/`, не в ядре

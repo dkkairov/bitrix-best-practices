@@ -5,18 +5,19 @@ module: templates-design
 edition: box
 status: verified
 provenance: documented
-verified: "2026-06-01 / документация модуля ui, раздел кнопок (dev.1c-bitrix.ru)"
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): UI — Кнопки"
 tags: [ui, кнопки, класс, адаптивность, меню]
 sources: ["[[source-devbook-ui]]"]
 related: ["[[entity-toolbar]]", "[[concept-ui-subsystem]]"]
 aliases: ["bitrix24-button-class"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `\Bitrix\UI\Buttons\Button`
 
 **Что это:** стандартная кнопка продукта. Рядом — `Icon`, `Color`, `Size`, `JsHandler`,
-`ButtonAttributes`.
+`ButtonAttributes` ([Кнопки](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Knopki.html);
+атрибуция и подводные камни уточнены при сверке с книгой 2026-09-21).
 
 ## Ключевые факты
 | Поле | Значение |
@@ -32,7 +33,8 @@ new Button(['link' => '/path/', 'text' => 'Открыть']);
 (new Button())->setText('Открыть')->setLink('/path/');
 ```
 
-Имена ключей массива и сеттеров совпадают — переписывать с одной формы на другую дёшево.
+Многие ключи массива и сеттеры названы одинаково — переписывать с одной формы на другую обычно
+дёшево (но не все — сверяйтесь с классом).
 
 ## Параметры
 
@@ -49,16 +51,20 @@ new Button(['link' => '/path/', 'text' => 'Открыть']);
 | `round`, `dropdown` | скруглённая, с треугольником развёртывания |
 | `menu` | выпадающее меню |
 
-Методы состояния: `setDisabled(bool)`, `setClocking(bool)` (иконка часов — долгая операция),
-`setWaiting(bool)` (загрузчик), `getDataSet()`.
+Обработчик — `\Bitrix\UI\Buttons\JsHandler` (имя JS-функции и контекст). JS-функция получает
+`(button, event)`; у JS-объекта кнопки есть методы состояния `setDisabled(bool)`, `setClocking(bool)`
+(иконка часов — долгая операция), `setWaiting(bool)` (загрузчик), `getDataSet()`.
 
 ## Подводные камни
 
-- **Кнопка без иконки не схлопывается на узком экране** и пишет предупреждение. Тулбар на
-  мобильном схлопывает кнопки справа налево, оставляя только иконку. Лечится
-  `dataset['toolbar-collapsed-icon']` (константа `Icon::*` или CSS-класс).
-- **`click`, `onclick` и `events.click` — три способа задать одно и то же.** Указывать нужно ровно
-  один, иначе поведение непредсказуемо.
+- **Кнопка без иконки не схлопывается** и пишет предупреждение в консоль. При нехватке места тулбар
+  схлопывает кнопки справа, оставляя только иконку. Лечится `dataset['toolbar-collapsed-icon']`
+  (константа `Icon::*` или CSS-класс).
+- **`click`, `onclick` и `events['click']` — три способа задать обработчик**, и приоритет у них
+  определённый: `events['click']` перекрывает `onclick`, тот — `click`. Задавайте один, чтобы не
+  гадать.
+- **Контекст `JsHandler` пока не обрабатывается** (по книге — «в данный момент»); если JS-функции нет,
+  в консоли появится предупреждение `BX.UI.ButtonManager.createFromNode`.
 - Для `aria-*` и прочих атрибутов — `$button->getAttributeCollection()`.
 
 ## Связанное

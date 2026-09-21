@@ -4,21 +4,29 @@ type: concept
 module: templates-design
 edition: box
 status: verified
-provenance: documented
-verified: "2026-06-01 / документация модулей ui и main (dev.1c-bitrix.ru)"
+provenance: mixed
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Разработка / UI — все 13 страниц; примеры книги ≈2023, без проверки на стенде"
 tags: [ui, тулбар, фильтр, грид, кнопки, шаблон, отложенные-функции]
 sources: ["[[source-devbook-ui]]"]
-related: ["[[concept-change-invasiveness-hierarchy]]", "[[concept-request-lifecycle]]", "[[recipe-custom-left-menu-section]]", "[[recipe-crm-card-editor-js-access]]"]
+related: ["[[concept-change-invasiveness-hierarchy]]", "[[concept-request-lifecycle]]", "[[recipe-custom-left-menu-section]]", "[[recipe-crm-card-editor-js-access]]", "[[recipe-custom-list-page-filter-grid]]", "[[concept-deferred-functions-and-page-areas]]"]
 aliases: ["bitrix24-ui"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # UI-подсистема
 
 **TL;DR:** для большинства интерфейсных задач в продукте уже есть готовый компонент. Начинать
 любую страницу списка или формы с вопроса «что из этого уже реализовано» — это уровень 1
-[[concept-change-invasiveness-hierarchy|иерархии способов изменения]], и по оценке документации
-он экономит до 30 % времени.
+[[concept-change-invasiveness-hierarchy|иерархии способов изменения]], и, по оценке автора
+«Книги разработчика», знание штатных инструментов экономит до 30 % времени
+([UI → Введение](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Vvedenie.html)).
+Сборка целиком — [[recipe-custom-list-page-filter-grid]].
+
+> **Сверено с книгой 2026-09-21.** Атрибуция исправлена (материал — из книги, не с dev.1c-bitrix.ru;
+> оценки и оговорки — автора книги, а не «документации»). Исправлено: тулбар стоит **между** зонами
+> `above_pagetitle`/`below_pagetitle`, а не занимает их; условие «только в шаблоне Bitrix24» относится
+> к тулбару, а не ко всей подсистеме; «устаревшим» автор называет только получение значений через
+> `Options::getFilter*()`.
 
 ## Что входит
 
@@ -26,12 +34,13 @@ updated: "2026-09-18"
 |---|---|---|
 | **Тулбар** — шапка страницы | `\Bitrix\UI\Toolbar\…` | `ui` |
 | **Кнопки** | `\Bitrix\UI\Buttons\…` | `ui` |
-| **Фильтр** — критерии поиска | `\Bitrix\Main\UI\Filter\…` | `main` |
+| **Фильтр** — компонент и настройки пользователя | `\Bitrix\Main\UI\Filter\…` | `main` |
+| **Свой фильтр** — объект фильтра и провайдеры данных | `\Bitrix\Main\Filter\…` | `main` |
 | **Грид** — табличное представление | `\Bitrix\Main\Grid\…` | `main` |
 
-**Важная тонкость:** «UI» — не один модуль. Тулбар и кнопки живут в отдельном модуле `ui`, и для
-них нужен `Loader::includeModule('ui')`; фильтр и грид — внутри главного модуля, там подключать
-нечего.
+«UI» — не один модуль: тулбар и кнопки живут в модуле `ui`, фильтр и грид — в главном модуле.
+**Практика команды:** перед использованием тулбара и кнопок вызывать
+`Loader::includeModule('ui')` (в книге этого нет — она считает `ui` неотъемлемой частью Bitrix24).
 
 ## Тулбар
 
@@ -39,15 +48,17 @@ updated: "2026-09-18"
 звезда «в избранное» (`addFavoriteStar`), контент после заголовка (`addAfterTitleHtml`), фильтр
 (`addFilter`), кнопки (`addButton`), пользовательский контент справа (`addRightCustomHtml`).
 
-По умолчанию тулбар отображается при трёх условиях:
+По умолчанию тулбар отображается при трёх условиях
+([условие применения](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Tulbar/Osnovnoe.html#uslovie-primenenia)):
 
 1. используется шаблон дизайна Bitrix24 — в других шаблонах компонент вызывается явно;
 2. пусты буферы отложенных функций `pagetitle`, `inside_pagetitle`, `in_pagetitle` — иначе
    включается «устаревший» вид шапки;
 3. буферизация вывода ещё идёт (см. [[concept-request-lifecycle]]).
 
-Физически тулбар занимает зоны `above_pagetitle` / `below_pagetitle`. Это значит, что свои
-отложенные функции над и под заголовком теперь конкурируют с тулбаром.
+Тулбар выводится **между** зонами `above_pagetitle` и `below_pagetitle`; сами эти зоны свободны для
+своего вывода над и под шапкой. Конфликтуют с тулбаром только `pagetitle*` (п. 2) —
+[[concept-deferred-functions-and-page-areas]].
 
 Компонент `bitrix:ui.sidepanel.wrapper` требует явного `'USE_UI_TOOLBAR' => 'Y'`.
 
@@ -59,19 +70,18 @@ updated: "2026-09-18"
 
 Три уровня работы:
 
-- **PHP:** компонент с параметрами (`FILTER_ID`, `FIELDS`, `FILTER_PRESETS`). Настройки
-  пользователя лежат в `b_user_option` (`CATEGORY = 'main.ui.filter'`), доступ — через
-  `\Bitrix\Main\UI\Filter\Options`.
-- **Мост в ORM:** `Options::getFilterLogic($sourceFields)` превращает выбранный фильтр в формат
-  D7 (с префиксами `>=`, `<=`) — готовый массив для `DataManager::getList()`.
+- **PHP, компонент:** параметры (`FILTER_ID`, поля, `FILTER_PRESETS`). Настройки пользователя лежат
+  в `b_user_option` (`CATEGORY = 'main.ui.filter'`), доступ — через `\Bitrix\Main\UI\Filter\Options`.
+- **Значения фильтра для выборки:** в новом коде — объект «своего фильтра»
+  (`\Bitrix\Main\Filter\Filter::getValue()`, [[entity-custom-filter]]). `Options::getFilterLogic()`
+  тоже отдаёт массив для `DataManager::getList()`, но автор книги называет этот путь демонстрационным
+  или для устаревших систем
+  ([получение фильтра](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Filtr/Filtry_polzovatela.html#polucenie-fil-tra)).
 - **JS:** `BX.Main.Filter` в публичной части.
-
-**Оговорка документации:** PHP-сторона через `Options` считается устаревшим подходом; для новой
-разработки рекомендуется путь «свой фильтр» (собственный класс фильтра).
 
 ## Грид
 
-Компонент `bitrix:main.ui.grid` — основа всех страниц списков продукта.
+Компонент `bitrix:main.ui.grid` — штатный табличный вывод.
 
 ```php
 $APPLICATION->IncludeComponent('bitrix:main.ui.grid', '', [
@@ -87,27 +97,30 @@ $APPLICATION->IncludeComponent('bitrix:main.ui.grid', '', [
 ]);
 ```
 
-Обязательны `GRID_ID`, `COLUMNS` (или `HEADERS`) и `ROWS`; остальное — поведенческие флаги,
-постраничная навигация и панель групповых действий.
+Обязательны `GRID_ID`, `COLUMNS` (устаревший синоним — `HEADERS`) и `ROWS`; остальное — поведенческие
+флаги, постраничная навигация и панель групповых действий.
 
-Термины: **бургер** — контекстное меню строки; **пресет** — персональные настройки порядка и
-ширины столбцов (PHP-API `\Bitrix\Main\Grid\Options`); **панель действий** — групповые операции над
-отмеченными строками; JS-API — `BX.Main.gridManager`.
+Термины: **бургер** — контекстное меню строки (ключ `actions` в строке); **пресет** — персональные
+настройки порядка и ширины столбцов (PHP-API `\Bitrix\Main\Grid\Options`); **панель действий** —
+групповые операции над отмеченными строками (`ACTION_PANEL`); JS-API — `BX.Main.gridManager`.
 
 ## Почему важно при внедрении
 
 Своя страница, собранная на этих компонентах, визуально не отличается от продукта и получает
 бесплатно: пресеты, сохранение настроек пользователя, групповые действия, адаптив. Своя вёрстка
-«похоже, но не то» — самый частый источник претензий заказчика к качеству доработки.
+«похоже, но не то» — частый источник претензий заказчика к качеству доработки (опыт команды).
 
 ## Подводные камни
-- **Вне шаблона Bitrix24 подсистема по умолчанию не работает** — компоненты надо вызывать явно.
-- Для тулбара и кнопок не забыть `Loader::includeModule('ui')`.
+- **Вне шаблона Bitrix24 тулбар сам не выводится** — компонент `bitrix:ui.toolbar` вызывают явно;
+  фильтр и грид подключаются явно в любом шаблоне.
+- Не выводить ничего в `pagetitle`, `inside_pagetitle`, `in_pagetitle` — пропадёт тулбар.
 - Собственные страницы, выведенные в свой раздел меню, тоже должны использовать эти компоненты —
   см. [[recipe-custom-left-menu-section]].
 
 ## Связанные страницы
-- [[concept-request-lifecycle]] — буферизация и зоны страницы, на которых стоит тулбар
+- [[recipe-custom-list-page-filter-grid]] — своя страница-список: фильтр, грид, тулбар
+- [[concept-deferred-functions-and-page-areas]] — зоны страницы и отложенный вывод
+- [[concept-request-lifecycle]] — буферизация, на которой стоит тулбар
 - [[recipe-crm-card-editor-js-access]] — соседний слой: JS-API карточки CRM
 
 [← Шаблоны и вёрстка](_index-templates-design.md)

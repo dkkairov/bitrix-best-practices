@@ -5,18 +5,25 @@ module: templates-design
 edition: box
 status: verified
 provenance: documented
-verified: "2026-06-01 / документация модуля main, раздел «Свой фильтр» (dev.1c-bitrix.ru)"
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): UI / Фильтр — Свой фильтр, Фильтры пользователя"
 tags: [ui, фильтр, свой-фильтр, dataprovider, orm, d7]
 sources: ["[[source-devbook-ui]]"]
-related: ["[[entity-filter-component]]", "[[entity-filter-options]]", "[[entity-main-event]]", "[[concept-ui-subsystem]]"]
+related: ["[[entity-filter-component]]", "[[entity-filter-options]]", "[[entity-main-event]]", "[[concept-ui-subsystem]]", "[[recipe-custom-list-page-filter-grid]]"]
 aliases: ["bitrix24-filter-class"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `\Bitrix\Main\Filter\…` — свой фильтр
 
-**Что это:** современный способ сделать фильтр для своей сущности. Рекомендованная замена
-[[entity-filter-options|`UI\Filter\Options`]] в новом коде.
+**Что это:** «современный подход» (термин автора «Книги разработчика») к фильтру для своей
+сущности: объект фильтра поверх провайдеров данных. В новом коде значения берут отсюда, а не через
+`UI\Filter\Options::getFilter*()` ([Свой фильтр](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Filtr/Svoj_filtr.html)).
+Рецепт целиком — [[recipe-custom-list-page-filter-grid]].
+
+> **Уточнено 2026-09-21 при сверке с книгой.** Рекомендации — автора книги, а не «документации»;
+> обязательных методов провайдера три (+ `getFieldName` у `EntityDataProvider`), а
+> `prepareListFilterParam` — необязательный хук из примера для дат; классы `UI\Filter\…` (типы полей,
+> темы) общие для обоих путей — «устарело» только получение значений через `Options`.
 
 ## Ключевые факты
 | Поле | Значение |
@@ -42,31 +49,36 @@ new \Bitrix\Main\Filter\Filter(
 | `getFieldArrays($fieldMask = [])` | поля в формате компонента [[entity-filter-component]] |
 | `getFields()` | объекты полей всех провайдеров |
 | `getID()`, `getDefaultFieldIDs()` | идентификатор и поля по умолчанию |
-| `prepareFilterValue` (protected) | **предназначен для переопределения** |
+| `prepareFilterValue` | подготовка значений; штатная плохо работает с диапазонами — пример того, что стоит переопределить в наследнике |
+
+**Главный совет книги — всегда делать наследника `Filter`**, даже пустой класс: так контролируются
+аргументы и остаётся место переопределить поведение.
 
 ## `DataProvider` — контракт
 
-| Метод | Возврат | Назначение |
+| Метод | Обязателен | Назначение |
 |---|---|---|
-| `getSettings()` | `Settings` | конфигурация |
-| `prepareFields()` | `Field[]` | описания полей (хелпер `$this->createField($id, $config)`) |
-| `prepareFieldData($fieldID)` | `array\|null` | мета-описание поля |
-| `prepareListFilterParam(array &$filter, $fieldId)` | — | преобразование `_from`/`_to` → `>=`/`<=` |
+| `getSettings()` | да | конфигурация (`Settings`) |
+| `prepareFields()` | да | описания полей (хелпер `$this->createField($id, $config)`) |
+| `prepareFieldData($fieldID)` | да | мета-описание поля (`array\|null`) |
+| `getFieldName($fieldID)` | да, у `EntityDataProvider` | подпись поля — `EntityDataProvider` подставляет названия сам |
+| `prepareListFilterParam(array &$filter, $fieldId)` | нет | необязательный хук; в примере книги переопределён для дат (`_from`/`_to` → `>=`/`<=`) |
 
-Наследник `EntityDataProvider` берёт часть работы на себя для ORM-сущностей.
-
-Фабрики фильтров собираются событием — каждый модуль добавляет свои через обработчик, возвращающий
-`EventResult` с массивом `callbacks` ([[entity-main-event]]).
+Создать фильтр можно напрямую (`new Filter(...)` с провайдерами, в книге — `UserDataProvider` +
+`UserUFDataProvider`) или фабрикой `\Bitrix\Main\Filter\Factory::createEntityFilter()`. Фабрики
+собираются событием `main:OnBuildFilterFactoryMethods`: обработчик возвращает `EventResult` с массивом
+`callbacks`, образец — `FactoryMain` ([[entity-main-event]]).
 
 ## Подводные камни
 
-- **`prepareFilterValue` стандартной реализации плохо работает с диапазонами** — документация
-  прямо рекомендует переопределять его в наследнике. Если фильтр «по датам от и до» ведёт себя
-  странно, начинать надо отсюда.
-- Преобразование `_from`/`_to` в префиксы ORM — отдельный хук `prepareListFilterParam`; забыть его
-  легко, а симптом — фильтр применяется, но выборка не сужается.
-- Не путать два `Filter`: `\Bitrix\Main\UI\Filter\…` — старый путь (визуал и пользовательские
-  настройки), `\Bitrix\Main\Filter\…` — этот, современный.
+- **`prepareFilterValue` стандартной реализации плохо работает с диапазонами.** Если фильтр «по датам
+  от и до» ведёт себя странно, начинать надо отсюда (и с `prepareListFilterParam`).
+- Если значения дат не превращаются в условия ORM, выборка может не сузиться — проверьте, что
+  возвращает `getValue()` (вывод команды, проверить на стенде).
+- Не путать два пространства: `\Bitrix\Main\UI\Filter\…` — компонент, пользовательские настройки и
+  классы типов полей (`FieldAdapter`, `DateType`, `Theme` — используются и здесь);
+  `\Bitrix\Main\Filter\…` — объект фильтра и провайдеры. Устаревшим автор называет только получение
+  значений через `UI\Filter\Options`.
 
 ## Связанное
 - [[entity-filter-options]] — путь, который этот API заменяет

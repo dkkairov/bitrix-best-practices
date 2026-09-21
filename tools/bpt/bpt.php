@@ -351,10 +351,9 @@ function outline(array $node, int $depth, array &$lines): void
 
 function printReport(array $r): void
 {
-    $kind = $r['kind'] === 'robots' ? 'роботы (автоматизация стадий)' : 'шаблон дизайнера БП';
     $out = [];
     $out[] = "== {$r['file']} ==";
-    $out[] = "Вид: {$kind}; корень {$r['root_type']}; VERSION " . var_export($r['version'], true);
+    $out[] = "Корень: {$r['root_type']} «{$r['root_title']}»; VERSION " . var_export($r['version'], true);
     if ($r['serialized_bytes'] !== null) {
         $out[] = sprintf('Размер: %s Б .bpt, %s Б serialize; логика %s Б; DOCUMENT_FIELDS: %d полей, %d%% объёма',
             number_format((int) $r['compressed_bytes'], 0, '', ' '), number_format($r['serialized_bytes'], 0, '', ' '),

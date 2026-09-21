@@ -85,7 +85,6 @@ function minimalSpec(?array $steps = null): array
     return [
         'bizproc' => 1,
         'name'    => 'Тест',
-        'kind'    => 'robots',
         'steps'   => $steps ?? [['change_stage' => ['TargetStatus' => 'DT1000_10:CLIENT']]],
     ];
 }

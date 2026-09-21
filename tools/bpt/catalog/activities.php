@@ -2,7 +2,9 @@
 /**
  * Каталог действий бизнес-процессов Bitrix24.
  *
- * Источник — разбор корпуса из 14 экспортов шаблонов роботов смарт-процессов (облако, 2026-09).
+ * Источник — разбор корпуса из 16 экспортов из дизайнера БП (кнопка «Экспорт») для смарт-процессов
+ * коробки клиента, 2026-09. До 2026-09-21 корпус ошибочно считался шаблонами роботов облака:
+ * корень «Bizproc Automation template» дизайнер пишет и в обычных шаблонах.
  * Официальной документации по свойствам действий нет, поэтому здесь только наблюдаемые факты:
  * какие свойства встречаются, какие значения выглядят как значения по умолчанию, что действие
  * возвращает (по ссылкам {=A…:Результат} в корпусе). Спорное помечено комментарием.
@@ -52,7 +54,7 @@ $waitingCommon = [
 
 return [
     'version'  => 1,
-    'verified' => '2026-09-18 / Bitrix24 cloud, корпус 14 шаблонов роботов СПА',
+    'verified' => '2026-09-21 / коробка клиента (версия модулей не зафиксирована), корпус 16 экспортов из дизайнера БП',
 
     // Свойства, которые есть у любого действия
     'common' => [
@@ -68,19 +70,19 @@ return [
             'title'    => 'Последовательный бизнес-процесс',
             'shape'    => 'root',
             'props'    => ['Permission' => ['type' => 'list', 'default' => []]],
-            'observed' => 14,
+            'observed' => 16,
         ],
         'SequenceActivity' => [
             'title'    => 'Последовательность действий',
             'shape'    => 'sequence',
             'props'    => [],
-            'observed' => 123,
+            'observed' => 125,
         ],
         'IfElseBranchActivity' => [
             'title'    => 'Ветка',
             'shape'    => 'branch',
             'props'    => $conditions,
-            'observed' => 262,
+            'observed' => 264,
         ],
 
         // ---------------------------------------------------------- структура
@@ -89,7 +91,7 @@ return [
             'title'    => 'Условие',
             'shape'    => 'ifelse',
             'props'    => [],
-            'observed' => 112,
+            'observed' => 113,
         ],
         'ParallelActivity' => [
             'alias'    => 'parallel',
@@ -140,7 +142,7 @@ return [
                 'TargetStatus' => ['type' => 'portal-id', 'required' => true],   // DT<тип>_<воронка>:СТАДИЯ
                 'ModifiedBy'   => ['type' => 'list', 'default' => []],
             ],
-            'observed' => 40,
+            'observed' => 43,
         ],
         'CrmSetObserverField' => [
             'alias'    => 'observers',
@@ -220,10 +222,10 @@ return [
             'props'    => [
                 'MessageUserFrom' => ['type' => 'str', 'default' => ''],
                 'MessageUserTo'   => ['type' => 'list', 'required' => true],
-                'MessageTemplate' => ['type' => 'str', 'default' => 'notify'],  // notify | important
+                'MessageTemplate' => ['type' => 'str', 'default' => 'notify'],  // в корпусе: notify, important, alert
                 'MessageFields'   => ['type' => 'map', 'required' => true],     // MessageText, MessageTitle
             ],
-            'observed' => 2,
+            'observed' => 3,
         ],
         'Task2Activity' => [
             'alias'    => 'task',
@@ -285,7 +287,7 @@ return [
                 'TaskButton2Message' => ['type' => 'str', 'default' => 'Отклонить'],
             ]),
             'returns'  => ['Comments', 'LastApprover'],
-            'observed' => 8,
+            'observed' => 9,
         ],
         'ReviewActivity' => [
             'alias'    => 'review',

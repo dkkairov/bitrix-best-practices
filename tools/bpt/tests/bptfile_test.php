@@ -58,7 +58,7 @@ test('BptFile: windows-1251 читается и пишется обратно', 
 
 test('Analyzer: отчёт по фикстуре', function () {
     $report = (new Analyzer())->analyze('sample.bpt', BptFile::read(fixtureBpt()));
-    assertSame('robots', $report['kind']);
+    assertSame('Bizproc Automation template', $report['root_title']);
     assertSame(5, $report['nodes']);
     assertSame([], $report['errors']);
     assertSame(['DT1000_10:CLIENT'], $report['portal_bindings']['stages']);

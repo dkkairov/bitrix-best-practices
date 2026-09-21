@@ -6,7 +6,6 @@
 
 bizproc: 1
 name: Согласование счёта
-kind: designer
 document: DYNAMIC_1000        # тип документа: подсказка при загрузке, в .bpt не пишется
 
 variables:
@@ -28,7 +27,7 @@ steps:
       Name: "Согласуйте счёт {=Document:TITLE}"
       Description: "Сумма: {=Variable:amount > printable}"
       TimeoutDuration: "172800"        # двое суток в секундах
-      # «Сменить стадию» — последний шаг ветки: так во всех 40 случаях корпуса.
+      # «Сменить стадию» — последний шаг ветки: так в 42 из 43 случаев корпуса.
       on_yes:
         - crm_event:
             EventText: "Счёт согласован. Комментарий: {=@fin:Comments}"

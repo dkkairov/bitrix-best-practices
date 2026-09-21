@@ -1,23 +1,28 @@
 ---
-title: "CIntranetUtils — оргструктура и отсутствия (старый API)"
+title: "CIntranetUtils — оргструктура и отсутствия (C-API интранета)"
 type: entity
 module: administration
 edition: box
 status: verified
-provenance: documented
-verified: "2026-06-01 / документация модуля intranet (dev.1c-bitrix.ru)"
+provenance: mixed
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Интранет — Организационная структура, Отсутствия"
 tags: [интранет, оргструктура, отсутствия, класс, c-api]
 sources: ["[[source-devbook-intranet]]"]
-related: ["[[concept-org-structure]]", "[[entity-user-absence]]", "[[concept-bitrix-naming-conventions]]"]
+related: ["[[concept-org-structure]]", "[[entity-user-absence]]", "[[concept-bitrix-naming-conventions]]", "[[recipe-intranet-absence-import]]"]
 aliases: ["bitrix24-cintranetutils"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `CIntranetUtils`
 
-**Что это:** старый C-API модуля `intranet` для оргструктуры и отсутствий. Сосуществует с
-D7-классами `\Bitrix\Intranet\Util` и [[entity-user-absence|`\Bitrix\Intranet\UserAbsence`]] —
-типичный случай двух поколений ([[concept-bitrix-naming-conventions]]).
+**Что это:** C-API модуля `intranet` для оргструктуры и отсутствий. Сосуществует с D7-классами
+`\Bitrix\Intranet\Util` и [[entity-user-absence|`\Bitrix\Intranet\UserAbsence`]] — типичный случай
+двух поколений ([[concept-bitrix-naming-conventions]]). Книга называет устаревшим только прокси
+`getDepartmentEmployees()`; `GetStructure()` и выборку отсутствий за период она рекомендует — их
+D7-аналогов книга не называет
+([Организационная структура](https://bx24devbook.website.yandexcloud.net/Modul_Intranet/Orgstruktura.html#api);
+атрибуция исправлена при сверке 2026-09-21). О возможном переходе структуры компании на модуль
+`humanresources` в новых версиях — [[concept-org-structure]].
 
 ## Ключевые факты
 | Поле | Значение |
@@ -37,11 +42,14 @@ D7-классами `\Bitrix\Intranet\Util` и [[entity-user-absence|`\Bitrix\In
   `SECTION_PAGE_URL`, `DEPTH_LEVEL`, `EMPLOYEES`.
 
 **Читать инфоблок оргструктуры напрямую не нужно** — этот метод и есть рекомендованный путь.
-`EMPLOYEES` содержит только **прямых** сотрудников подразделения, без вложенных.
+`EMPLOYEES` содержит только **прямых** сотрудников подразделения, без вложенных. **Все ID —
+строки** (`ID`, `UF_HEAD`, `DEPTH_LEVEL`, элементы `TREE` и `EMPLOYEES`; `IBLOCK_SECTION_ID` — `0`
+или строка): строгие сравнения с `int` (`===`, `in_array(…, true)`) не сработают.
 
 ### `GetIBlockSectionChildren($arSections): array`
 
-Для списка подразделений — все потомки плоским списком.
+Для списка подразделений — **исходные ID плюс** все вложенные, плоским списком (так в примере
+книги: корень попадает в результат).
 
 ### `GetDeparmentsTree($sectionId = 0, $bFlat = false): array`
 
@@ -50,7 +58,9 @@ D7-классами `\Bitrix\Intranet\Util` и [[entity-user-absence|`\Bitrix\In
 
 ### Сотрудники подразделения
 
-`CIntranetUtils::getDepartmentEmployees(...)` — прокси в D7-метод. **Звать напрямую D7:**
+`CIntranetUtils::getDepartmentEmployees(...)` — прокси для совместимости, книга его не рекомендует.
+**Звать напрямую D7** (возвращает наследника `CDBResult` — перебирать через `fetch()`; `RECURSIVE`
+по умолчанию `N`):
 
 ```php
 \Bitrix\Intranet\Util::getDepartmentEmployees([
@@ -66,10 +76,11 @@ D7-классами `\Bitrix\Intranet\Util` и [[entity-user-absence|`\Bitrix\In
 | Метод | Что делает |
 |---|---|
 | `IsUserAbsent($userId): bool` | отсутствует ли сотрудник **сейчас** |
-| `GetAbsenceData($params, $mode): array` | отсутствия за период |
+| `GetAbsenceData($params, $mode = BX_INTRANET_ABSENCE_ALL): array` | отсутствия за период |
 
-Режимы: `BX_INTRANET_ABSENCE_ALL` — из календаря и графика отсутствий;
-`BX_INTRANET_ABSENCE_HR` — только из графика.
+Режимы (целочисленные константы): `BX_INTRANET_ABSENCE_ALL` — из календаря и графика отсутствий,
+**это значение по умолчанию**; `BX_INTRANET_ABSENCE_HR` — только из графика. Для кадровых данных
+режим `…_HR` задавайте явно, иначе в результат попадут и события календаря.
 
 Параметры: `DATE_START` и `DATE_FINISH` (в формате сайта), `USERS` (пусто — без фильтра),
 `PER_USER` (группировать по сотруднику).
@@ -79,8 +90,9 @@ D7-классами `\Bitrix\Intranet\Util` и [[entity-user-absence|`\Bitrix\In
 - **`GetIBlockSectionChildren` делает запросы в цикле** — на большом списке подразделений это
   заметно. И **ключам результата доверять нельзя**: массив собирается через `array_merge` и
   `array_unique`, индексы получаются произвольными. Обходить только по значениям.
-- `GetStructure()` возвращает **всю** структуру: на крупном портале это заметный объём, кэшируйте
-  у себя, если зовёте часто.
+- `GetStructure()` возвращает **всю** структуру: на крупном портале это заметный объём. Пример в
+  книге подписан как кэшированная структура — нужен ли свой кэш поверх, проверить (совет «кэшируйте
+  у себя» — гипотеза команды).
 - Даты в `GetAbsenceData` — в формате сайта, а не в ISO. Для России это `d.m.Y H:i:s`.
 
 ## Связанное

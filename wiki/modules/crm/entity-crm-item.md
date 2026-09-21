@@ -4,24 +4,30 @@ type: entity
 module: crm
 edition: box
 status: verified
-provenance: documented
-verified: "2026-06-02 / документация Universal API CRM (apidocs.bitrix24.ru)"
+provenance: mixed
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль CRM — Универсальное API / Элементы, Кастомизация; Смарт-процессы / Элементы; Счёт; нестрогое isChanged — эмпирика, crm 26.800"
 tags: [crm, universal-api, item, класс, d7, поля, товары, файлы]
 sources: ["[[source-devbook-crm]]"]
 related: ["[[concept-crm-universal-api]]", "[[entity-crm-factory]]", "[[entity-crm-operation]]", "[[pattern-crm-action-vs-event]]"]
 aliases: ["bitrix24-crm-item"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `\Bitrix\Crm\Item`
 
-**Что это:** элемент CRM-сущности в Universal API. Объект в памяти: `set*` ничего не сохраняет,
-запись в БД — только через [[entity-crm-operation|операцию]].
+**Что это:** элемент CRM-сущности в Universal API. Объект в памяти: `set*` ничего не сохраняет;
+штатная запись в БД — только через [[entity-crm-operation|операцию]]
+([Элементы](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Universalnoe_api/Elementy.html)).
+
+> **Уточнено 2026-09-21 при сверке с книгой.** У элемента **есть** низкоуровневые `save()` и
+> `delete()`, но они обходят обязательные шаги операции — в прикладном коде не используем (раньше
+> страница утверждала, что писать можно только операцией). Добавлены семантика товарных позиций и
+> момент, когда доступен снимок `getItemBeforeSave()`. Атрибуция исправлена.
 
 ## Ключевые факты
 | Поле | Значение |
 |------|----------|
-| Тип | абстрактный класс; наследники `Item\Deal`, `Item\Lead`, `Item\Contact`, `Item\Company`, … |
+| Тип | абстрактный класс; наследники `Item\Deal`, `Item\Lead`, `Item\Contact`, `Item\Company`, `Item\Dynamic` (смарт-процессы), … |
 | Модуль | `crm` |
 | Откуда берётся | `$factory->getItem($id)` / `getItems()` / `createItem()` |
 
@@ -59,7 +65,9 @@ $item->remindActual('FIELD_CODE');   // значение, которое сей�
 $item->isChanged('FIELD_CODE');      // менялось ли локально
 ```
 
-Внутри действия операции доступен снимок целиком: `$this->getItemBeforeSave()`.
+Внутри действия операции доступен снимок целиком: `$this->getItemBeforeSave()`. Книга связывает
+его с действием **после** сохранения (`ACTION_AFTER_SAVE`); в действии **до** сохранения она
+использует `remindActual()` / `isChanged*()` — заполнен ли снимок там, проверить в коде.
 
 ## Сериализация
 
@@ -78,6 +86,12 @@ $item->isChanged('FIELD_CODE');      // менялось ли локально
 `updateProductRow($id, $fields)`, `setProductRows(ProductRow[])`. Объект —
 `\Bitrix\Crm\ProductRow::createFromArray()`. Смежные: `\Bitrix\Crm\Discount`,
 `\Bitrix\Crm\ProductType`.
+
+По книге ([товарные позиции](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Universalnoe_api/Elementy.html#tovarnye-pozicii)):
+- `updateProductRow()` — передавать **только изменяемые** поля; непереданные сбросятся к исходным;
+  резерв не поддерживается;
+- `setProductRows()` **удаляет** позиции, которых нет в новом списке;
+- методы возвращают `Result` — если разбор товаров не удался, операцию не запускать.
 
 ## Файлы — два шага
 
@@ -103,10 +117,16 @@ $item->bindContacts($bindings);
 ## Подводные камни
 
 - **`set*` не сохраняет.** Самая частая ошибка новичка в Universal API.
+- **`$item->save()` и `$item->delete()` существуют, но в прикладном коде запрещены.** По книге
+  низкоуровневое сохранение обходит значения по умолчанию, права, связи, push, БП и роботов,
+  пересчёт прав, поисковый индекс, статистику и таймлайн; удаление не чистит товары, права, связи с
+  событиями, дела, чаты и счётчики. Только `get*Operation()->launch()`
+  ([Смарт-процессы → Элементы](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Smart_processy/Elementy.html#sohranenie)).
 - **`var_dump` / `print_r` на `Item` способен уронить портал по памяти** — объект тянет за собой
   коллекции и связанные сущности. Для отладки — `getData()` или конкретные поля.
 - **`isChanged()` сравнивает массивы нестрого** (`!=`): `['119']` и `[119]` считаются равными.
   Обычно это спасает от ложных записей в историю, но может скрыть реальное изменение типа.
+  (Эмпирика команды, crm 26.800; в книге нет.)
 - `getPrimaryContact()` возвращает `\Bitrix\Crm\Contact`, а не `Item` — разные классы с похожими
   именами.
 

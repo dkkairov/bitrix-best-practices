@@ -4,19 +4,21 @@ type: entity
 module: crm
 edition: box
 status: verified
-provenance: documented
-verified: "2026-06-02 / документация Universal API CRM (apidocs.bitrix24.ru)"
+provenance: mixed
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль CRM — Универсальное API (фабрики, элементы, операции, кастомизация), Смарт-процессы, Счёт; префикс UF смарт-процесса и диапазоны ID — эмпирика"
 tags: [crm, universal-api, фабрика, класс, d7, стадии, направления]
 sources: ["[[source-devbook-crm]]"]
-related: ["[[concept-crm-universal-api]]", "[[entity-crm-container]]", "[[entity-crm-item]]", "[[entity-crm-operation]]", "[[concept-crm-dictionaries]]"]
+related: ["[[concept-crm-universal-api]]", "[[entity-crm-container]]", "[[entity-crm-item]]", "[[entity-crm-operation]]", "[[concept-crm-dictionaries]]", "[[recipe-smart-process-factory-customization]]"]
 aliases: ["bitrix24-crm-factory"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `\Bitrix\Crm\Service\Factory`
 
 **Что это:** рабочая лошадка Universal API — по фабрике на тип CRM-сущности. Выдаёт элементы,
-операции, направления и стадии, отвечает на вопросы о возможностях типа.
+операции, направления и стадии, отвечает на вопросы о возможностях типа
+([Фабрики](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Universalnoe_api/Fabriki.html);
+атрибуция исправлена при сверке 2026-09-21, эмпирические строки помечены).
 
 ## Ключевые факты
 | Поле | Значение |
@@ -25,7 +27,7 @@ updated: "2026-09-18"
 | Модуль | `crm` |
 | Наследник для смарт-процессов | `\Bitrix\Crm\Service\Factory\Dynamic` |
 | Откуда берётся | `Container::getInstance()->getFactory($entityTypeId)` |
-| Имя сервиса (для подмены) | `crm.service.factory.dynamic.<entityTypeId>` |
+| Имя сервиса (для подмены) | `crm.service.factory.dynamic.<entityTypeId>` — **только смарт-процессы**; для сделки и других имя в книге не описано |
 
 ## Четыре группы методов
 
@@ -43,14 +45,16 @@ updated: "2026-09-18"
 ### 2. Операции
 
 ```php
-$factory->getAddOperation($item): Operation\Add
-$factory->getUpdateOperation($item, $context = null): Operation\Update
-$factory->getDeleteOperation($item, $context = null): Operation\Delete
-$factory->getCopyOperation($item): Operation\Copy
-$factory->getConversionOperation($item): Operation\Conversion
+$factory->getAddOperation($item)
+$factory->getUpdateOperation(Item $item, Context $context = null)   // Operation\Update
+$factory->getDeleteOperation(Item $item, Context $context = null)   // Operation\Delete
+$factory->getCopyOperation($item)
+$factory->getConversionOperation($item)
 ```
 
-Подробно — [[entity-crm-operation]].
+С контекстом в книге показаны только `Update` и `Delete`; точные сигнатуры остальных сверять по
+ядру. Операцию получают **только через фабрику** — созданная напрямую (`new Operation\…`) обойдёт
+действия, добавленные в подменённой фабрике (вывод команды). Подробно — [[entity-crm-operation]].
 
 ### 3. Направления и стадии
 
@@ -83,7 +87,8 @@ $factory->getStageSemantics(string $stageId): ?string
 | `getEntityAbbreviation()` | `'D'` |
 | `getEntityDescription()` / `…InPlural()` | «Сделка» / «Сделки» |
 | `getFieldCaption($code)` / `getFieldValueCaption($code, $value)` | подпись поля и читаемое значение |
-| `getFieldsInfo()` / `getUserFieldsInfo()` | описания полей |
+| `getFieldsInfo()` / `getUserFieldsInfo()` | описания полей; полный набор = оба вместе (книга) |
+| `isFieldExists($code)` | защита при заливке данных из внешних систем |
 
 Плюс 20+ предикатов: `isCategoriesSupported`/`isCategoriesEnabled`, `isStagesSupported`/
 `isStagesEnabled`, `isAutomationEnabled`, `isBizProcEnabled`, `isObserversEnabled`,
@@ -95,15 +100,21 @@ $factory->getStageSemantics(string $stageId): ?string
 
 - **`getUserFieldEntityId()` не угадывать.** У смарт-процесса это `CRM_<ID типа>`, а **не**
   `CRM_<ENTITY_TYPE_ID>`: у типа с `ENTITY_TYPE_ID = 162` поля лежат под `CRM_4` и называются
-  `UF_CRM_4_…`. См. [[recipe-smart-process-programmatic-creation]].
-- **`getFieldsInfo()` не возвращает `UF_CRM_*`.** Для полного перечня полей —
-  `getFieldsCollection()->getFieldNameList()`. На этом ломается история изменений
-  ([[recipe-crm-history-all-fields]]).
-- **Счёт, документ и B2E-документ** работают на API динамических типов, но имеют свои фабрики
-  (`Factory\SmartInvoice` и другие). Обычные смарт-процессы: ID 128–191 либо ≥ 1030 и чётный.
-- `getUpdateOperation()` и `getAddOperation()` не `final` — на этом стоит подмена. Но сигнатуры
-  могут измениться при обновлении продукта: сверять рефлексией
-  ([[pattern-module-self-disabling-guard]]).
+  `UF_CRM_4_…` (эмпирика команды, в книге нет). См. [[recipe-smart-process-programmatic-creation]].
+- **`getFieldsInfo()` не возвращает `UF_CRM_*`.** Книга берёт полный набор как
+  `getFieldsInfo()` + `getUserFieldsInfo()`; у команды — `getFieldsCollection()->getFieldNameList()`.
+  На этом ломается история изменений ([[recipe-crm-history-all-fields]]).
+- **Счёт** — свой класс `Factory\SmartInvoice`, `ENTITY_ID` полей `CRM_SMART_INVOICE`; для него
+  `\CCrmOwnerType::isPossibleDynamicTypeId(31)` возвращает `false` — код, который отличает
+  смарт-процессы этой проверкой, счёт пропустит, обрабатывайте 31 явно
+  ([Счёт](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Scet.html#osnovnoe)). Диапазоны ID
+  обычных смарт-процессов (128–191 либо ≥ 1030 и чётный) — не из книги, сверять по коду или REST.
+- **Правила подмены фабрики** (книга): наследоваться, переопределять точечно, сохранять контракты
+  родителя и не добавлять в подменённый класс новых методов. Подменяют обычно
+  `getUpdateOperation()`, `getAddOperation()`, `getDeleteOperation()` и `getUserFieldsInfo()`
+  (атрибуты поля «только чтение», «скрыто», «обязательно») —
+  [[recipe-smart-process-factory-customization]]. Методы не `final`, но сигнатуры могут измениться
+  при обновлении продукта: сверять рефлексией ([[pattern-module-self-disabling-guard]]).
 
 ## Связанное
 - [[entity-crm-container]] — где берут фабрику

@@ -7,10 +7,10 @@ status: draft
 provenance: mixed
 verified: ""
 tags: [миграция, импорт, дубли, качество-данных, приёмка]
-sources: []
+sources: ["[[source-devbook-crm]]"]
 related: ["[[checklist-presale-audit]]", "[[checklist-requirements-workshop]]", "[[checklist-golive-deployment]]", "[[pattern-rest-batch-and-limits]]", "[[pattern-rest-reliable-delivery]]"]
 aliases: []
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # Playbook: миграция данных
@@ -58,10 +58,17 @@ updated: "2026-09-18"
 ### 5. Техника загрузки
 - [ ] Загрузка идёт [[pattern-rest-batch-and-limits|батчами]], а не по записи на запрос
 - [ ] Повторный запуск **не создаёт дубли** — есть соответствие «внешний ключ → ID в портале»
-      ([[pattern-rest-reliable-delivery]])
+      ([[pattern-rest-reliable-delivery]]). Внешний ключ — в своём пользовательском поле или своей
+      таблице, **не** в `ORIGINATOR_ID`/`ORIGIN_ID`: они заполняются только при создании из внешней
+      системы и не годятся как ключ синхронизации («Книга разработчика», поля лида/контакта/компании/
+      сделки, коробка)
 - [ ] Автоматизация на время загрузки **выключена**: роботы и бизнес-процессы не должны
       срабатывать на исторических записях
 - [ ] Уведомления отключены — иначе сотрудники получат тысячи писем о «новых» сделках
+- [ ] Коробка, загрузка кодом: у старого API CRM для этого есть опции `REGISTER_SONET_EVENT`,
+      `IS_SYSTEM_ACTION`, `DISABLE_TIMELINE_CREATION` и др., у операций Universal API —
+      `disableBizProc()`/`disableAutomation()` (`disableAllChecks()` их **не** выключает) —
+      [[recipe-crm-legacy-entity-crud]], [[entity-crm-operation]]
 - [ ] Ведётся журнал: что загружено, что отклонено и почему
 
 ### 6. Боевая миграция

@@ -4,16 +4,22 @@ type: pattern
 module: crm
 edition: box
 status: verified
-provenance: documented
-verified: "2026-06-02 / документация Universal API CRM (apidocs.bitrix24.ru)"
+provenance: mixed
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль CRM — Кастомизация (как работает, добавление действий, подмена фабрики), события сделки; getScope — эмпирика, crm 26.800"
 tags: [crm, universal-api, действия, события, решение, фабрика]
 sources: ["[[source-devbook-crm]]"]
-related: ["[[concept-crm-universal-api]]", "[[pattern-events-over-core-modification]]", "[[recipe-d7-orm-event-subscription]]", "[[recipe-crm-history-all-fields]]", "[[concept-change-invasiveness-hierarchy]]"]
+related: ["[[concept-crm-universal-api]]", "[[pattern-events-over-core-modification]]", "[[recipe-d7-orm-event-subscription]]", "[[recipe-crm-history-all-fields]]", "[[concept-change-invasiveness-hierarchy]]", "[[entity-crm-legacy-events]]", "[[recipe-smart-process-factory-customization]]"]
 aliases: ["bitrix24-crm-deystviya-vs-sobytiya"]
-updated: "2026-09-18"
+updated: "2026-09-21"
 ---
 
 # `Operation\Action` или обработчик события
+
+> **Сверено с «Книгой разработчика» 2026-09-21.** Атрибуция исправлена (материал — из
+> [Кастомизация → Как работает](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Universalnoe_api/Kastomizacia/Kak_rabotaet.html),
+> а не из apidocs). Уточнены: подписка на события CRM — `addEventHandlerCompatible`; механизм отмены
+> в событиях; обход событий через `ENABLE_SYSTEM_EVENTS`; различие контекстов; «приложения» →
+> «модули» Маркетплейса.
 
 ## Проблема и контекст
 
@@ -31,24 +37,26 @@ Universal API (`Operation\Action`). Пути **не эквивалентны**, 
 
 | Аспект | Обработчик события | `Operation\Action` |
 |---|---|---|
-| Где регистрируется | `EventManager::addEventHandler(...)` | `Operation::addAction(...)` в фабрике |
-| Состав данных | `$arFields` — **только изменённые** поля | `$item` — **весь** объект |
-| Значение «до» | пара `OnBefore` + `OnAfter` и `static`-переменная | `$this->getItemBeforeSave()` или `$item->remindActual('FIELD')` |
-| Запросы в БД | дублируются у независимых обработчиков | один `Item`, кэшируется |
+| Где регистрируется | `EventManager::addEventHandlerCompatible(...)` — события CRM из старого ядра ([[entity-crm-legacy-events]]) | `Operation::addAction(...)` в фабрике |
+| Состав данных | `$arFields` — только изменённые или «затронутые» поля (при смене названия — `TITLE`, `~DATE_MODIFY`, `MODIFY_BY_ID`) | `$item` — **весь** объект |
+| Значение «до» | пара `OnBefore` + `OnAfter` и `static`-переменная | после сохранения — `$this->getItemBeforeSave()`; до сохранения — `$item->remindActual('FIELD')` / `isChanged*()` |
+| Запросы в БД | дублируются у независимых обработчиков | один `Item` на операцию |
 | Тестируемость | плохая (глобальное состояние) | хорошая (обычный класс) |
-| Покрытие | все изменения объекта автоматически | только конкретная операция (Add / Update / Delete) |
+| Покрытие | вызовы `CCrm*::Add/Update/Delete` (в том числе из интерфейса); `Update` лида и сделки с `ENABLE_SYSTEM_EVENTS => false` события не вызывает | только конкретная операция (Add / Update / Delete) |
 | Привязка к типу | нет: одно событие на все объекты вида | есть: через фабрику конкретного типа |
-| Отмена | `false` / исключение | `Result::addError()` с человеческим текстом |
-| Контекст запроса | через глобальные переменные | `getContext()->getUserId()`, `getScope()` |
+| Отмена | только в `OnBefore…`: `return false` + текст в `$arFields['RESULT_MESSAGE']` (Add/Update) или `$APPLICATION->ThrowException()` (Delete); возврат `OnAfter…` игнорируется | `Result::addError()` с человеческим текстом |
+| Контекст запроса | через глобальные переменные | `$this->getContext()` — пользователь операции (контейнерный — пользователь хита); `getScope()` — эмпирика |
 
 ## Ключевая ловушка событий
 
-`$arFields` в `OnAfter…Update` содержит **только изменённые** поля. Правило вида «если `UF_X` пуст
-и `UF_Y` < 100 — отправить письмо» на событии срабатывает ложно: при изменении одного лишь
-заголовка `UF_X` в массив не попадёт, `empty(null)` вернёт `true`, письмо уйдёт впустую.
+`$arFields` в `OnAfter…Update` содержит только изменённые или затронутые поля. Правило вида «если
+`UF_X` пуст и `UF_Y` < 100 — отправить письмо» на событии срабатывает ложно: при изменении одного
+лишь заголовка `UF_X` в массив не попадёт, `empty(null)` вернёт `true`, письмо уйдёт впустую. Книга
+показывает наивный вариант и громоздкую «заплатку» с проверкой ключа — ниже она, и она всё равно не
+знает значения «до».
 
 ```php
-// хрупко
+// хрупко: наличие ключа проверено, но значения «до» нет
 $em->addEventHandlerCompatible('crm', 'OnAfterCrmDealUpdate', function (&$ar) {
     if (array_key_exists('UF_X', $ar) && empty($ar['UF_X'])) { /* ... */ }
 });
@@ -72,10 +80,10 @@ class NotifyResponsible extends \Bitrix\Crm\Service\Operation\Action
 // + $operation->addAction(Operation::ACTION_AFTER_SAVE, new NotifyResponsible());
 ```
 
-Вторая ловушка, названная в документации прямо: если в момент `afterUpdate` нужно изменить
-**другую** сделку теми же полями, мы дважды войдём в `before` с разными параметрами и перезапишем
-общее `static::$objBeforeSave` — уведомление уйдёт не тому. У действия общего статического
-состояния нет.
+Вторая ловушка, названная в книге прямо (и названная «очень редкой»): если внутри `afterUpdate`
+изменить **другую** сделку, вложенный вызов снова войдёт в `before` и перезапишет общее
+`static::$objBeforeSave` — уведомление уйдёт не тому. У действия общего статического состояния нет.
+Третий недостаток событий по книге — независимые обработчики повторяют одни и те же запросы.
 
 ## Когда применять `Operation\Action`
 - Сущность работает через Universal API (смарт-процессы — всегда).
@@ -92,10 +100,12 @@ class NotifyResponsible extends \Bitrix\Crm\Service\Operation\Action
 
 ## Как реализовать
 
-Действие добавляется в операцию **подменённой фабрикой** типа — регистрация в `ServiceLocator`
-под именем `crm.service.factory.dynamic.<entityTypeId>`. Подменять фабрику одного типа, а не
-контейнер целиком: контейнер конфликтует с приложениями маркетплейса. Практический пример —
-[[recipe-crm-history-all-fields]].
+Действие добавляется в операцию **подменённой фабрикой** типа. Для смарт-процесса — регистрация в
+`ServiceLocator` под именем `crm.service.factory.dynamic.<entityTypeId>` лениво и **до первого
+`getFactory()`** в хите (книга: [Подмена фабрики](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Universalnoe_api/Kastomizacia/Podmena_fabriki.html)).
+Практика команды — подменять фабрику одного типа, а не контейнер: книга допускает и подмену
+контейнера, но некоторые **модули** Маркетплейса делают то же. Рецепт —
+[[recipe-smart-process-factory-customization]], рабочий пример — [[recipe-crm-history-all-fields]].
 
 Порядок шагов `Operation::launch()`: действия «перед сохранением» → запись элемента → запись
 истории → действия «после сохранения». Это важно, если нужно что-то запомнить до истории.
@@ -109,6 +119,8 @@ class NotifyResponsible extends \Bitrix\Crm\Service\Operation\Action
 ## Открытые вопросы
 - Где разместить **общее** действие для нескольких типов сущностей.
 - Есть ли события CRM без аналога в системе действий.
+- Срабатывают ли старые события (`OnAfterCrmDealUpdate`) при сохранении через операции, когда UA
+  для сделки включён: книга обещает, что старый код продолжит работать, — проверять на стенде.
 
 ## Связанное
 - [[concept-crm-universal-api]] — Container / Factory / Item / Operation

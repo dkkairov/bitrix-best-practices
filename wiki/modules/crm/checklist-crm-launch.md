@@ -4,13 +4,13 @@ type: checklist
 module: crm
 edition: both
 status: verified
-provenance: empirical
-verified: "2026-06-19 / Bitrix24 cloud + box"
+provenance: mixed
+verified: "2026-06-19 / Bitrix24 cloud + box; пункты с пометкой «книга» — 2026-09-21 / «Книга разработчика Bitrix24» (коробка)"
 tags: [crm, запуск, онбординг, воронка, права]
-sources: []
-related: ["[[pattern-crm-sales-funnel-design]]", "[[antipattern-crm-stage-explosion]]", "[[recipe-crm-permissions]]", "[[checklist-portal-initial-setup]]"]
+sources: ["[[source-devbook-crm]]"]
+related: ["[[pattern-crm-sales-funnel-design]]", "[[antipattern-crm-stage-explosion]]", "[[recipe-crm-permissions]]", "[[checklist-portal-initial-setup]]", "[[recipe-crm-lead-conversion]]"]
 aliases: ["crm-launch-checklist"]
-updated: "2026-06-20"
+updated: "2026-09-21"
 ---
 
 # Чек-лист запуска CRM «под ключ»
@@ -29,9 +29,16 @@ updated: "2026-06-20"
 - [ ] Спроектированы стадии каждой воронки по [[pattern-crm-sales-funnel-design|Проектирование воронки]] (без [[antipattern-crm-stage-explosion|Взрыв стадий воронки]])
 - [ ] Заданы причины провалов (fail-стадии) для аналитики потерь
 - [ ] Решён вопрос лидов: работаем с лидами или без них (упрощённый режим)
+- [ ] Проверены права ролей на **целевые** сущности конвертации: лид конвертируется только в то, что
+      пользователь вправе создавать; повторный лид — только в сделку (книга, коробка —
+      [[recipe-crm-lead-conversion]]; в облаке проверить)
 
 ### 2. Поля и карточки
 - [ ] Минимально необходимый набор полей (не «всё подряд»); лишние скрыты
+- [ ] Поля лида спроектированы вместе с целевыми сущностями: при конвертации пользовательские поля
+      лида (`UF_CRM_…`) создаются в сделке, контакте и компании (книга, коробка)
+- [ ] Адреса и банковские данные компании — в **реквизитах**, а не в устаревших полях
+      `ADDRESS`/`REG_ADDRESS`/`BANKING_DETAILS` (книга, [Компания](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Kompania/Opisanie.html))
 - [ ] Обязательные поля привязаны к стадиям, а не на старте
 - [ ] Настроены пользовательские поля, справочники, обязательность
 - [ ] Включён и настроен контроль дублей (контакты/компании/лиды)

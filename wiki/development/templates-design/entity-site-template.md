@@ -5,12 +5,12 @@ module: templates-design
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Общие сведения — Шаблон, Страница; Технологии — Отложенные функции; UI — Тулбар; Интранет — Темы"
+verified: "2026-09-22 / коробка в Docker, main 26.750.0: зоны шаблона bitrix24 (AIR) и безусловное подключение тулбара сверены по header.php; 2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Общие сведения — Шаблон, Страница; Технологии — Отложенные функции; UI — Тулбар; Интранет — Темы"
 tags: [шаблон, вёрстка, зоны-страницы, отложенные-функции]
 sources: ["[[source-devbook-core-d7]]", "[[source-devbook-ui]]", "[[source-devbook-intranet]]"]
 related: ["[[concept-change-invasiveness-hierarchy]]", "[[entity-theme-picker]]", "[[concept-request-lifecycle]]", "[[entity-local-directory]]", "[[concept-deferred-functions-and-page-areas]]", "[[entity-toolbar]]"]
 aliases: ["bitrix24-shablon-dizayna"]
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Шаблон дизайна
@@ -59,9 +59,11 @@ updated: "2026-09-21"
   продукта пройдут мимо копии, и интерфейс начнёт расходиться с продуктом.
 - **Вне шаблона Bitrix24 тулбар не выводится сам** — компонент `bitrix:ui.toolbar` придётся вызывать
   явно ([[entity-toolbar]]). Фильтр и грид подключаются явно в любом шаблоне.
-- **Не выводите ничего в `pagetitle`, `inside_pagetitle`, `in_pagetitle`** — если эти буферы
-  непусты, тулбар не появится. Зоны `above_pagetitle` и `below_pagetitle` для своего вывода
-  свободны: тулбар стоит между ними.
+- **`pagetitle`, `inside_pagetitle`, `in_pagetitle` — не для своего вывода.** На коробках до AIR
+  непустые буферы этих зон выключали тулбар; в шаблоне 26.750.0 таких зон уже нет, вывод в них
+  просто никуда не попадёт (стенд, 2026-09-22). Зоны `above_pagetitle` и `below_pagetitle` для
+  своего вывода свободны — тулбар стоит между ними
+  ([[concept-deferred-functions-and-page-areas]] — полный список зон текущего шаблона).
 
 ## Связанное
 - [[entity-theme-picker]] — пользовательские темы оформления

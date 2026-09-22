@@ -5,12 +5,12 @@ module: templates-design
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): UI — Тулбар, Кнопки; includeModule('ui') — практика команды"
+verified: "2026-09-22 / коробка в Docker, main 26.750.0: зоны шаблона bitrix24 (AIR) и безусловное подключение тулбара сверены по header.php; 2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): UI — Тулбар, Кнопки; includeModule('ui') — практика команды"
 tags: [ui, тулбар, класс, кнопки, фасад]
 sources: ["[[source-devbook-ui]]"]
 related: ["[[concept-ui-subsystem]]", "[[entity-ui-button]]", "[[entity-filter-component]]", "[[concept-deferred-functions-and-page-areas]]", "[[recipe-custom-list-page-filter-grid]]"]
 aliases: ["bitrix24-toolbar"]
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # `\Bitrix\UI\Toolbar\…`
@@ -72,10 +72,11 @@ $own = $manager->createToolbar($id, ['filter' => $filterOptions]);  // свой 
 
 - **HTML в `add…Html()` не экранируется** — книга требует передавать заранее безопасный HTML; всё
   пользовательское — через `htmlspecialcharsbx()`, иначе XSS.
-- **Тулбар не появится, если непусты буферы отложенных функций** `pagetitle`, `inside_pagetitle`,
-  `in_pagetitle` — включится «устаревший» вид шапки. Зоны `above_pagetitle` и `below_pagetitle`
-  при этом **свободны** для своего вывода над и под тулбаром
-  ([[concept-deferred-functions-and-page-areas]]).
+- **Условие «непустые `pagetitle`/`inside_pagetitle`/`in_pagetitle` выключают тулбар» относится к
+  шаблону до AIR.** На коробке 26.750.0 этих зон в шаблоне нет вовсе, а тулбар подключён в
+  `header.php` безусловно (стенд, 2026-09-22). На более старых коробках условие в силе — сверяйте
+  по своему шаблону. Зоны `above_pagetitle` и `below_pagetitle` в обеих версиях **свободны** для
+  своего вывода ([[concept-deferred-functions-and-page-areas]]).
 - **Тулбар выводится, пока идёт буферизация**; вне шаблона Bitrix24 компонент тулбара нужно вызывать
   явно; в `bitrix:ui.sidepanel.wrapper` — параметр `'USE_UI_TOOLBAR' => 'Y'`.
 - `deleteButtons()` — способ убрать чужую кнопку, не трогая чужой код; но он завязан на признаки

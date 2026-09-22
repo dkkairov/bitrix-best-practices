@@ -5,12 +5,12 @@ module: templates-design
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Разработка / UI — все 13 страниц; примеры книги ≈2023, без проверки на стенде"
+verified: "2026-09-22 / коробка в Docker, main 26.750.0: зоны шаблона bitrix24 (AIR) и безусловное подключение тулбара сверены по header.php; 2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Разработка / UI — все 13 страниц; примеры книги ≈2023, без проверки на стенде"
 tags: [ui, тулбар, фильтр, грид, кнопки, шаблон, отложенные-функции]
 sources: ["[[source-devbook-ui]]"]
 related: ["[[concept-change-invasiveness-hierarchy]]", "[[concept-request-lifecycle]]", "[[recipe-custom-left-menu-section]]", "[[recipe-crm-card-editor-js-access]]", "[[recipe-custom-list-page-filter-grid]]", "[[concept-deferred-functions-and-page-areas]]"]
 aliases: ["bitrix24-ui"]
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # UI-подсистема
@@ -53,7 +53,8 @@ updated: "2026-09-21"
 
 1. используется шаблон дизайна Bitrix24 — в других шаблонах компонент вызывается явно;
 2. пусты буферы отложенных функций `pagetitle`, `inside_pagetitle`, `in_pagetitle` — иначе
-   включается «устаревший» вид шапки;
+   включается «устаревший» вид шапки. **Пункт относится к шаблону до AIR:** на коробке 26.750.0
+   этих зон нет, тулбар подключается безусловно (стенд, 2026-09-22);
 3. буферизация вывода ещё идёт (см. [[concept-request-lifecycle]]).
 
 Тулбар выводится **между** зонами `above_pagetitle` и `below_pagetitle`; сами эти зоны свободны для
@@ -113,7 +114,9 @@ $APPLICATION->IncludeComponent('bitrix:main.ui.grid', '', [
 ## Подводные камни
 - **Вне шаблона Bitrix24 тулбар сам не выводится** — компонент `bitrix:ui.toolbar` вызывают явно;
   фильтр и грид подключаются явно в любом шаблоне.
-- Не выводить ничего в `pagetitle`, `inside_pagetitle`, `in_pagetitle` — пропадёт тулбар.
+- Не выводить ничего в `pagetitle`, `inside_pagetitle`, `in_pagetitle`: на старых коробках пропадёт
+  тулбар, на новых вывод просто потеряется — зон нет
+  ([[concept-deferred-functions-and-page-areas]]).
 - Собственные страницы, выведенные в свой раздел меню, тоже должны использовать эти компоненты —
   см. [[recipe-custom-left-menu-section]].
 

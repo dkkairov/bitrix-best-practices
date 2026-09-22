@@ -204,7 +204,7 @@
   ([[checklist-data-migration]], [[checklist-golive-deployment]], [[checklist-user-adoption]],
   [[checklist-support-handover]], [[checklist-permissions-audit]],
   [[checklist-tasks-regulations]], [[pattern-smart-process-vs-deal-fields]]);
-  **не подтверждено пилотом** ([[pattern-bizproc-ai-assisted-generation]]);
+  **пилот пройден только на коробке, облако и оценка на задачах — впереди** ([[pattern-bizproc-ai-assisted-generation]]);
   **не удалось сверить с первоисточником** ([[entity-module-manager]] — справочник D7 не отдал
   содержимое страницы);
   **написано по «Книге разработчика», на стенде не проверялось** — 11 страниц сверки 2026-09-21

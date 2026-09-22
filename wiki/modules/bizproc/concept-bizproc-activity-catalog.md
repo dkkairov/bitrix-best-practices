@@ -5,12 +5,12 @@ module: bizproc
 edition: both
 status: verified
 provenance: empirical
-verified: "2026-09-21 / коробка клиента (версия не зафиксирована): корпус 16 экспортов из дизайнера БП (VERSION 2)"
+verified: "2026-09-22 / коробка клиента: корпус 16 экспортов из дизайнера БП (VERSION 2); стенд Docker, bizproc 26.1075.0: ValidateProperties и прогон процессов"
 tags: [бизнес-процессы, действия, активити, каталог, bpt, генерация, роботы]
 sources: []
 related: ["[[concept-bizproc-bpt-format]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[concept-bizproc-engine]]", "[[entity-cbp-activity]]", "[[antipattern-bizproc-hardcoded-portal-ids]]"]
 aliases: []
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Каталог действий БП: свойства, вложенность, результаты
@@ -78,7 +78,7 @@ updated: "2026-09-21"
 | `CrmGetRelationsInfoActivity`<br>Получить информацию о привязанном элементе | `get_parent_item` | leaf | `ParentTypeId`!, `ParentEntityFields`=[] | по `ParentEntityFields` | 1 |
 | `CrmEventAddActivity`<br>Запись события в crm | `crm_event` | leaf | `EventType`=INFO, `EventText`!, `EventUser`=[] | — | 99 |
 | `CrmTimelineCommentAdd`<br>Добавить комментарий в элемент | `timeline_comment` | leaf | `CommentText`!, `CommentUser`=[] | — | 24 |
-| `IMNotifyActivity`<br>Уведомление пользователя | `notify` | leaf | `MessageSite`!, `MessageOut`=, `MessageType`=2, `MessageUserFrom`=[], `MessageUserTo`! | — | 20 |
+| `IMNotifyActivity`<br>Уведомление пользователя | `notify` | leaf | `MessageSite`!, `MessageOut`=, `MessageType`=2, `MessageUserFrom`!, `MessageUserTo`! | — | 20 |
 | `ImMessageActivity`<br>Отправить сообщение сотруднику в чат | `chat_message` | leaf | `MessageUserFrom`=, `MessageUserTo`!, `MessageTemplate`=notify, `MessageFields`! | — | 3 |
 | `Task2Activity`<br>Поставить задачу | `task` | leaf | `Fields`!, `HoldToClose`=N, `AUTO_LINK_TO_CRM_ENTITY`=Y, `AsChildTask`=, `CheckListItems`=[], `TimeEstimateHour`=, `TimeEstimateMin`= | — | 6 |
 | `RobotDelayActivity`<br>Пауза робота | `delay` | leaf | `TimeoutTime`!, `TimeoutTimeIsLocal`=N, `WriteToLog`=Y, `WaitWorkDayUser`=[] | — | 13 |
@@ -88,6 +88,23 @@ updated: "2026-09-21"
 | `RequestInformationActivity`<br>Запрос дополнительной информации *(заголовок под вопросом)* | `request_info` | waiting | `Users`!, `Name`!, `Description`=, `StatusMessage`=, `SetStatusMessage`=Y, `ShowComment`=Y, `CommentRequired`=N, `CommentLabelMessage`=Пояснение, `TimeoutDuration`=, `TimeoutDurationType`=s, `OverdueDate`=, `AccessControl`=N, `DelegationType`=1, `RequestedInformation`!, `TaskButtonMessage`=Принято | Comments, InfoUser | 6 |
 | `RequestInformationOptionalActivity`<br>Запрос информации с возможностью отклонить *(заголовок под вопросом)* | `request_info_optional` | waiting-branches | `Users`!, `Name`!, `Description`=, `StatusMessage`=, `SetStatusMessage`=Y, `ShowComment`=Y, `CommentRequired`=N, `CommentLabelMessage`=Пояснение, `TimeoutDuration`=, `TimeoutDurationType`=s, `OverdueDate`=, `AccessControl`=N, `DelegationType`=1, `RequestedInformation`!, `TaskButtonMessage`=Принято, `CancelType`=any, `TaskButtonCancelMessage`=Отклонить, `SaveVariables`=N | Comments, InfoUser | 3 |
 | `CodeActivity`<br>Выполнение PHP-кода | `php_code` | leaf | `ExecuteCode`! | — | 0 |
+
+## Проверено на стенде (коробка, bizproc 26.1075.0, crm 26.800.0, 2026-09-22)
+- **Обязательность — по проверке ядра.** Импорт вызывает `ValidateProperties` каждого действия.
+  «Уведомление пользователя» требует отправителя (`MessageUserFrom`), получателя и текст; не
+  администратор может указать отправителем только себя. «Утверждение» требует `Users`, `Name` и
+  `ApproveType` из `all`, `any`, `vote`. «Запись события в crm» — `EventType` и `EventText`.
+  «Запустить бизнес-процесс» при импорте требует прав администратора. Каталог и сборщик это учитывают:
+  `bpt.php catalog <алиас>` показывает допустимые значения.
+- **«Сменить стадию» завершает процесс.** Шаг после неё не выполнился; статус процесса —
+  «Завершён в результате изменения стадии». В корпусе смена стадии стоит последней в 42 случаях из
+  43; в оставшемся шаблоне сообщение после неё, по этому опыту, не отправляется.
+- **Результат `Comments` утверждения** — строка «ФИО (e-mail): Утвержден» или «…: Отклонен» и с
+  новой строки «Пояснение: текст» (подпись — `CommentLabelMessage`). E-mail согласующего попадает
+  туда, куда подставлен результат.
+- **Автозапуск «при изменении»** срабатывает на каждую правку пользователя или API, в том числе при
+  ещё не законченном процессе: создание и две правки дали три параллельных согласования. Изменения,
+  которые делает сам БП (смена стадии, изменение поля), автозапуск не вызывают.
 
 ## Что известно не наверняка
 - **Смысл значений** взят из наблюдений: например, `MessageType` у уведомления встречался `2` и

@@ -5,12 +5,12 @@ module: core-d7
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Технологии — Локатор служб; Свой код — kernel.php; CRM — Подмена фабрики"
+verified: "2026-09-22 / коробка в Docker, main 26.750.0: форма constructor (только замыкание) проверена прогоном; 2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Технологии — Локатор служб; Свой код — kernel.php; CRM — Подмена фабрики"
 tags: [d7, di, servicelocator, сервисы, kernel-php, подмена]
 sources: ["[[source-devbook-core-d7]]", "[[source-devbook-dev-rules]]"]
 related: ["[[concept-crm-universal-api]]", "[[recipe-crm-history-all-fields]]", "[[concept-bitrix-naming-conventions]]", "[[concept-change-invasiveness-hierarchy]]", "[[pattern-local-solution-structure]]", "[[recipe-smart-process-factory-customization]]"]
 aliases: ["bitrix24-service-locator"]
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # ServiceLocator
@@ -39,9 +39,14 @@ updated: "2026-09-21"
 \Bitrix\Main\DI\ServiceLocator::getInstance()->addInstanceLazy('vendor.exchange.service', [
     'className' => \Vendor\Exchange\Service::class,
 ]);
-// либо своя фабрика:
-// 'constructor' => [\Vendor\Exchange\ServiceBuilder::class, 'buildInstance']
+// либо своя фабрика — только замыканием:
+// 'constructor' => static fn () => \Vendor\Exchange\ServiceBuilder::buildInstance()
 ```
+
+> **`constructor` принимает `Closure`, а не массив-колбэк.** Локатор хранит значение как имя класса
+> и создаёт объект через `new $class(...)`; замыкание он вызывает, а массив `['Класс', 'метод']`
+> ломается на первом `get()`: `Error: Class name must be a valid object or a string`
+> (`main` 26.750.0, стенд 2026-09-22). Само ядро регистрирует сервисы замыканиями.
 
 ## Соглашение именования
 
@@ -109,7 +114,7 @@ $locator->addInstanceLazy('vendor.currency.manager', [
 
 ```php
 $locator->addInstanceLazy('vendor.currency.manager', [
-    'constructor' => [\Vendor\Currency\ManagerBuilder::class, 'buildInstance']
+    'constructor' => static fn () => \Vendor\Currency\ManagerBuilder::buildInstance()
 ]);
 ```
 

@@ -78,11 +78,20 @@ test('Сборщик: плейсхолдеры подставляются, бе�
     assertTrue(str_contains(implode(' ', $without['errors']), '--portal'), 'подсказка про снимок портала');
 });
 
-test('Сборщик: DOCUMENT_FIELDS берутся из снимка', function () {
+test('Сборщик: DOCUMENT_FIELDS из снимка — только по явной просьбе', function () {
+    // Импорт создаёт на портале поля из DOCUMENT_FIELDS, которых там нет (стенд, bizproc 26.1075.0)
     $snapshot = Snapshot::fromBpt(BptFile::read(fixtureBpt())['data']);
-    $r = (new Compiler(Catalog::load(), $snapshot))->compile(minimalSpec());
-    assertTrue(isset($r['bpt']['DOCUMENT_FIELDS']['STAGE_ID']), 'поля документа перенесены из снимка');
-    assertSame([], array_values(array_filter($r['warnings'], fn ($w) => str_contains($w, 'без DOCUMENT_FIELDS'))));
+    $default = (new Compiler(Catalog::load(), $snapshot))->compile(minimalSpec());
+    assertSame([], $default['bpt']['DOCUMENT_FIELDS'], 'по умолчанию поля документа в файл не кладутся');
+    $with = (new Compiler(Catalog::load(), $snapshot, false, true))->compile(minimalSpec());
+    assertTrue(isset($with['bpt']['DOCUMENT_FIELDS']['STAGE_ID']), 'по флагу — поля из снимка');
+    assertTrue(str_contains(implode(' ', $with['warnings']), 'создаст'), 'предупреждение о создании полей при импорте');
+});
+
+test('Сборщик: поля документа сверяются со снимком, даже если в файл не попадают', function () {
+    $snapshot = Snapshot::fromBpt(BptFile::read(fixtureBpt())['data']);
+    $r = (new Compiler(Catalog::load(), $snapshot))->compile(minimalSpec([['crm_event' => ['EventText' => '{=Document:UF_НЕТ_ТАКОГО}']]]));
+    assertTrue(str_contains(implode(' ', $r['warnings']), 'UF_НЕТ_ТАКОГО'), 'неизвестное поле документа видно');
 });
 
 test('Сборщик: --strict делает «сырые» ID ошибкой', function () {

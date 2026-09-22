@@ -275,8 +275,9 @@ test('Пример: собирается, разбирается и рисует
     assertTrue(str_contains((new Mermaid($catalog))->render($built['bpt']), 'Согласование бухгалтерией'), 'схема');
 });
 
-test('Сборщик: пустое DOCUMENT_FIELDS — предупреждение', function () {
+test('Сборщик: без снимка DOCUMENT_FIELDS пусты, и это не предупреждение', function () {
+    // Импорт с пустым DOCUMENT_FIELDS поля портала не трогает (стенд, bizproc 26.1075.0)
     $r = (new Compiler(Catalog::load()))->compile(minimalSpec());
     assertSame([], $r['bpt']['DOCUMENT_FIELDS']);
-    assertTrue(str_contains(implode(' ', $r['warnings']), 'DOCUMENT_FIELDS'), 'предупреждение про поля документа');
+    assertTrue(!str_contains(implode(' ', $r['warnings']), 'DOCUMENT_FIELDS'), 'пустые поля документа — норма');
 });

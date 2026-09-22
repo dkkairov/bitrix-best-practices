@@ -25,10 +25,16 @@ final class Compiler
     private array $steps = [];
     private array $nodeLabels = [];
 
+    /**
+     * $withDocumentFields: класть в .bpt поля документа из снимка. По умолчанию нет — импорт
+     * создаёт на портале поля из DOCUMENT_FIELDS, которых там нет (стенд, bizproc 26.1075.0),
+     * а пустой раздел импорт просто пропускает.
+     */
     public function __construct(
         private readonly Catalog $catalog,
         private readonly ?Snapshot $snapshot = null,
         private readonly bool $strict = false,
+        private readonly bool $withDocumentFields = false,
     ) {
     }
 
@@ -65,9 +71,11 @@ final class Compiler
             'Children'   => $children,
         ];
 
-        if (($this->snapshot?->documentFields() ?? []) === []) {
-            $this->warning('DOCUMENT_FIELDS', 'собрано без DOCUMENT_FIELDS: перед загрузкой проверьте'
-                . ' поведение на тестовом портале');
+        $snapshotFields = $this->snapshot?->documentFields() ?? [];
+        if ($this->withDocumentFields) {
+            $this->warning('DOCUMENT_FIELDS', $snapshotFields
+                ? 'в файл попадут DOCUMENT_FIELDS из снимка: при импорте портал создаст недостающие поля документа'
+                : 'поля документа запрошены, но в снимке их нет');
         }
 
         $bpt = [
@@ -76,9 +84,10 @@ final class Compiler
             'PARAMETERS'      => $this->definitions($spec['parameters'] ?? [], 'parameters'),
             'VARIABLES'       => $this->definitions($spec['variables'] ?? [], 'variables'),
             'CONSTANTS'       => $this->definitions($spec['constants'] ?? [], 'constants'),
-            'DOCUMENT_FIELDS' => $this->snapshot?->documentFields() ?? [],
+            'DOCUMENT_FIELDS' => $this->withDocumentFields ? $snapshotFields : [],
         ];
-        $this->runAnalyzer($bpt);
+        // Поля документа сверяем со снимком, даже если в файл они не попадают
+        $this->runAnalyzer(['DOCUMENT_FIELDS' => $snapshotFields] + $bpt);
 
         return ['bpt' => $bpt, 'errors' => $this->errors, 'warnings' => $this->warnings];
     }

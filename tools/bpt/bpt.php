@@ -22,7 +22,7 @@ const USAGE = <<<'TXT'
   php bpt.php analyze <file.bpt|file.json>... [--json] [--charset=windows-1251]
   php bpt.php compact <file.bpt|file.json> [-o out.txt] [--json] [--charset=windows-1251]
   php bpt.php catalog [Тип|алиас] [--json]
-  php bpt.php compile <spec.yaml|spec.json> -o <out.bpt> [--portal=<снимок>] [--strict] [--force]
+  php bpt.php compile <spec.yaml|spec.json> -o <out.bpt> [--portal=<снимок>] [--strict] [--force] [--with-document-fields]
   php bpt.php decompile <file.bpt> [-o spec.yaml] [--portal=<снимок>] [--keep-names] [--json]
   php bpt.php render <file.bpt|spec.yaml> [-o схема.md] [--portal=<снимок>]
   php bpt.php snapshot <file.bpt> [-o out.portal.yaml] [--json]
@@ -31,6 +31,8 @@ const USAGE = <<<'TXT'
   compile  спецификация процесса -> .bpt; при ошибках файл не пишется
            --portal: снимок портала для плейсхолдеров {{вид:Название}}
            --strict: «сырые» ID портала в спецификации считать ошибкой
+           --with-document-fields: положить в файл поля документа из снимка — импорт создаст
+             на портале недостающие поля; по умолчанию раздел пуст и поля портала не трогаются
   decompile .bpt -> спецификация процесса (для библиотеки примеров и сверки)
             --portal: заменить идентификаторы на плейсхолдеры; --keep-names: сохранить имена действий
   render   схема процесса (Mermaid) для ревью; спецификация рисуется как черновик
@@ -248,8 +250,8 @@ function cmdCompile(array $files, array $opts): int
 {
     requireFiles($files, 1, 1);
     $out = $opts['out'] ?? usageError('для compile нужен -o <out.bpt>');
-    $result = (new Compiler(Catalog::load(), portalSnapshot($opts), isset($opts['strict'])))
-        ->compile(SpecReader::read($files[0]));
+    $result = (new Compiler(Catalog::load(), portalSnapshot($opts), isset($opts['strict']),
+        isset($opts['with-document-fields'])))->compile(SpecReader::read($files[0]));
     printMessages($result['warnings'], '[ВНИМАНИЕ]');
     printMessages($result['errors'], '[ОШИБКА]');
     if ($result['errors']) {

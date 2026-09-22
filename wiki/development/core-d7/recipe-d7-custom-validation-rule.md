@@ -3,14 +3,14 @@ title: "Свой валидатор и правило валидации D7"
 type: recipe
 module: core-d7
 edition: box
-status: draft
+status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Технологии / Валидация — Быстрый старт, Собственные правила, Валидация в контроллерах, Существующие правила; без проверки на стенде"
+verified: "2026-09-22 / коробка в Docker, main 26.750.0: классы рецепта развёрнуты в /local/php_interface/classes и прогнаны — валидатор отдельно, правило свойства и правило класса через main.validation.service, оба способа в контроллере (Controller::run); текст — «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Технологии / Валидация"
 tags: [d7, валидация, атрибуты, валидатор, правило, dto, контроллеры]
 sources: ["[[source-devbook-core-d7]]"]
-related: ["[[concept-validation-d7]]", "[[entity-validation-service]]", "[[entity-validation-result]]", "[[antipattern-ajax-controller-lowercase-name]]", "[[concept-code-namespaces-and-autoloading]]"]
+related: ["[[concept-validation-d7]]", "[[entity-validation-service]]", "[[entity-validation-result]]", "[[antipattern-ajax-controller-lowercase-name]]", "[[concept-code-namespaces-and-autoloading]]", "[[recipe-cli-script-bootstrap]]"]
 aliases: []
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Свой валидатор и правило валидации D7
@@ -21,6 +21,10 @@ updated: "2026-09-21"
 встроенные `#[Email]` или `#[PositiveNumber]`. Основа —
 [«Собственные правила и валидаторы»](https://bx24devbook.website.yandexcloud.net/Razrabotka/Tehnologii/Validacia/Svoi_pravila.html).
 
+> **Проверено на стенде** (коробка в Docker, main 26.750.0, 2026-09-22): все классы ниже развёрнуты
+> в `/local/php_interface/classes` и прогнаны. Подтвердилось всё, что обещает книга; уточнения —
+> в тексте («стенд») и в разделе «Проверка результата».
+
 **Когда применять:** встроенных правил не хватает. Сначала смотрим каталог: `RegExp`, `Length`,
 `Range`, `InArray`, `Json`, `Url` и другие закрывают большинство форматов
 ([Существующие правила](https://bx24devbook.website.yandexcloud.net/Razrabotka/Tehnologii/Validacia/Susestvuusie_pravila.html),
@@ -29,8 +33,9 @@ updated: "2026-09-21"
 
 ## Предусловия
 
-- Коробка с пакетом `Bitrix\Main\Validation`. **С какой версии модуля `main` он доступен, в книге
-  не указано** — проверить на своей версии.
+- Коробка с пакетом `Bitrix\Main\Validation` (`bitrix/modules/main/lib/Validation/`). В `main`
+  26.750.0 он есть (стенд); **с какой версии появился, в книге не указано** — на своей версии
+  проверяем существованием класса `Bitrix\Main\Validation\ValidationService`.
 - PHP: правила — это атрибуты, а примеры книги используют `readonly`-свойства, значит нужен
   PHP 8.1+ (вывод из синтаксиса).
 - Место для классов: в модуле — `lib/`, namespace `Vendor\Module\…`
@@ -116,6 +121,13 @@ $MESS['VENDOR_MODULE_PACK_QUANTITY_MULTIPLE'] = 'Количество должн
 
 Языковой файл повторяет путь класса внутри `lang/ru/` — как `lang/ru/install/` в
 [[recipe-module-structure-and-install]]; коды фраз — с префиксом вендора (в книге — `FUSION_…`).
+Ядро ищет его так: поднимается от файла класса вверх до первой папки `lang` и берёт
+`lang/<язык>/<остаток пути>` (`Loc::includeLangFiles`). Для решения в `/local` это значит: завели
+`/local/php_interface/classes/lang/`, и фразы валидатора лежат в
+`classes/lang/ru/Validation/Validator/PackQuantityValidator.php` (стенд).
+
+Проверка `is_int($value)` строга: `'12'` строкой её не проходит (стенд). Из запроса приходят строки —
+приводим к типу до валидации (в DTO это делает типизированное свойство, см. шаг 4).
 
 Валидатор работает и без атрибутов — для старого кода с массивами
 ([без атрибутов](https://bx24devbook.website.yandexcloud.net/Razrabotka/Tehnologii/Validacia/Osnovnoe.html#validatory-bez-atributov)):
@@ -167,6 +179,9 @@ final class PackQuantity extends AbstractPropertyValidationAttribute
   Задан — вместо сообщений валидатора вернётся одно это сообщение; не задан — сообщения валидатора,
   как у встроенных правил без `errorMessage`
   ([сообщение об ошибке](https://bx24devbook.website.yandexcloud.net/Razrabotka/Tehnologii/Validacia/Osnovnoe.html#soobsenie-ob-osibke-posle-validacii)).
+  Механика — `ValidationErrorTrait::replaceWithCustomError()`: при успехе и при незаданном
+  `errorMessage` результат возвращается **как есть**, иначе все ошибки заменяются одной, но
+  `failedValidator` первого отказавшего валидатора сохраняется (ядро + стенд).
 - Флаг `TARGET_PARAMETER` позволяет повесить правило на параметр метода — в том числе action-метода
   контроллера (шаг 4).
 - В примере книги с `AbstractPropertyValidationAttribute` нет `use` для самого базового класса — при
@@ -260,6 +275,10 @@ final class ChangeEmailDto
 Ошибки правила класса создаются без `failedValidator` — так и в примере книги, — поэтому обработку
 таких ошибок на `getFailedValidator()` не строим (вывод команды).
 
+На стенде: ошибка правила класса приходит **с пустым кодом** (`0`), а не с именем свойства — правило
+не знает, какое поле виновато, поэтому в интерфейсе привязать её к полю формы нечем. Нужна привязка —
+делаем правило свойства (шаг 2) либо кладём имя поля в текст сообщения.
+
 ## Шаг 4. Применение
 
 **Сервис** — как со встроенными правилами ([[entity-validation-service]]):
@@ -273,8 +292,12 @@ $result = \Bitrix\Main\DI\ServiceLocator::getInstance()
 **Контроллер, скалярный параметр** — атрибут прямо на параметре action-метода; при ошибке метод не
 вызывается, клиент получает ошибку в стандартном формате
 ([контроллеры](https://bx24devbook.website.yandexcloud.net/Razrabotka/Tehnologii/Validacia/Kontrollery.html#validacia-prostyh-tipov-dannyh)).
-Книга показывает так встроенный `#[PositiveNumber]`; своё правило с `TARGET_PARAMETER` должно
-работать так же — **проверить на стенде**.
+Книга показывает так встроенный `#[PositiveNumber]`; своё правило с `TARGET_PARAMETER` работает
+точно так же (стенд). Но **текст ошибки клиенту другой**: биндер (`ValidationChecker`) заворачивает
+её в служебное сообщение `Invalid value to match parameter: [quantity] <текст правила>.` с кодом
+`100` (`ArgumentException`), тогда как у DTO уходит чистая ошибка правила с кодом-именем свойства.
+Для форм, где сообщение показывают пользователю, берём DTO; скалярный атрибут — для внутренних
+вызовов и грубой отсечки.
 
 **Контроллер, DTO** — `getAutoWiredParameters()` и `ValidationParameter`: фабрика собирает DTO из
 запроса; если DTO не прошёл валидацию, действие не вызывается, а клиенту уходит JSON с ошибками
@@ -344,14 +367,65 @@ BX.ajax.runAction('vendor:module.Order.add', { data: { productId: 128, quantity:
 
 Имя контроллера в действии — с заглавной буквы: [[antipattern-ajax-controller-lowercase-name]].
 
-## Проверка результата (на стенде)
+## Группы правил
 
-- Валидатор отдельно: `(new PackQuantityValidator(6))->validate(12)->isSuccess()` → `true`; для `7`
-  и `0` → `false`, а `getErrors()[0]->getFailedValidator()` — экземпляр `PackQuantityValidator`.
-- Через сервис: DTO с `quantity: 7` даёт ошибку; ожидаем код ошибки `quantity` — в примере
-  [рекурсивной валидации](https://bx24devbook.website.yandexcloud.net/Razrabotka/Tehnologii/Validacia/Osnovnoe.html#rekursivnaa-validacia)
-  код ошибки — путь к свойству.
-- Контроллер: `runAction` с `quantity: 7` → `status: "error"`, тело `addAction` не выполнено.
+Книга о них не пишет, но `validate()` принимает вторым аргументом **группу**:
+`$service->validate($dto, 'order')`. Правило попадает в группу, если реализует
+`Bitrix\Main\Validation\Rule\ValidateByGroupInterface` и возвращает её имя из `getGroups()`;
+встроенные правила принимают список в конструкторе — `#[PositiveNumber(groups: ['order'])]`.
+
+Поведение (стенд): без второго аргумента применяются все правила; с группой — правила этой группы и
+правила с пустым списком групп. Правило **без** интерфейса применяется всегда, даже когда запрошена
+чужая группа. Поэтому если в проекте группы используются, своё правило объявляем так:
+
+```php
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
+final class PackQuantity extends AbstractPropertyValidationAttribute implements ValidateByGroupInterface
+{
+    public function __construct(
+        private readonly int $packSize,
+        protected string|LocalizableMessageInterface|null $errorMessage = null,
+        protected array $groups = [],
+    ) {
+    }
+
+    protected function getValidators(): array
+    {
+        return [new PackQuantityValidator($this->packSize)];
+    }
+
+    public function getGroups(): array
+    {
+        return $this->groups;
+    }
+}
+```
+
+Нужен ещё один импорт — `use Bitrix\Main\Validation\Rule\ValidateByGroupInterface;`.
+
+## Проверка результата (прогон на стенде)
+
+Коробка в Docker, `main` 26.750.0, классы в `/local/php_interface/classes`, запуск из консоли
+([[recipe-cli-script-bootstrap]]); контроллер — через `Controller::run()` со снятыми префильтрами
+(авторизация, CSRF, метод запроса).
+
+| Что проверяли | Результат |
+|---|---|
+| `(new PackQuantityValidator(6))->validate(12)` | успех |
+| `validate(7)` / `validate(0)` / `validate('12')` | ошибка; `getErrors()[0]->getFailedValidator()` — экземпляр `PackQuantityValidator` |
+| Сервис: DTO `quantity: 7` | ошибка, **код = `quantity`** (имя свойства), текст — от валидатора |
+| Сервис: DTO `productId: -1, quantity: 7` | две ошибки сразу, коды `productId` и `quantity` — правила разных свойств не мешают друг другу |
+| Правило с `errorMessage` | одно своё сообщение, `failedValidator` сохранён |
+| Правило класса: значения разные | ошибка, код пустой (`0`), `failedValidator` нет; фраза `LocalizableMessage` разворачивается |
+| Правило класса: свойства нет | своя ошибка «правило указывает на несуществующее свойство» — исключения нет |
+| Nullable-свойство не инициализировано / присвоен `null` | пропущено / провалидировано и даёт ошибку |
+| Контроллер, DTO: `quantity: 12` → `quantity: 7` | успех и тело действия выполнено / `status: error`, тело **не** выполнено |
+| Контроллер, скалярный параметр `#[PackQuantity]` | отсекает так же, но текст обёрнут биндером (см. шаг 4) |
+| Группы: `#[PositiveNumber(groups: ['order'])]` | `validate($dto)` и `validate($dto, 'order')` — ошибка; `validate($dto, 'other')` — правило пропущено |
+| Опечатка в имени атрибута (`#[PackQuantityy]`) | ошибок нет — проверка молча не выполняется |
+
+Если своя проверка не срабатывает — смотрим в первую очередь на тип значения (`is_int` против строки
+из запроса) и на то, объявлен ли атрибут с нужным `Attribute::TARGET_*`.
 
 ## Чего избегать
 
@@ -364,14 +438,31 @@ BX.ajax.runAction('vendor:module.Order.add', { data: { productId: 128, quantity:
   читаем как `null` — только после `isInitialized()`.
 - ⚠️ Аргументы атрибута — константные выражения (ограничение PHP): размер упаковки, который зависит
   от товара, правилом-атрибутом не задать — такую проверку делаем в сервисе.
+- ⚠️ Скалярный параметр action-метода там, где текст ошибки увидит пользователь: клиент получит
+  служебную обёртку биндера. Для форм — DTO и `ValidationParameter`.
+- ⚠️ Привязки ошибки к полю формы по правилу класса — у такой ошибки кода-свойства нет.
+- ⚠️ Опечатки в имени правила и забытого `use`: атрибут неизвестного класса сервис **молча
+  пропускает** (стенд) — проверка просто не работает. После правки правил прогоняем заведомо
+  плохое значение и смотрим, что ошибка появилась.
+
+## `Loc::getMessage()` или `LocalizableMessage`
+
+Книга использует оба, не поясняя разницу. По коду ядра и прогону (стенд):
+
+- `Loc::getMessage('CODE')` — фраза разворачивается **сразу**, в текущем языке; в ошибку попадает
+  готовая строка. Языковой файл ядро подтянет само, по файлу вызывающего кода, даже без
+  `Loc::loadMessages(__FILE__)` (`Loc::loadLazy`) — но `loadMessages` оставляем, он дешевле поиска.
+- `LocalizableMessage('CODE')` — хранит код, подстановки и путь к своему файлу фраз, а разворачивает
+  текст **при обращении** (`localize($lang)`, приведение к строке) и умеет сериализоваться. Годится,
+  когда ошибка уедет в очередь, кэш или в ответ на другом языке. Цена — в конструкторе снимается
+  backtrace, поэтому создаём его только для сообщения, которое действительно покажут.
+
+Практика: сообщения правил и валидаторов — `LocalizableMessage` (язык ответа определится позже),
+разовые тексты внутри бизнес-логики — `Loc::getMessage()`.
 
 ## Открытые вопросы
 
-- С какой версии `main` доступна валидация — книга не указывает.
-- Что делает `replaceWithCustomError()`, когда `errorMessage` не задан (ожидаем: результат без
-  изменений).
-- Чем для ошибок отличаются `Loc::getMessage()` и `LocalizableMessage` — книга использует оба без
-  пояснений.
+- С какой версии `main` доступна валидация — книга не указывает; на 26.750.0 пакет есть.
 
 ## Связанное
 - [[concept-validation-d7]] — модель «валидатор + правило», каталог встроенных правил

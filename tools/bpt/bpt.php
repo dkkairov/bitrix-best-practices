@@ -21,13 +21,14 @@ const USAGE = <<<'TXT'
   php bpt.php check   <file.bpt>... [--charset=windows-1251]
   php bpt.php analyze <file.bpt|file.json>... [--json] [--charset=windows-1251]
   php bpt.php compact <file.bpt|file.json> [-o out.txt] [--json] [--charset=windows-1251]
-  php bpt.php catalog [Тип|алиас] [--json]
+  php bpt.php catalog [Тип|алиас] [--json] [--notes]
   php bpt.php compile <spec.yaml|spec.json> -o <out.bpt> [--portal=<снимок>] [--strict] [--force] [--with-document-fields]
   php bpt.php decompile <file.bpt> [-o spec.yaml] [--portal=<снимок>] [--keep-names] [--json]
   php bpt.php render <file.bpt|spec.yaml> [-o схема.md] [--portal=<снимок>]
   php bpt.php snapshot <file.bpt> [-o out.portal.yaml] [--json]
 
-  catalog  каталог действий: таблица целиком или подробности одного типа
+  catalog  каталог действий: таблица целиком или подробности одного типа (варианты значений,
+           поведение); --notes: таблица «смысл значений и поведение» для вики
   compile  спецификация процесса -> .bpt; при ошибках файл не пишется
            --portal: снимок портала для плейсхолдеров {{вид:Название}}
            --strict: «сырые» ID портала в спецификации считать ошибкой
@@ -217,6 +218,10 @@ function cmdCatalog(array $files, array $opts): int
         emit($catalog->toJson($type), $opts['out'] ?? null);
         return 0;
     }
+    if ($type === null && isset($opts['notes'])) {
+        emit($catalog->notesToMarkdown(), $opts['out'] ?? null);
+        return 0;
+    }
     if ($type === null) {
         emit(sprintf("Каталог действий: версия %d, проверен %s\n\n%s",
             $catalog->version(), $catalog->verified(), $catalog->toMarkdown()), $opts['out'] ?? null);
@@ -232,16 +237,35 @@ function cmdCatalog(array $files, array $opts): int
     if ($catalog->isForbidden($type)) {
         $lines[] = 'ЗАПРЕЩЕНО генерировать: ' . $catalog->forbiddenReason($type);
     }
+    if ($catalog->note($type) !== null) {
+        $lines[] = 'Поведение: ' . $catalog->note($type);
+    }
     $lines[] = 'Свойства:';
     foreach ($catalog->props($type) as $prop => $spec) {
         $lines[] = sprintf('  %-24s %-9s %s%s', $prop, $spec['type'],
             ($spec['required'] ?? false) ? 'обязательное'
                 : (array_key_exists('default', $spec) ? 'по умолчанию: ' . BptFile::flatJson($spec['default']) : '—'),
             isset($spec['values']) ? '; допустимо: ' . implode(', ', $spec['values']) : '');
+        if (isset($spec['options'])) {
+            $lines[] = '      варианты: ' . implode('; ', array_map(
+                fn ($value, $meaning) => "{$value} — {$meaning}", array_keys($spec['options']), $spec['options']));
+        }
+        if (isset($spec['required_keys'])) {
+            $lines[] = '      обязательные ключи: ' . implode(', ', $spec['required_keys']);
+        }
+        if (isset($spec['note'])) {
+            $lines[] = '      ' . $spec['note'];
+        }
+    }
+    foreach ($catalog->requiredAny($type) as $group) {
+        $lines[] = 'Нужно хотя бы одно из: ' . implode(', ', $group);
     }
     $returns = $catalog->returns($type);
     $lines[] = 'Возвращает: ' . ($returns ? implode(', ', $returns)
         : (is_string($entry['returns'] ?? null) ? "поля из свойства {$entry['returns']}" : '—'));
+    if (!empty($entry['returns_more'])) {
+        $lines[] = '  ещё результаты (курс 57, ядро): ' . implode(', ', $entry['returns_more']);
+    }
     emit(implode(PHP_EOL, $lines), $opts['out'] ?? null);
     return 0;
 }

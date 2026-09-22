@@ -60,7 +60,8 @@ test('Сборщик: переменные и константы нормали�
 
 test('Сборщик: значения из YAML приводятся к строкам', function () {
     $r = (new Compiler(Catalog::load()))->compile(minimalSpec([[
-        'task' => ['Fields' => ['TITLE' => 'Задача', 'RESPONSIBLE_ID' => 'user_42', 'PRIORITY' => 1],
+        // CREATED_BY обязателен: без постановщика импорт не примет задачу (Task2Activity::validateProperties)
+        'task' => ['Fields' => ['TITLE' => 'Задача', 'CREATED_BY' => 'user_1', 'RESPONSIBLE_ID' => 'user_42', 'PRIORITY' => 1],
                    'HoldToClose' => false],
     ]]));
     assertSame([], $r['errors']);
@@ -100,6 +101,53 @@ test('Сборщик: уведомление без отправителя не 
         'MessageSite' => 'Текст', 'MessageUserTo' => ['user_42'],
     ]]]))['errors']);
     assertTrue(str_contains($errors, 'MessageUserFrom'), "отправитель обязателен: {$errors}");
+});
+
+test('Сборщик: постановщик задачи и отправитель сообщения обязательны', function () {
+    $c = new Compiler(Catalog::load());
+    $errors = implode(' ', $c->compile(minimalSpec([['task' => ['Fields' => ['TITLE' => 'Т', 'RESPONSIBLE_ID' => 'user_42']]]]))['errors']);
+    assertTrue(str_contains($errors, 'CREATED_BY'), "постановщик обязателен: {$errors}");
+    // Без ответственного, но с потоком — можно (Task2Activity::validateProperties)
+    assertSame([], $c->compile(minimalSpec([['task' => ['Fields' => ['TITLE' => 'Т', 'CREATED_BY' => 'user_1', 'FLOW_ID' => '5']]]]))['errors']);
+    $chat = implode(' ', $c->compile(minimalSpec([['chat_message' => [
+        'MessageUserTo' => ['user_42'], 'MessageFields' => ['MessageText' => 'Текст'],
+    ]]]))['errors']);
+    assertTrue(str_contains($chat, 'MessageUserFrom'), "отправитель сообщения в чат обязателен: {$chat}");
+});
+
+test('Сборщик: пауза робота — время или период', function () {
+    $c = new Compiler(Catalog::load());
+    assertSame([], $c->compile(minimalSpec([['delay' => ['TimeoutDuration' => 1, 'TimeoutDurationType' => 'd']]]))['errors']);
+    $errors = implode(' ', $c->compile(minimalSpec([['delay' => ['WriteToLog' => 'Y']]]))['errors']);
+    assertTrue(str_contains($errors, 'TimeoutTime, TimeoutDuration'), "нужно одно из двух: {$errors}");
+});
+
+test('Сборщик: значение вне вариантов дизайнера — предупреждение, не ошибка', function () {
+    $c = new Compiler(Catalog::load());
+    $r = $c->compile(minimalSpec([['observers' => ['ActionOnObservers' => 'clear', 'Observers' => ['user_42']]]]));
+    assertSame([], $r['errors']);
+    assertTrue(str_contains(implode(' ', $r['warnings']), 'вне вариантов'), 'предупреждение о варианте');
+    $ok = $c->compile(minimalSpec([['observers' => ['ActionOnObservers' => 'replace', 'Observers' => ['user_42']]]]));
+    assertSame([], array_values(array_filter($ok['warnings'], fn ($w) => str_contains($w, 'вне вариантов'))));
+});
+
+test('Сборщик: «или» в первой строке условия — предупреждение', function () {
+    $spec = fn (string $joiner) => minimalSpec([['if' => ['branches' => [
+        ['title' => 'Да', 'when' => ['fieldcondition' => [['UF_X', '!empty', '', $joiner]]], 'steps' => []],
+        ['title' => 'Иначе', 'else' => true, 'steps' => []],
+    ]]]]);
+    $c = new Compiler(Catalog::load());
+    assertTrue(str_contains(implode(' ', $c->compile($spec('1'))['warnings']), 'всё условие истинным'), 'первая связка «или»');
+    assertSame([], array_values(array_filter($c->compile($spec('0'))['warnings'], fn ($w) => str_contains($w, 'истинным'))));
+});
+
+test('Сборщик: результаты по курсу не дают ложных предупреждений', function () {
+    $r = (new Compiler(Catalog::load()))->compile(minimalSpec([
+        ['approve' => ['id' => 'ap', 'Users' => ['user_42'], 'Name' => 'С', 'on_yes' => [], 'on_no' => []]],
+        ['crm_event' => ['EventText' => 'Автоотклонение: {=@ap:IsTimeout}']],
+    ]));
+    assertSame([], $r['errors']);
+    assertSame([], array_values(array_filter($r['warnings'], fn ($w) => str_contains($w, 'не возвращает'))));
 });
 
 test('Сборщик: запрещённое действие не собирается', function () {

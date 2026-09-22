@@ -128,7 +128,7 @@ final class Compiler
             return $original;
         }
         $step = $this->steps[$id];
-        $returns = $this->catalog->returns($step['type'], $step['props']);
+        $returns = $this->catalog->results($step['type'], $step['props']);
         if ($returns && !in_array($result, $returns, true)) {
             $this->warning($label, "действие {$step['type']} (шаг {$id}) обычно не возвращает «{$result}»"
                 . '; известные результаты: ' . implode(', ', $returns));
@@ -279,13 +279,32 @@ final class Compiler
                 $this->error($label, "нет обязательного свойства {$required}");
             }
         }
+        foreach ($this->catalog->requiredAny($type) as $group) {
+            $present = array_filter($group, fn ($prop) => !in_array($props[$prop] ?? null, [null, '', []], true));
+            if (!$present) {
+                $this->error($label, 'нужно хотя бы одно из свойств: ' . implode(', ', $group));
+            }
+        }
         foreach ($props as $prop => $value) {
             $allowed = $this->catalog->allowedValues($type, (string) $prop);
+            $options = $this->catalog->options($type, (string) $prop);
             // Выражения ({=…}, формулы) проверяет только портал при запуске
-            if ($allowed && is_string($value) && !str_contains($value, '{=') && !str_starts_with($value, '=')
-                && !in_array($value, $allowed, true)) {
+            $literal = is_string($value) && !str_contains($value, '{=') && !str_starts_with($value, '=');
+            if ($allowed && $literal && !in_array($value, $allowed, true)) {
                 $this->error($label, "{$prop}: значение «{$value}» вне допустимых (" . implode(', ', $allowed)
                     . ') — такой шаблон портал не примет при импорте');
+            } elseif ($options && $literal && !array_key_exists($value, $options)) {
+                $this->warning($label, "{$prop}: значение «{$value}» вне вариантов дизайнера ("
+                    . implode(', ', array_keys($options)) . ')');
+            }
+            foreach ($this->catalog->requiredKeys($type, (string) $prop) as $keys) {
+                $oneOf = explode('|', $keys);
+                $present = array_filter($oneOf, fn ($key) => is_array($value)
+                    && !in_array($value[$key] ?? null, [null, '', []], true));
+                if (!$present) {
+                    $this->error($label, "{$prop}: нет ключа " . implode(' или ', $oneOf)
+                        . ' — такой шаблон портал не примет при импорте');
+                }
             }
         }
 
@@ -444,7 +463,15 @@ final class Compiler
             $this->error($label, "неизвестный вид условия «{$kind}»");
             return [];
         }
-        return [$kind => $this->catalog->normalizeValue($this->catalog->propType('IfElseBranchActivity', $kind), $when[$kind])];
+        $rows = $this->catalog->normalizeValue($this->catalog->propType('IfElseBranchActivity', $kind), $when[$kind]);
+        // Ядро делит строки на группы по «или», и первая группа изначально истинна
+        // (Bizproc\Activity\ConditionGroup::evaluate): «или» в первой строке делает условие всегда истинным
+        $first = is_array($rows) && array_is_list($rows) && is_array($rows[0] ?? null) ? $rows[0] : null;
+        $firstJoiner = $first === null ? null : ($kind === 'mixedcondition' ? ($first['joiner'] ?? null) : ($first[3] ?? null));
+        if (!in_array($firstJoiner, [null, '', '0', 0], true)) {
+            $this->warning($label, "{$kind}: связка «или» в первой строке делает всё условие истинным — поставьте \"0\"");
+        }
+        return [$kind => $rows];
     }
 
     private function makeName(array $meta, string $label, string $path): string

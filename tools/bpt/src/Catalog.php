@@ -128,6 +128,43 @@ final class Catalog
         return $this->props($type)[$prop]['values'] ?? null;
     }
 
+    /**
+     * Варианты значения, которые предлагает дизайнер, с расшифровкой: значение → смысл.
+     * В отличие от values ядро их при импорте не проверяет, поэтому сборщик только предупреждает.
+     * @return array<string, string>|null
+     */
+    public function options(string $type, string $prop): ?array
+    {
+        return $this->props($type)[$prop]['options'] ?? null;
+    }
+
+    /** Пояснение к действию (без $prop) или к его свойству: смысл и поведение по курсу 57 и ядру. */
+    public function note(string $type, ?string $prop = null): ?string
+    {
+        return $prop === null
+            ? ($this->entry($type)['note'] ?? null)
+            : ($this->props($type)[$prop]['note'] ?? null);
+    }
+
+    /**
+     * Ключи, без которых ядро не примет свойство-отображение (ValidateProperties).
+     * «A|B» — достаточно одного из ключей.
+     * @return string[]
+     */
+    public function requiredKeys(string $type, string $prop): array
+    {
+        return $this->props($type)[$prop]['required_keys'] ?? [];
+    }
+
+    /**
+     * Группы свойств, из которых ядро требует хотя бы одно (ValidateProperties).
+     * @return string[][]
+     */
+    public function requiredAny(string $type): array
+    {
+        return $this->entry($type)['required_any'] ?? [];
+    }
+
     /** @return string[] */
     public function requiredProps(string $type): array
     {
@@ -156,6 +193,19 @@ final class Catalog
             return [];
         }
         return array_map('strval', array_is_list($source) ? $source : array_keys($source));
+    }
+
+    /**
+     * Все известные результаты: взятые по ссылкам в корпусе (returns) и описанные курсом 57 и ядром
+     * (returns_more). По ним сборщик проверяет ссылки {=@id:Результат}.
+     * @return string[]
+     */
+    public function results(string $type, array $props = []): array
+    {
+        return array_values(array_unique(array_merge(
+            $this->returns($type, $props),
+            $this->entry($type)['returns_more'] ?? []
+        )));
     }
 
     public function types(): array
@@ -249,6 +299,46 @@ final class Catalog
                 $entry['observed'] ?? 0);
         }
         return implode(PHP_EOL, $lines);
+    }
+
+    /** Таблица «смысл значений и поведение» — всё, у чего в каталоге есть note, options или values. */
+    public function notesToMarkdown(): string
+    {
+        $lines = [
+            '| Тип | Свойство | Значения и поведение |',
+            '|-----|----------|----------------------|',
+        ];
+        foreach ($this->data['activities'] as $type => $entry) {
+            if (isset($entry['note'])) {
+                $lines[] = sprintf('| `%s` | — | %s |', $type, self::cell($entry['note']));
+            }
+            foreach ($entry['props'] as $prop => $spec) {
+                $parts = [];
+                if (isset($spec['options'])) {
+                    $parts[] = implode('; ', array_map(
+                        fn ($value, $meaning) => "`{$value}` — {$meaning}",
+                        array_keys($spec['options']), $spec['options']
+                    ));
+                } elseif (isset($spec['values'])) {
+                    $parts[] = 'допустимо: ' . implode(', ', array_map(fn ($v) => "`{$v}`", $spec['values']));
+                }
+                if (isset($spec['required_keys'])) {
+                    $parts[] = 'обязательные ключи: ' . implode(', ', array_map(fn ($k) => "`{$k}`", $spec['required_keys']));
+                }
+                if (isset($spec['note'])) {
+                    $parts[] = $spec['note'];
+                }
+                if ($parts) {
+                    $lines[] = sprintf('| `%s` | `%s` | %s |', $type, $prop, self::cell(implode('. ', $parts)));
+                }
+            }
+        }
+        return implode(PHP_EOL, $lines);
+    }
+
+    private static function cell(string $text): string
+    {
+        return str_replace('|', '\\|', $text);
     }
 
     public function toJson(?string $type = null): string

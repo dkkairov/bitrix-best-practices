@@ -46,6 +46,60 @@ test('Каталог: обязательность и допустимые зн�
     assertSame(null, $c->allowedValues('ApproveActivity', 'Name'));
 });
 
+test('Каталог: варианты значений с расшифровкой и поведение — по курсу 57 и ядру', function () {
+    $c = Catalog::load();
+    // Урок 3771, константы CBPTaskDelegationType
+    assertSame(['0', '1', '2'], array_map('strval', array_keys($c->options('ApproveActivity', 'DelegationType'))));
+    assertSame(['s', 'm', 'h', 'd'], array_keys($c->options('ReviewActivity', 'TimeoutDurationType')));
+    // «Запрашивать пояснение»: у утверждения четыре варианта, у ознакомления два
+    assertSame(['N', 'Y', 'YA', 'YR'], array_keys($c->options('ApproveActivity', 'CommentRequired')));
+    assertSame(['N', 'Y'], array_keys($c->options('ReviewActivity', 'CommentRequired')));
+    // Урок 20768: наблюдателей можно и заменить
+    assertTrue(isset($c->options('CrmSetObserverField', 'ActionOnObservers')['replace']), 'replace у наблюдателей');
+    // Урок 3862, константы модуля im: 2 — персонализированное, 4 — от системы
+    assertSame([2, 4], array_keys($c->options('IMNotifyActivity', 'MessageType')));
+    // Проверка ядра остаётся в values, смысл — в options
+    assertSame(['all', 'any', 'vote'], array_keys($c->options('ApproveActivity', 'ApproveType')));
+    assertTrue(str_contains((string) $c->note('ApproveActivity'), 'ветка «нет»'), 'по истечении срока — отклонение');
+    assertTrue(str_contains((string) $c->note('CrmChangeStatusActivity'), 'завершается'), 'смена стадии завершает процесс');
+    assertSame(null, $c->options('ApproveActivity', 'Name'));
+    assertSame(null, $c->note('SequenceActivity'));
+});
+
+test('Каталог: заголовки по умолчанию — как ставит дизайнер', function () {
+    $c = Catalog::load();
+    assertSame('Ознакомление с документом', $c->title('ReviewActivity'));
+    assertSame('Запрос доп.информации (с отклонением)', $c->title('RequestInformationOptionalActivity'));
+    assertSame('Получить информацию об элементе CRM', $c->title('CrmGetDynamicInfoActivity'));
+    assertTrue(!isset($c->entry('ApproveActivity')['title_guess']), 'заголовок утверждения подтверждён');
+});
+
+test('Каталог: обязательность — как в проверке импорта на стенде', function () {
+    $c = Catalog::load();
+    // validateTemplate на стенде (bizproc 26.1075.0, 2026-09-22): без этого импорт не проходит
+    assertTrue(in_array('MessageUserFrom', $c->requiredProps('ImMessageActivity'), true), 'отправитель сообщения в чат');
+    assertSame(['TITLE', 'CREATED_BY', 'RESPONSIBLE_ID|FLOW_ID'], $c->requiredKeys('Task2Activity', 'Fields'));
+    assertSame([['TimeoutTime', 'TimeoutDuration']], $c->requiredAny('RobotDelayActivity'));
+    assertTrue(!in_array('TimeoutTime', $c->requiredProps('RobotDelayActivity'), true), 'время паузы — одно из двух');
+    assertSame([], $c->requiredKeys('SetFieldActivity', 'FieldValue'));
+    assertSame([], $c->requiredAny('SetFieldActivity'));
+});
+
+test('Каталог: результаты — из корпуса и по курсу', function () {
+    $c = Catalog::load();
+    $all = $c->results('ApproveActivity');
+    assertTrue(in_array('IsTimeout', $all, true) && in_array('Comments', $all, true), 'все результаты утверждения');
+    assertSame(['ErrorMessage'], $c->results('SetFieldActivity'));
+    assertSame(['UF_X', 'Document'], $c->results('CrmGetDynamicInfoActivity', ['ReturnFields' => ['UF_X']]));
+    assertSame([], $c->results('SequenceActivity'));
+});
+
+test('Каталог: таблица значений и поведения для вики', function () {
+    $md = Catalog::load()->notesToMarkdown();
+    assertTrue(str_contains($md, '`YR` — только при отклонении'), 'варианты с расшифровкой');
+    assertTrue(str_contains($md, 'обязательные ключи: `TITLE`, `CREATED_BY`'), 'обязательные ключи');
+});
+
 test('Каталог: частные значения заданий перекрывают общие', function () {
     // У ознакомления своя подпись поля комментария, у утверждения — общая
     assertSame('Комментарий', Catalog::load()->defaults('ReviewActivity')['CommentLabelMessage']);

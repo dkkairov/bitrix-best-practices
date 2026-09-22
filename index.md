@@ -17,7 +17,7 @@
 
 ### Продуктовые модули (облако и коробка)
 - [CRM](wiki/modules/crm/_index-crm.md) — сделки, лиды, воронки, контакты/компании, аналитика
-- [Бизнес-процессы](wiki/modules/bizproc/_index-bizproc.md) — БП, роботы, триггеры, дизайнер, формат `.bpt`, генерация агентом
+- [Бизнес-процессы](wiki/modules/bizproc/_index-bizproc.md) — БП, роботы, триггеры, дизайнер, формат `.bpt`, типовые процессы, свои действия, генерация агентом
 - [REST и интеграции](wiki/modules/rest-integrations/_index-rest-integrations.md) — REST API, вебхуки, события, OAuth
 - [Права доступа](wiki/modules/permissions/_index-permissions.md) — роли, права, экстранет
 - [Администрирование](wiki/modules/administration/_index-administration.md) — портал, тарифы, домены, безопасность
@@ -61,6 +61,7 @@
 - [[checklist-support-handover|Playbook передачи в поддержку]] · Playbooks · both · черновик
 - [[checklist-permissions-audit|Аудит прав доступа]] · Права · both · черновик
 - [[checklist-tasks-regulations|Регламент постановки задач]] · Задачи · both · черновик
+- [[checklist-bizproc-template-review|Ревью шаблона БП: ошибки проектирования]] · БП · both · черновик
 
 ### Паттерны
 - [[pattern-crm-sales-funnel-design|Проектирование воронки и стадий]] · CRM · both
@@ -112,6 +113,10 @@
 - [[recipe-crm-todo-activity|Универсальное дело (ToDo) из кода]] · CRM · box · черновик
 - [[recipe-smart-process-programmatic-creation|Создать смарт-процесс и поля из инсталлятора]] · СПА · box
 - [[recipe-smart-process-factory-customization|Своя фабрика смарт-процесса]] · СПА · box · черновик
+- [[recipe-bizproc-approval-route|Маршрут согласования: срок, доработка, итог]] · БП · both · черновик
+- [[recipe-bizproc-request-intake|Заявка: исполнитель, задача со сроком, контроль]] · БП · both · черновик
+- [[recipe-bizproc-debugging|Отладка БП: журнал, зависшие процессы]] · БП · both · черновик
+- [[recipe-bizproc-custom-activity-baseactivity|Своё действие БП на BaseActivity]] · БП · box · черновик
 - [[recipe-bizproc-custom-task-activity|Своё действие БП с заданием (CBPTaskService)]] · БП · box
 - [[recipe-tasks-v2-commands|Команды задач V2: операции и ловушки]] · Задачи · box · черновик
 - [[recipe-custom-left-menu-section|Свой раздел в левом меню (CustomSection)]] · Администрирование · box
@@ -129,6 +134,8 @@
 - [[concept-testing-approach|Подход к тестированию]] · Разработка · box
 - [[concept-bizproc-bpt-format|Формат шаблона БП (.bpt)]] · Бизнес-процессы · both
 - [[concept-bizproc-activity-catalog|Каталог действий БП (25 типов)]] · Бизнес-процессы · both
+- [[concept-bizproc-expressions|Выражения БП: функции, модификаторы, коды]] · Бизнес-процессы · both · черновик
+- [[concept-bizproc-state-machine|БП со статусами: устройство и выбор]] · Бизнес-процессы · both · черновик
 - [[concept-crm-universal-api|Universal API CRM: Container → Factory → Item]] · CRM · box
 - [[concept-crm-dictionaries|Справочники CRM: новое читает, старое пишет]] · CRM · box
 - [[concept-request-lifecycle|Жизненный цикл HTTP-запроса]] · Разработка · box
@@ -157,7 +164,7 @@
 [[entity-crm-legacy-events|События старого ядра CRM]]
 
 **Бизнес-процессы** — [[entity-cbp-activity|CBPActivity / BaseActivity]] ·
-[[entity-bizproc-activity-description|.description.php]] (черновик) ·
+[[entity-bizproc-activity-description|.description.php]] ·
 [[entity-cbp-activity-condition|CBPActivityCondition]] · [[entity-cbp-task-service|CBPTaskService]] ·
 [[entity-bizproc-field-type|FieldType]] · [[entity-bizproc-globals-manager|GlobalsManager]]
 
@@ -190,16 +197,25 @@
 - [[source-devbook-ui|Книга разработчика: UI-подсистема]] · box
 - [[source-devbook-intranet|Книга разработчика: интранет]] · box
 - [[source-devbook-tasks|Книга разработчика: модуль задач]] · box
+- [[source-course57-basics|Курс 57 «Бизнес-процессы»: основы]] · dev.1c-bitrix.ru · both
+- [[source-course57-templates-designer|Курс 57: объекты, дизайнер, шаблоны]] · both
+- [[source-course57-expressions|Курс 57: «Вставка значения», выражения, ошибки]] · both
+- [[source-course57-actions-core|Курс 57: действия — документ, задания, конструкции]] · both
+- [[source-course57-actions-notify-other|Курс 57: действия — уведомления и прочее]] · both
+- [[source-course57-actions-crm-disk|Курс 57: действия CRM и Диска]] · both
+- [[source-course57-examples|Курс 57: каталог примеров]] · both
+- [[source-course57-developer|Курс 57: глава для разработчика]] · box
 
 Все семь конспектов «Книги разработчика» сверены постранично с сайтом книги 2026-09-21; снимок-манифест
-страниц — `raw/sources/2026-09-21-bx24devbook-manifest.md`.
+страниц — `raw/sources/2026-09-21-bx24devbook-manifest.md`. Курс 57 «Бизнес-процессы» пройден целиком
+2026-09-22 (223 урока), снимок-манифест без текста — `raw/sources/2026-09-22-course57-bizproc-manifest.md`.
 
 ---
 
 ## По статусу
 
-- **verified:** 119 страниц из 139 (`verified`: 2026-06-01 … 2026-09-21).
-- **draft:** 20 страниц, по четырём разным причинам —
+- **verified:** 128 страниц из 154 (`verified`: 2026-06-01 … 2026-09-22).
+- **draft:** 26 страниц, по пяти разным причинам —
   **методические каркасы**, которые уточняются после первого применения на проекте
   ([[checklist-data-migration]], [[checklist-golive-deployment]], [[checklist-user-adoption]],
   [[checklist-support-handover]], [[checklist-permissions-audit]],
@@ -207,12 +223,18 @@
   **пилот пройден только на коробке, облако и оценка на задачах — впереди** ([[pattern-bizproc-ai-assisted-generation]]);
   **не удалось сверить с первоисточником** ([[entity-module-manager]] — справочник D7 не отдал
   содержимое страницы);
-  **написано по «Книге разработчика», на стенде не проверялось** — 11 страниц сверки 2026-09-21
+  **написано по «Книге разработчика», на стенде не проверялось** — 10 страниц сверки 2026-09-21
   ([[concept-deferred-functions-and-page-areas]], [[recipe-cli-script-bootstrap]],
   [[recipe-d7-custom-validation-rule]], [[recipe-custom-list-page-filter-grid]],
   [[recipe-crm-legacy-entity-crud]], [[recipe-crm-lead-conversion]], [[recipe-crm-todo-activity]],
   [[recipe-smart-process-factory-customization]], [[recipe-tasks-v2-commands]],
-  [[recipe-intranet-absence-import]], [[entity-bizproc-activity-description]]).
+  [[recipe-intranet-absence-import]]); паспорт `.description.php` снят с черновика 2026-09-22 — спор
+  книги закрыт курсом 57 и кодом ядра;
+  **по курсу 57 и коду ядра, целиком на стенде не прогонялись** — 7 страниц 2026-09-22
+  ([[recipe-bizproc-approval-route]], [[recipe-bizproc-request-intake]],
+  [[checklist-bizproc-template-review]], [[recipe-bizproc-debugging]], [[concept-bizproc-expressions]],
+  [[concept-bizproc-state-machine]], [[recipe-bizproc-custom-activity-baseactivity]]); части из них
+  проверены на стенде — спецификации проходят проверку импорта, поведение ошибок своих действий.
 - **deprecated:** —
 
 > При устаревании практики ставь `status: deprecated` и ссылку на замену; `/wiki:lint` следит за
@@ -222,13 +244,13 @@
 
 ## По редакции
 
-- **box (109 страниц):** ветка разработки `development/*`, коробочная часть модулей и справочник
+- **box (111 страниц):** ветка разработки `development/*`, коробочная часть модулей и справочник
   по 42 классам, файлам и компонентам ядра.
 - **cloud (3 страницы):** [[entity-bizproc-template-rest-methods]],
   [[pattern-rest-batch-and-limits]], [[pattern-rest-reliable-delivery]] — сверено через MCP
   по документации облака.
-- **both (27 страниц):** практики внедрения, не зависящие от редакции, — playbooks жизненного
-  цикла, права, задачи, смарт-процессы.
+- **both (40 страниц):** практики внедрения, не зависящие от редакции, — playbooks жизненного
+  цикла, права, задачи, смарт-процессы, бизнес-процессы и конспекты курса 57.
 
 > Перекос в сторону `box` сохраняется: он следствие того, что перенесённый архив был про
 > коробку. Облачно-внедренческая часть пополнена 18.09 (playbooks жизненного цикла, REST-лимиты

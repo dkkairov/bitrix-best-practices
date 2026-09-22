@@ -52,7 +52,8 @@ updated: "2026-09-22"
    `bizproc.workflow.instances`, остановка с сохранением данных — `bizproc.workflow.terminate`,
    удаление вместе с данными — `bizproc.workflow.kill`
    ([[entity-bizproc-template-rest-methods|REST-методы]]). Прерванный процесс не продолжить — только
-   запустить заново ([урок 3813](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3813)).
+   запустить заново ([урок 3813](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3813));
+   задания в работе при остановке удаляются (код ядра).
 8. **Своё действие в коде** пишет в журнал через `WriteToTrackingService()` или `$this->log()` /
    `$this->logError()` у `BaseActivity` ([[entity-cbp-activity]]); `echo` и `exit` в процессе не
    помогают.

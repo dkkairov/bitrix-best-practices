@@ -7,6 +7,34 @@
 
 ## 2026-09
 
+- **2026-09-22 — ingest (батч): официальный курс 57 «Бизнес-процессы» и сверка вики (§6, §9)** —
+  Курс (https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&INDEX=Y) пройден целиком: 223 урока,
+  28 глав. В `raw/` — снимок-манифест без текста (адреса уроков, даты, хэши):
+  `raw/sources/2026-09-22-course57-bizproc-manifest.md`. Восемь конспектов `source-course57-*` со
+  ссылками на уроки и таблицами сверки. Спорное проверено кодом ядра и стендом (bizproc 26.1075.0).
+  Снято: задание без веток штатно на `CBPActivity`, с ветками — на `CBPCompositeActivity`; результат
+  из `RETURN` дизайнер видит без `ADDITIONAL_RESULT`; правки процесса запускают автозапуск CRM только
+  с опцией `start_bp_within_bp`. Исправлено с пометками: `DELEGATION_TYPE => 0` — это «только
+  подчинённым», не запрет; коды разделов дизайнера `logic`/`interaction` вместо
+  `constructs`/`notification`; «`Faulting` и исключение останавливают процесс» — на стенде нет, а
+  фатальная ошибка PHP вешает процесс. Сверены и обновлены [[concept-bizproc-engine]],
+  [[concept-bizproc-bpt-format]], [[concept-bizproc-activity-catalog]],
+  [[pattern-robots-vs-bizproc-decision]], [[pattern-bizproc-ai-assisted-generation]],
+  [[recipe-bizproc-custom-task-activity]], [[antipattern-bizproc-php-code-activity]], шесть
+  entity-страниц модуля (паспорт `.description.php` снят с черновика), [[entity-robots-triggers]],
+  [[entity-bizproc-template-rest-methods]], [[antipattern-bizproc-hardcoded-portal-ids]],
+  [[entity-smart-process]], [[source-devbook-bizproc]]. Новые черновики:
+  [[recipe-bizproc-approval-route]], [[recipe-bizproc-request-intake]],
+  [[checklist-bizproc-template-review]], [[recipe-bizproc-debugging]], [[concept-bizproc-expressions]],
+  [[concept-bizproc-state-machine]], [[recipe-bizproc-custom-activity-baseactivity]]. `tools/bpt`:
+  каталог — смысл значений и поведение по курсу и ядру (`options`, `note`, `required_keys`,
+  `required_any`, `returns_more`), сборщик проверяет их и ловит связку «или» в первой строке условия и
+  лишние ключи описаний. Тестов 87 (+13); одна правка существующего теста: у задачи обязателен
+  `CREATED_BY` — импорт без него отклоняется (стенд). Стенд: проверка импорта без записи в базу,
+  временное действие в `/local` удалено, прогоны процессов в памяти на фиктивном документе с уборкой;
+  «Заявки» и шаблоны пилота не тронуты. Не сделано: файлы-примеры `.bpt` из уроков не скачивались,
+  процессы со статусами `tools/bpt` не собирает. `index.md` — 154 страницы, бэклог источников.
+
 - **2026-09-22 — пилот генерации БП на коробке: пройден, найдено и исправлено три ошибки** — По
   навыку `building-bizproc-templates` на стенде (bizproc 26.1075.0, crm 26.800.0): смарт-процесс
   «Заявки» создан по [[recipe-smart-process-programmatic-creation]] (подтверждено: поля под

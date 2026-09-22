@@ -130,7 +130,9 @@ steps:
       on_no:
         - notify:
             MessageSite: "Отклонено: {=@fin:Comments}"   # ссылка на результат шага
-            MessageUserFrom: ["{=@fin:LastApprover}"]    # без отправителя портал не примет импорт
+            # отправитель обязателен при импорте; у задания без срока в ветке «нет» он всегда есть,
+            # со сроком — MessageType "4" (от системы), как в полном примере
+            MessageUserFrom: ["{=@fin:LastApprover}"]
             MessageUserTo: ["{{user:Иванов Иван}}"]
 ```
 

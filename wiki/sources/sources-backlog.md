@@ -5,11 +5,11 @@ module: sources
 edition: both
 status: verified
 provenance: documented
-verified: "2026-09-21"
+verified: "2026-09-22"
 tags: [источники, бэклог, ингест, очередь]
 sources: []
-related: ["[[source-b24-crm-deal-add]]", "[[source-devbook-dev-rules]]"]
-updated: "2026-09-21"
+related: ["[[source-b24-crm-deal-add]]", "[[source-devbook-dev-rules]]", "[[source-devbook-bizproc]]", "[[source-course57-basics]]"]
+updated: "2026-09-22"
 ---
 
 # Бэклог источников
@@ -31,6 +31,7 @@ updated: "2026-09-21"
 | 2 | [bx24devbook — Книга разработчика](https://bx24devbook.website.yandexcloud.net/) | содержание (многоглавный), **эталон** (`CLAUDE.md` §9) | [development/](../development/core-d7/_index-core-d7.md) + [modules/](../modules/crm/_index-crm.md) | **сделано** | **пройдена целиком 2026-09-21** — 97 страниц, все разделы навигации: семь конспектов `source-devbook-*`, снимок-манифест `raw/sources/2026-09-21-bx24devbook-manifest.md`. Дальше — пересверка только страниц, у которых изменился хэш в манифесте |
 | 3 | [awesome-bitrix](https://github.com/awesomebitrix/awesome-bitrix) | каталог-указатель | мета (порождает под-источники) | **P2** | разобрать по категориям → завести под-источники |
 | 4 | [api_help (старое ядро)](https://dev.1c-bitrix.ru/api_help/) | каталог-указатель (legacy) | [development/](../development/core-d7/_index-core-d7.md) | **P3** | по требованию: только когда нужен конкретный метод старого ядра; сначала смотреть D7/devbook/MCP |
+| 5 | [Курс 57 «Бизнес-процессы»](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&INDEX=Y) | содержание (многоглавный), **эталон** — официальная документация (`CLAUDE.md` §9) | [modules/bizproc/](../modules/bizproc/_index-bizproc.md) | **сделано** | **пройден целиком 2026-09-22** — 223 урока, 28 глав: восемь конспектов `source-course57-*`, снимок-манифест `raw/sources/2026-09-22-course57-bizproc-manifest.md`. Дальше — пересверка уроков, у которых изменился хэш |
 
 > **Долг по «Книге разработчика» закрыт (2026-09-21).** История: 2026-09-18 при переносе архивной
 > вики заведены шесть кластерных конспектов — по тому, что взято в вики, без перечитывания книги;
@@ -70,16 +71,19 @@ updated: "2026-09-21"
 ## Очередь после сверки с книгой (2026-09-21)
 
 **Проверки на стенде** (коробка в Docker) — снять `draft` или поправить страницы:
-- 11 черновиков, написанных по книге без прогона: [[concept-deferred-functions-and-page-areas]],
+- 10 черновиков, написанных по книге без прогона: [[concept-deferred-functions-and-page-areas]],
   [[recipe-cli-script-bootstrap]], [[recipe-d7-custom-validation-rule]],
   [[recipe-custom-list-page-filter-grid]], [[recipe-crm-legacy-entity-crud]],
   [[recipe-crm-lead-conversion]], [[recipe-crm-todo-activity]],
   [[recipe-smart-process-factory-customization]], [[recipe-tasks-v2-commands]],
-  [[recipe-intranet-absence-import]], [[entity-bizproc-activity-description]].
-- Вопросы с расхождением «книга ↔ практика команды»: базовый класс задания БП (`CBPActivity` или
-  `CBPCompositeActivity`, [[recipe-bizproc-custom-task-activity]]); видимость результатов при
-  `RETURN`/`ADDITIONAL_RESULT`; прерывают ли процесс ошибки `ErrorCollection` ([[entity-cbp-activity]]);
-  перенос глобалов между порталами ([[entity-bizproc-globals-manager]]).
+  [[recipe-intranet-absence-import]]. [[entity-bizproc-activity-description]] снят с черновика
+  2026-09-22 (курс 57 и код ядра).
+- Вопросы с расхождением «книга ↔ практика команды»: перенос глобалов между порталами
+  ([[entity-bizproc-globals-manager]]). **Сняты 2026-09-22** курсом 57, кодом ядра и стендом: базовый
+  класс задания БП — оба, по наличию веток ([[recipe-bizproc-custom-task-activity]]); результат из
+  `RETURN` дизайнер видит без `ADDITIONAL_RESULT` (в роботах — открыто); ошибки `ErrorCollection`,
+  исключения и `Faulting` процесс не останавливают, фатальная ошибка PHP его вешает
+  ([[entity-cbp-activity]]).
 - Возможное устаревание (§6): модель оргструктуры на свежей коробке — инфоблок или `humanresources`
   ([[concept-org-structure]]).
 
@@ -88,9 +92,28 @@ updated: "2026-09-21"
 |------|------------------|-----------|
 | Панель групповых действий грида | `entity-grid-action-panel` | P2 |
 | Валидация в контроллерах D7 | `recipe-d7-controller-validation` | P2 |
-| Своё действие БП на `BaseActivity` (без задания) | `recipe-bizproc-custom-activity-baseactivity` | P2 |
+| Своё действие БП на `BaseActivity` (без задания) | [[recipe-bizproc-custom-activity-baseactivity]] — черновик 2026-09-22 | сделано |
 | Смарт-счета в коробке | `entity-crm-smart-invoice` | P2 |
 | Поиск задач и доступ (провайдеры) | `recipe-tasks-search-and-access` | P3 |
+
+## Очередь после курса 57 (2026-09-22)
+
+**Проверки на стенде** — снять `draft`:
+- Прогнать целиком на тестовом смарт-процессе (не на «Заявках» пилота):
+  [[recipe-bizproc-approval-route]], [[recipe-bizproc-request-intake]]; собрать в дизайнере процесс со
+  статусами по [[concept-bizproc-state-machine]]; применить [[checklist-bizproc-template-review]] и
+  [[recipe-bizproc-debugging]] на реальном разборе; запустить действие из
+  [[recipe-bizproc-custom-activity-baseactivity]] на сделке.
+- Видны ли результаты своих действий (`RETURN`) в роботах.
+- Открытые вопросы конспектов курса: [[source-course57-basics]], [[source-course57-templates-designer]],
+  [[source-course57-expressions]], [[source-course57-actions-core]],
+  [[source-course57-actions-notify-other]], [[source-course57-actions-crm-disk]],
+  [[source-course57-developer]] — раздел «Открытые вопросы» в каждом.
+
+**Не сделано и почему:**
+- Файлы-примеры шаблонов из уроков курса (`.bpt`) не скачаны — загрузка файлов требует отдельного
+  разрешения; для сверки `tools/bpt` хватило текста уроков и кода ядра.
+- `tools/bpt` не собирает процессы со статусами (`StateMachineWorkflowActivity`) — отдельная задача.
 
 ## Под-источники из awesome-bitrix (категория → раздел вики)
 - Учебные курсы → [playbooks](../cross-cutting/playbooks/_index-playbooks.md) / development

@@ -19,12 +19,12 @@ final class Report
     {
         $results = $checklists = $acceptances = [];
         foreach (glob(rtrim($runDir, '/\\') . '/*/result.json') ?: [] as $file) {
-            $result = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+            $result = self::readJson($file);
             $task = (string) $result['task'];
             $results[$task] = $result;
             $checklistFile = dirname($file) . '/checklist.json';
             if (is_file($checklistFile)) {
-                $checklists[$task] = json_decode((string) file_get_contents($checklistFile), true, 512, JSON_THROW_ON_ERROR);
+                $checklists[$task] = self::readJson($checklistFile);
             }
             $taskDirs = glob(rtrim($tasksDir, '/\\') . "/{$task}-*", GLOB_ONLYDIR) ?: [];
             if ($taskDirs) {
@@ -32,9 +32,19 @@ final class Report
             }
         }
         $agentsFile = rtrim($runDir, '/\\') . '/agents.json';
-        $agents = is_file($agentsFile) ? json_decode((string) file_get_contents($agentsFile), true, 512, JSON_THROW_ON_ERROR) : [];
+        $agents = is_file($agentsFile) ? self::readJson($agentsFile) : [];
         ksort($results);
         return self::fromData($results, $checklists, $acceptances, $agents, basename(rtrim($runDir, '/\\')));
+    }
+
+    /** Разбор JSON-файла прогона (result.json/checklist.json/agents.json): битый файл — EvalException с путём, а не голый JsonException. */
+    private static function readJson(string $file): array
+    {
+        try {
+            return json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            throw new EvalException("не удалось разобрать {$file}: " . $e->getMessage());
+        }
     }
 
     public static function fromData(array $results, array $checklists, array $acceptances, array $agents, string $run): self

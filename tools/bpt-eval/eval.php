@@ -101,6 +101,19 @@ try {
                 printf("%s: %s%s\n", $task, $ok ? 'эталон прошёл' : 'ЭТАЛОН НЕ ПРОШЁЛ', $reasons ? ' — ' . implode('; ', $reasons) : '');
             }
             exit($failed ? 1 : 0);
+        case 'usage':
+            $task = (string) ($positional[0] ?? '');
+            $file = "{$runDir}/agents.json";
+            $agents = is_file($file) ? json_decode((string) file_get_contents($file), true) : [];
+            $agents[$task] = ['tokens' => (int) ($opts['tokens'] ?? 0), 'tool_uses' => (int) ($opts['tools'] ?? 0),
+                'duration_ms' => (int) ($opts['ms'] ?? 0)];
+            file_put_contents($file, json_encode($agents, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+            exit(0);
+        case 'report':
+            $report = Report::fromRunDir($runDir, __DIR__ . '/tasks');
+            file_put_contents("{$runDir}/report.md", $report->toMarkdown());
+            echo $report->toMarkdown();
+            exit(0);
         default:
             fwrite(STDERR, "неизвестная команда «{$command}»\n");
             exit(2);

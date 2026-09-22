@@ -39,6 +39,20 @@ test('Отчёт: сценарии не прогнаны — задача не �
     assertTrue(!$report->rows()['T05']['passed'], 'нет результатов сценариев — не пройдена');
 });
 
+test('Отчёт: битый result.json — EvalException с путём к файлу', function () {
+    $runDir = tmpPath('');
+    mkdir("{$runDir}/T01", 0777, true);
+    $file = "{$runDir}/T01/result.json";
+    file_put_contents($file, '{испорченный json');
+    try {
+        assertThrows(fn () => Report::fromRunDir($runDir, $runDir), $file, 'ошибка называет путь к битому файлу');
+    } finally {
+        unlink($file);
+        rmdir("{$runDir}/T01");
+        rmdir($runDir);
+    }
+});
+
 test('Отчёт: markdown', function () {
     $md = reportFixture()->toMarkdown();
     assertTrue(str_contains($md, '| Задача | Сборка | Импорт | Сценарии | Чек-лист |'), 'таблица');

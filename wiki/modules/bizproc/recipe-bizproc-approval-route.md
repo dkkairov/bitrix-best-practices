@@ -3,9 +3,9 @@ title: "Маршрут согласования: срок, доработка в
 type: recipe
 module: bizproc
 edition: both
-status: draft
+status: verified
 provenance: mixed
-verified: ""
+verified: "2026-09-22 / коробка, bizproc 26.1075.0, crm 26.800.0, tasks 26.300.100: спецификация собрана tools/bpt, импортирована, пройдены все ветки — согласовали, отклонили и доработали, три отказа, срок истёк"
 tags: [бизнес-процессы, согласование, утверждение, доработка, цикл, таймаут, типовой-процесс]
 sources: ["[[source-course57-actions-core]]", "[[source-course57-actions-notify-other]]", "[[source-course57-examples]]"]
 related: ["[[checklist-bizproc-template-review]]", "[[concept-bizproc-activity-catalog]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[recipe-bizproc-request-intake]]", "[[concept-bizproc-expressions]]"]
@@ -19,9 +19,13 @@ updated: "2026-09-22"
 его и отправляет на новый круг (не больше трёх); по истечении срока процесс не висит, а завершается
 итогом «срок истёк»; стадия меняется последним шагом.
 
-> **Черновик.** Спецификация ниже собирается `tools/bpt` и проходит проверку импорта на стенде
-> (`validateTemplate`, коробка, bizproc 26.1075.0, 2026-09-22), но целиком процесс на стенде не
-> прогонялся. Поведение действий — по курсу 57 и коду ядра.
+> **Проверено на стенде** (коробка, bizproc 26.1075.0, 2026-09-22): спецификация собрана `tools/bpt`,
+> импортирована и пройдена по всем веткам — согласовали сразу; отклонили без пояснения (ядро не
+> пустило), с пояснением, доработали, согласовали; отклонили трижды; никто не ответил за срок.
+>
+> **Изменено 2026-09-22 по итогам прогона.** Прежняя версия после третьего отказа всё равно
+> отправляла автору запрос доработки, а в уведомлении показывала код итога (`rework`). Теперь отказ в
+> последнем круге сразу даёт итог «не согласовано», у каждого исхода своё уведомление.
 
 ## Предусловия
 - Решено, что нужен БП, а не роботы ([[pattern-robots-vs-bizproc-decision]]); процесс запускается
@@ -33,8 +37,8 @@ updated: "2026-09-22"
 1. **Роли — в константы шаблона:** «Согласующие» и «Кому сообщать об итоге». Тогда перенос на другой
    портал и замена согласующего — правка одной константы
    ([[antipattern-bizproc-hardcoded-portal-ids|зашитые ID]]).
-2. **Переменные состояния:** «Итог» (`rework` → `approved` / `expired`), счётчик кругов, признак
-   истёкшего срока, поле для ответа автора.
+2. **Переменные состояния:** «Итог» (`rework` → `approved` / `expired` / `rejected`), счётчик кругов,
+   признак истёкшего срока, поле для ответа автора.
 3. **Цикл «пока на доработке и кругов меньше трёх».** Счётчик — аварийный выход: без него отказ за
    отказом крутят цикл бесконечно (курс,
    [урок 8445](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=8445)); предел ядра —
@@ -43,10 +47,14 @@ updated: "2026-09-22"
    пояснение обязательно при отклонении (`CommentRequired: YR`), делегирование «никому». По истечении
    срока документ автоматически отклонён: ветка «нет», результат «Автоматическое отклонение»
    (`IsTimeout`) = 1 ([урок 3771](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3771)).
-5. **На ветке «нет» различить отказ и истечение срока:** записать `IsTimeout` в переменную и проверить
-   условием. Отказ — «Запрос дополнительной информации» автору со сроком 3 дня: ответ ляжет в
-   переменную с кодом поля, замечания согласующих — `{=A…:Comments}`. Срок истёк — итог `expired`.
-6. **После цикла — итог:** согласовано → «Сменить стадию»; иначе → уведомление и «Сменить стадию».
+5. **На ветке «нет» — три исхода:** записать `IsTimeout` в переменную и проверить условием. Срок
+   истёк — итог `expired`. Отказ, и круги ещё есть — «Запрос дополнительной информации» автору со
+   сроком 3 дня: ответ ляжет в переменную с кодом поля, замечания — `{=A…:Comments}` (в тексте имя и
+   e-mail согласующего, решение и пояснение). Отказ в последнем круге — итог `rejected`, без запроса
+   доработки: следующего круга не будет.
+6. **После цикла — итог:** согласовано → «Сменить стадию»; срок истёк и не согласовано — у каждого своё
+   уведомление, затем «Сменить стадию». Код итога в текст уведомления не выводить: читателю он ничего
+   не скажет.
    Смена стадии — последний шаг ветки: она завершает процесс
    ([урок 9011](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=9011)).
 7. **Уведомление — «от системы»** (`MessageType: "4"`) с отправителем из константы: «Последний
@@ -87,14 +95,14 @@ steps:
             on_no:
               - set_var: {title: "Запомнить, истёк ли срок", VariableValue: {timeout: "{=@approval:IsTimeout}"}}
               - if:
-                  title: Отклонено или срок истёк?
+                  title: Почему «нет»
                   branches:
                     - title: Срок истёк
                       when: {propertyvariablecondition: [[timeout, "=", "1", "0"]]}
                       steps:
                         - set_var: {title: Итог — срок истёк, VariableValue: {decision: expired}}
-                    - title: Отклонено — на доработку
-                      else: true
+                    - title: Отклонено, есть ещё круг — на доработку
+                      when: {propertyvariablecondition: [[round, "<", "3", "0"]]}
                       steps:
                         - request_info:
                             title: Доработка
@@ -105,6 +113,10 @@ steps:
                               - {Name: rework_note, Title: Что исправлено, Type: text, Required: true}
                             TimeoutDuration: "3"
                             TimeoutDurationType: d
+                    - title: Отклонено в последнем круге
+                      else: true
+                      steps:
+                        - set_var: {title: Итог — не согласовано, VariableValue: {decision: rejected}}
   - if:
       title: Итог согласования
       branches:
@@ -112,12 +124,22 @@ steps:
           when: {propertyvariablecondition: [[decision, "=", approved, "0"]]}
           steps:
             - change_stage: {TargetStatus: "{{stage:Общая/Клиент}}"}
+        - title: Срок истёк
+          when: {propertyvariablecondition: [[decision, "=", expired, "0"]]}
+          steps:
+            - notify:
+                title: Сообщить, что срок истёк
+                MessageSite: "Согласование не уложилось в срок: {=Document:TITLE}"
+                MessageType: "4"
+                MessageUserFrom: ["{=Constant:supervisor}"]
+                MessageUserTo: ["{=Constant:supervisor}", "{=Document:ASSIGNED_BY_ID}"]
+            - change_stage: {TargetStatus: "{{stage:Общая/Доработка}}"}
         - title: Не согласовано
           else: true
           steps:
             - notify:
-                title: Сообщить об итоге
-                MessageSite: "Не согласовано: {=Document:TITLE}. Итог: {=Variable:decision}"
+                title: Сообщить об отказе
+                MessageSite: "Не согласовано за три круга: {=Document:TITLE}"
                 MessageType: "4"
                 MessageUserFrom: ["{=Constant:supervisor}"]
                 MessageUserTo: ["{=Constant:supervisor}", "{=Document:ASSIGNED_BY_ID}"]
@@ -150,7 +172,8 @@ php tools/bpt/bpt.php render approval.bpt
 ## Откат и проблемы
 - Шаблон заменили — уже запущенные процессы идут по старой версии; зависшие удалить в «Все активные».
 - Минимальный срок в облаке — 5 минут: для теста срок меньше не поставить
-  ([[checklist-bizproc-template-review]]).
+  ([[checklist-bizproc-template-review]]). В коробке минимум по умолчанию не задан — для теста хватает
+  срока в минуту: снимает его агент на cron, у нас — в пределах двух минут (стенд).
 
 ## Источники и связанное
 - Курс 57: [[source-course57-actions-core]] (задания, условия, цикл), [[source-course57-actions-notify-other]]

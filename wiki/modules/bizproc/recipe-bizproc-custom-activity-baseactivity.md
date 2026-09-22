@@ -3,9 +3,9 @@ title: "Своё действие БП на BaseActivity: форма по кар
 type: recipe
 module: bizproc
 edition: box
-status: draft
+status: verified
 provenance: mixed
-verified: ""
+verified: "2026-09-22 / коробка, bizproc 26.1075.0: код рецепта прогнан в процессе на элементе смарт-процесса; импорт, результат, ошибка формата, списки дизайнера и роботов, форма настроек (HTML ядра)"
 tags: [bizproc, активити, BaseActivity, свои-действия, робот, результат, ошибки]
 sources: ["[[source-devbook-bizproc]]", "[[source-course57-developer]]"]
 related: ["[[entity-cbp-activity]]", "[[entity-bizproc-activity-description]]", "[[recipe-bizproc-custom-task-activity]]", "[[antipattern-bizproc-php-code-activity]]", "[[entity-bizproc-field-type]]", "[[recipe-module-structure-and-install]]", "[[recipe-bizproc-debugging]]", "[[pattern-robots-vs-bizproc-decision]]"]
@@ -19,12 +19,15 @@ updated: "2026-09-22"
 отдают его следующим шагам. Форму настроек рисует ядро по карте полей, обязательные поля
 проверяются при сохранении и импорте шаблона, к запуску значения уже разобраны и приведены к типу.
 
-> **Черновик.** Проверено на стенде (коробка, bizproc 26.1075.0, 2026-09-22): ядро находит действие в
-> `/local/activities/custom/`, берёт название и результат из `RETURN`; импорт шаблона
-> (`validateTemplate`) без обязательного поля отклоняется с текстом «Не заполнено обязательное поле:
-> Префикс»; `FILTER` скрывает действие в процессах списков. Отдельным прогоном процесса проверено, что
-> ошибки и исключения делают с процессом (шаг 5). Вид формы в дизайнере и роботах и работа этого
-> действия на реальной сделке — по коду ядра, не проверялись.
+> **Проверено на стенде** (коробка, bizproc 26.1075.0, 2026-09-22): код ниже развёрнут в
+> `/local/activities/custom/` и прогнан в процессе на элементе смарт-процесса. Импорт без префикса
+> отклонён («Не заполнено обязательное поле: Префикс»); номер `DOG-<ID элемента>` виден следующему
+> шагу через `{=A1:Number}`; неверный префикс — ошибка в журнале, процесс идёт дальше; действие есть в
+> списках дизайнера и роботов, `FILTER` скрывает его в процессах списков; форму ядро строит само —
+> строки таблицы для дизайнера, блоки для робота (по HTML ядра, интерфейс глазами не смотрели).
+>
+> **Изменено 2026-09-22 по итогам прогона.** Прежний код брал все цифры ID документа и для
+> `DYNAMIC_1042_16` давал `DOG-104216`; теперь берётся часть после последнего `_` — ID элемента.
 
 ## Когда это, а не другое
 - **Сначала — «модулем или нет?»** (`CLAUDE.md` §9). Действие для нескольких порталов поставляет
@@ -183,8 +186,9 @@ class CBPVendorContractNumberActivity extends BaseActivity
 	{
 		$errors = parent::internalExecute();
 
-		$documentId = (string)$this->getDocumentId()[2];   // например, DYNAMIC_1000_15
-		$number = $this->Prefix . '-' . preg_replace('/\D+/', '', $documentId);
+		$documentId = (string)$this->getDocumentId()[2];   // например, DYNAMIC_1000_15 или DEAL_15
+		$itemId = (int)substr((string)strrchr($documentId, '_'), 1);   // 15 — ID элемента
+		$number = $this->Prefix . '-' . $itemId;
 
 		$this->setProperty('Number', $number);   // результат для следующих шагов
 		$this->log(Loc::getMessage('VENDOR_CN_DONE', ['#NUMBER#' => $number]));

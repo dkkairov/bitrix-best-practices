@@ -61,7 +61,7 @@
 - [[checklist-support-handover|Playbook передачи в поддержку]] · Playbooks · both · черновик
 - [[checklist-permissions-audit|Аудит прав доступа]] · Права · both · черновик
 - [[checklist-tasks-regulations|Регламент постановки задач]] · Задачи · both · черновик
-- [[checklist-bizproc-template-review|Ревью шаблона БП: ошибки проектирования]] · БП · both · черновик
+- [[checklist-bizproc-template-review|Ревью шаблона БП: ошибки проектирования]] · БП · both
 
 ### Паттерны
 - [[pattern-crm-sales-funnel-design|Проектирование воронки и стадий]] · CRM · both
@@ -113,10 +113,10 @@
 - [[recipe-crm-todo-activity|Универсальное дело (ToDo) из кода]] · CRM · box · черновик
 - [[recipe-smart-process-programmatic-creation|Создать смарт-процесс и поля из инсталлятора]] · СПА · box
 - [[recipe-smart-process-factory-customization|Своя фабрика смарт-процесса]] · СПА · box · черновик
-- [[recipe-bizproc-approval-route|Маршрут согласования: срок, доработка, итог]] · БП · both · черновик
-- [[recipe-bizproc-request-intake|Заявка: исполнитель, задача со сроком, контроль]] · БП · both · черновик
-- [[recipe-bizproc-debugging|Отладка БП: журнал, зависшие процессы]] · БП · both · черновик
-- [[recipe-bizproc-custom-activity-baseactivity|Своё действие БП на BaseActivity]] · БП · box · черновик
+- [[recipe-bizproc-approval-route|Маршрут согласования: срок, доработка, итог]] · БП · both
+- [[recipe-bizproc-request-intake|Заявка: исполнитель, задача со сроком, контроль]] · БП · both
+- [[recipe-bizproc-debugging|Отладка БП: журнал, зависшие процессы]] · БП · both
+- [[recipe-bizproc-custom-activity-baseactivity|Своё действие БП на BaseActivity]] · БП · box
 - [[recipe-bizproc-custom-task-activity|Своё действие БП с заданием (CBPTaskService)]] · БП · box
 - [[recipe-tasks-v2-commands|Команды задач V2: операции и ловушки]] · Задачи · box · черновик
 - [[recipe-custom-left-menu-section|Свой раздел в левом меню (CustomSection)]] · Администрирование · box
@@ -134,8 +134,8 @@
 - [[concept-testing-approach|Подход к тестированию]] · Разработка · box
 - [[concept-bizproc-bpt-format|Формат шаблона БП (.bpt)]] · Бизнес-процессы · both
 - [[concept-bizproc-activity-catalog|Каталог действий БП (25 типов)]] · Бизнес-процессы · both
-- [[concept-bizproc-expressions|Выражения БП: функции, модификаторы, коды]] · Бизнес-процессы · both · черновик
-- [[concept-bizproc-state-machine|БП со статусами: устройство и выбор]] · Бизнес-процессы · both · черновик
+- [[concept-bizproc-expressions|Выражения БП: функции, модификаторы, коды]] · Бизнес-процессы · both
+- [[concept-bizproc-state-machine|БП со статусами: устройство и выбор]] · Бизнес-процессы · both
 - [[concept-crm-universal-api|Universal API CRM: Container → Factory → Item]] · CRM · box
 - [[concept-crm-dictionaries|Справочники CRM: новое читает, старое пишет]] · CRM · box
 - [[concept-request-lifecycle|Жизненный цикл HTTP-запроса]] · Разработка · box
@@ -215,8 +215,8 @@
 
 ## По статусу
 
-- **verified:** 128 страниц из 154 (`verified`: 2026-06-01 … 2026-09-22).
-- **draft:** 26 страниц, по пяти разным причинам —
+- **verified:** 135 страниц из 154 (`verified`: 2026-06-01 … 2026-09-22).
+- **draft:** 19 страниц, по четырём разным причинам —
   **методические каркасы**, которые уточняются после первого применения на проекте
   ([[checklist-data-migration]], [[checklist-golive-deployment]], [[checklist-user-adoption]],
   [[checklist-support-handover]], [[checklist-permissions-audit]],
@@ -230,12 +230,8 @@
   [[recipe-crm-legacy-entity-crud]], [[recipe-crm-lead-conversion]], [[recipe-crm-todo-activity]],
   [[recipe-smart-process-factory-customization]], [[recipe-tasks-v2-commands]],
   [[recipe-intranet-absence-import]]); паспорт `.description.php` снят с черновика 2026-09-22 — спор
-  книги закрыт курсом 57 и кодом ядра;
-  **по курсу 57 и коду ядра, целиком на стенде не прогонялись** — 7 страниц 2026-09-22
-  ([[recipe-bizproc-approval-route]], [[recipe-bizproc-request-intake]],
-  [[checklist-bizproc-template-review]], [[recipe-bizproc-debugging]], [[concept-bizproc-expressions]],
-  [[concept-bizproc-state-machine]], [[recipe-bizproc-custom-activity-baseactivity]]); части из них
-  проверены на стенде — спецификации проходят проверку импорта, поведение ошибок своих действий.
+  книги закрыт курсом 57 и кодом ядра. Семь страниц по курсу 57 сняты с черновика 2026-09-22 после
+  прогона на стенде.
 - **deprecated:** —
 
 > При устаревании практики ставь `status: deprecated` и ссылку на замену; `/wiki:lint` следит за

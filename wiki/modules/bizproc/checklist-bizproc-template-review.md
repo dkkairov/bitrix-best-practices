@@ -3,12 +3,12 @@ title: "Ревью шаблона БП: ошибки проектировани�
 type: checklist
 module: bizproc
 edition: both
-status: draft
+status: verified
 provenance: mixed
-verified: ""
+verified: "2026-09-22 / коробка, bizproc 26.1075.0: применён к двум рецептам, поведение из пунктов подтверждено прогоном; минимальное время ожидания, параллельное ожидание и код группы — по курсу и коду"
 tags: [бизнес-процессы, ревью, ошибки-проектирования, таймаут, цикл, автозапуск, нагрузка]
 sources: ["[[source-course57-expressions]]", "[[source-course57-actions-core]]", "[[source-course57-actions-crm-disk]]", "[[source-course57-examples]]"]
-related: ["[[concept-bizproc-activity-catalog]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[antipattern-bizproc-php-code-activity]]", "[[pattern-robots-vs-bizproc-decision]]", "[[recipe-bizproc-debugging]]", "[[concept-bizproc-expressions]]", "[[recipe-bizproc-approval-route]]", "[[recipe-bizproc-custom-activity-baseactivity]]", "[[source-course57-examples]]"]
+related: ["[[concept-bizproc-activity-catalog]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[antipattern-bizproc-php-code-activity]]", "[[pattern-robots-vs-bizproc-decision]]", "[[recipe-bizproc-debugging]]", "[[concept-bizproc-expressions]]", "[[recipe-bizproc-approval-route]]", "[[recipe-bizproc-custom-activity-baseactivity]]", "[[source-course57-examples]]", "[[recipe-bizproc-request-intake]]"]
 aliases: []
 updated: "2026-09-22"
 ---
@@ -20,7 +20,12 @@ updated: "2026-09-22"
 [«Распространенные ошибки»](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=8445),
 уроков о действиях и кода ядра (bizproc 26.1075.0).
 
-> **Черновик:** пункты взяты из курса и кода ядра; как единый чек-лист на проекте ещё не применялся.
+> **Проверено на стенде** (коробка, bizproc 26.1075.0, 2026-09-22): чек-лист применён к двум
+> рецептам ([[recipe-bizproc-approval-route]], [[recipe-bizproc-request-intake]]), и поведение из
+> пунктов подтверждено их прогоном — истечение сроков заданий, смена стадии, рекурсивный запуск,
+> лимит цикла, ошибка в выражении, системное уведомление. Ревью нашло в рецепте согласования лишний
+> запрос доработки после последнего круга. Минимальное время ожидания, «Параллельное ожидание» и код
+> группы в поле для одного пользователя — по курсу и коду.
 
 ## Предусловия
 - Шаблон есть в файле: экспорт из дизайнера (`bp-<ID>.bpt`) или сборка из спецификации.

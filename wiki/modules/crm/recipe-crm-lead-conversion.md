@@ -3,14 +3,14 @@ title: "Конвертация лида из кода"
 type: recipe
 module: crm
 edition: box
-status: draft
+status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль CRM / Лид / Конвертация — глава с оговорками о моменте написания и о версии 20; без проверки на стенде"
+verified: "2026-09-22 / коробка в Docker, crm 26.800.0: оба пути конвертации прогнаны на тестовых лидах, флаги проверок разобраны по коду; без синхронизации UF. Текст — «Книга разработчика Bitrix24» (снимок 2026-09-21): Модуль CRM / Лид / Конвертация"
 tags: [crm, лид, конвертация, сделка, контакт, компания, пользовательские-поля, автоматизация, legacy]
 sources: ["[[source-devbook-crm]]"]
 related: ["[[recipe-crm-legacy-entity-crud]]", "[[entity-crm-legacy-events]]", "[[concept-crm-universal-api]]", "[[entity-ccrm-owner-type]]", "[[checklist-crm-launch]]"]
 aliases: []
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Конвертация лида из кода
@@ -18,9 +18,11 @@ updated: "2026-09-21"
 **Результат:** лид программно превращается в сделку нужного направления и/или в контакт и
 компанию. Второй вариант — уже существующие элементы привязываются к лиду без создания новых.
 
-> **Черновик.** Глава книги описывает состояние на момент её написания и делает оговорку о версии 20.
-> В её примерах есть ошибки, живой проверки не было. Путь через Universal API (`Operation\Conversion`)
-> в главе не описан — он остаётся открытым вопросом в [[concept-crm-universal-api]].
+> **Проверено на стенде** (коробка в Docker, `crm` 26.800.0, 2026-09-22): оба пути прогнаны на
+> тестовых лидах (созданы и удалены). Главное, что выяснилось: **путь 2 в фоновом коде падает**
+> с «Обновление лида запрещено», пока не отключить проверку прав, а **путь 1 выключает проверки
+> сам** — подробности в шагах. Путь через Universal API (`Operation\Conversion`) глава не
+> описывает — открытый вопрос в [[concept-crm-universal-api]].
 
 ## Суть: что во что конвертируется
 
@@ -77,7 +79,14 @@ updated: "2026-09-21"
 ## Путь 1 — простой: `Automation\Converter`
 
 Самый простой способ по книге — средства автоматизации из `\Bitrix\Crm\Automation\Converter`
-([простой способ](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Lid/Konvertacia.html#prostoj-sposob-konvertacii)):
+([простой способ](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Lid/Konvertacia.html#prostoj-sposob-konvertacii)).
+
+> **Что фабрика делает за вас — и о чём книга молчит.** `Automation\Converter\Factory::create()`
+> собирает ту же пару «конфигурация + мастер», что и путь 2, и сразу выключает четыре проверки:
+> `enablePermissionCheck(false)`, `enableUserFieldCheck(false)`, `enableBizProcCheck(false)`,
+> `setSkipBizProcAutoStart(true)` (код 26.800.0). Поэтому путь 1 и работает в фоне «из коробки».
+> Обратная сторона: **прав пользователя он не проверяет** — `USER_ID` задаёт авторство, но не
+> ограничивает. В сценарии, который запускает пользователь, права проверяем сами.
 
 ```php
 use Bitrix\Crm\Automation;
@@ -108,8 +117,14 @@ try {
 }
 ```
 
-Регистрация результата у книги идёт до проверки `isSuccess()`. Нужна ли она при неуспехе —
-**проверить на стенде**.
+Что вернулось (стенд): `Automation\Converter\Result` — наследник `\Bitrix\Main\Result`; ID
+смотрим не в `getData()` (он пуст), а в `getCreatedEntities()` и `getBoundEntities()` —
+коллекциях `Identificator\ComplexCollection`. Лид после успешной конвертации получает
+`STATUS_ID = CONVERTED` (семантика `S`).
+
+`Automation\Factory::registerConversionResult()` просто кладёт результат в статический массив
+процесса, откуда его забирает автоматизация (`shiftConversionResult()`) в том же хите. Значит
+при неуспехе вызывать его незачем, а вне сценариев автоматизации он не нужен вовсе (код 26.800.0).
 
 ## Путь 2 — явный: конфигурация и мастер
 
@@ -117,6 +132,12 @@ try {
 `EntityConversionWizard`) → параметры → запуск. Для лида это `LeadConversionConfig` и
 `LeadConversionWizard`
 ([конвертация лида](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Lid/Konvertacia.html#konvertacia-lida)).
+
+> **Фоновому коду обязателен `enablePermissionCheck(false)`.** Мастер берёт права **текущего**
+> пользователя, а не `USER_ID` из `execute()`: в консоли, агенте и интеграции без авторизации он
+> падает с `getErrorText()` = «Обновление лида запрещено» и ничего не создаёт. С отключённой
+> проверкой тот же код отрабатывает (стенд, 2026-09-22). Отключая проверку, помните, что ролевые
+> ограничения на цели тоже перестают действовать.
 
 ```php
 use Bitrix\Crm\Conversion;
@@ -130,6 +151,7 @@ $userId     = 1030;
 $categoryId = 1;
 
 $config = new Conversion\LeadConversionConfig();
+$config->enablePermissionCheck(false);   // фоновая конвертация: права берутся от текущего пользователя
 
 $deal = $config->getItem(\CCrmOwnerType::Deal);
 if ($deal) {
@@ -164,7 +186,8 @@ $wizard->setSkipBizProcAutoStart(true);    // не запускать БП ли�
 $wizard->enableActivityCompletion(true);   // завершить дела после конвертации
 
 if ($wizard->execute(['USER_ID' => $userId])) {
-    $data = $wizard->getResultData();      // формат результата книга не раскрывает
+    // стенд: ['CONTACT' => 10, 'IS_RECENT_CONTACT' => true, 'DEAL' => 13, 'IS_RECENT_DEAL' => true]
+    $data = $wizard->getResultData();      // IS_RECENT_* = элемент создан, а не привязан
 } else {
     $error = $wizard->getErrorText();
 }
@@ -180,10 +203,11 @@ if ($wizard->execute(['USER_ID' => $userId])) {
 | `$wizard->setSkipBizProcAutoStart(true)` | не запускать БП лида, настроенные на автозапуск при изменении |
 | `$wizard->enableActivityCompletion(true)` | завершить дела после конвертации |
 | `$wizard->execute(['USER_ID' => …])` | запуск; `false` — текст в `getErrorText()`, успех — данные в `getResultData()` |
-| `$config->enablePermissionCheck(false)` | по имени — отключить проверку прав; комментарий в примере книги говорит о проверке пользовательских полей — **проверить на стенде** |
-| `$wizard->enableUserFieldCheck(false)` | по имени — отключить проверку UF; комментарий в примере книги говорит о синхронизации UF — **проверить на стенде** |
+| `$config->enablePermissionCheck(false)` | **отключает проверку прав** — именно то, что в имени: у операции создания снимается `disableCheckAccess()`, не проверяется право обновить лид и (у сделки) права на цены каталога. Комментарий книги про пользовательские поля ошибочен |
+| `$wizard->enableUserFieldCheck(false)` | **отключает проверку полей** при создании: `disableCheckFields()` в новом API и `DISABLE_USER_FIELD_CHECK` в старом. Комментарий книги про синхронизацию ошибочен |
 
-Последние два вызова в пример выше не включены: их точный эффект книга описывает противоречиво.
+Оба вызова разобраны по коду 26.800.0 и проверены прогоном: без первого фоновая конвертация не
+проходит вовсе.
 
 ## Привязка без создания («псевдоконвертация»)
 
@@ -203,9 +227,24 @@ if (!$dealObject->Update($dealId, $fields, true, true, ['CURRENT_USER' => $userI
 \Bitrix\Crm\Statistics\LeadConversionStatisticsEntry::processBindingsChange($leadId);
 ```
 
-**Противоречие в книге:** в таблицах полей контакта, компании и сделки `LEAD_ID` помечен `RO`, а эта
-глава велит заполнять его через `Update`. Примет ли `Update` поле на вашей версии — **проверить на
-стенде**. Методы и опции `Update` — [[recipe-crm-legacy-entity-crud]].
+**Противоречие книги разрешено в пользу этой главы:** несмотря на пометку `RO` в таблицах полей,
+`LEAD_ID` через старое API пишется — на стенде поле проставилось и в `CCrmDeal::Add()`, и в
+`CCrmContact::Update()` (2026-09-22). Методы и опции `Update` — [[recipe-crm-legacy-entity-crud]].
+
+## Что прогнали на стенде
+
+Коробка в Docker, `crm` 26.800.0, 2026-09-22; тестовые лиды созданы, сконвертированы и удалены.
+
+| Проверка | Результат |
+|---|---|
+| Путь 1 в консоли | успех: созданы сделка и контакт, лид → `CONVERTED` |
+| Путь 2 как в книге | **ошибка** «Обновление лида запрещено», ничего не создано |
+| Путь 2 + `enablePermissionCheck(false)` | успех; `getResultData()` = `CONTACT`, `DEAL`, `IS_RECENT_*` |
+| `LEAD_ID` через `Update` | пишется, несмотря на пометку `RO` |
+| `registerConversionResult()` | кладёт результат в память процесса для автоматизации |
+
+Не проверяли: синхронизацию пользовательских полей (чтобы не плодить UF на стенде) и поведение
+при включённых БП с параметрами.
 
 ## Проверка результата
 
@@ -221,7 +260,9 @@ if (!$dealObject->Update($dealId, $fields, true, true, ['CURRENT_USER' => $userI
 
 - **Не править `b_crm_conv_map` руками** и не рассчитывать на `isLocked` / `isRequired` в карте.
 - **Не проставлять `LEAD_ID` SQL-запросом.** Если уже проставили — `processBindingsChange($leadId)`.
-- **Повторный лид** в контакт или компанию не сконвертировать: только в сделку.
+- **Повторный лид** в контакт или компанию не сконвертировать: только в сделку. Это зашито в
+  `LeadConversionScheme::isTargetTypeSupported()`: при типе `LeadConversionType::RETURNING_CUSTOMER`
+  разрешена единственная цель — сделка (код 26.800.0).
 - **Пользователь без прав на целевую сущность** — ролевая карта её отсечёт. Для фоновой конвертации
   передавайте `USER_ID` пользователя с нужными правами (вывод команды).
 - **Мусорные UF в целях.** Синхронизация создаёт поля лида в каждой цели, поэтому коды UF планируйте

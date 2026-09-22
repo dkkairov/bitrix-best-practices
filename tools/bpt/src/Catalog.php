@@ -301,16 +301,21 @@ final class Catalog
         return implode(PHP_EOL, $lines);
     }
 
-    /** Таблица «смысл значений и поведение» — всё, у чего в каталоге есть note, options или values. */
+    /**
+     * Таблица «смысл значений и поведение» — всё, у чего в каталоге есть note, options или values.
+     * Одинаковые строки разных типов (общие свойства заданий, условий) печатаются один раз.
+     */
     public function notesToMarkdown(): string
     {
-        $lines = [
-            '| Тип | Свойство | Значения и поведение |',
-            '|-----|----------|----------------------|',
-        ];
+        $rows = [];   // «свойство|текст» → [типы, свойство, текст]
+        $add = function (string $type, string $prop, string $text) use (&$rows): void {
+            $key = $prop . '|' . $text;
+            $rows[$key] ??= [[], $prop, $text];
+            $rows[$key][0][] = $type;
+        };
         foreach ($this->data['activities'] as $type => $entry) {
             if (isset($entry['note'])) {
-                $lines[] = sprintf('| `%s` | — | %s |', $type, self::cell($entry['note']));
+                $add($type, '—', $entry['note']);
             }
             foreach ($entry['props'] as $prop => $spec) {
                 $parts = [];
@@ -329,9 +334,17 @@ final class Catalog
                     $parts[] = $spec['note'];
                 }
                 if ($parts) {
-                    $lines[] = sprintf('| `%s` | `%s` | %s |', $type, $prop, self::cell(implode('. ', $parts)));
+                    $add($type, "`{$prop}`", implode('. ', $parts));
                 }
             }
+        }
+        $lines = [
+            '| Тип | Свойство | Значения и поведение |',
+            '|-----|----------|----------------------|',
+        ];
+        foreach ($rows as [$types, $prop, $text]) {
+            $lines[] = sprintf('| %s | %s | %s |',
+                implode(', ', array_map(fn ($t) => "`{$t}`", $types)), $prop, self::cell($text));
         }
         return implode(PHP_EOL, $lines);
     }

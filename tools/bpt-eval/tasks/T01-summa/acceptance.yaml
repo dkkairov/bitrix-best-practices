@@ -1,0 +1,27 @@
+task: T01
+document: Заявки
+start: create
+item:
+  Название: Заявка T01
+  Сумма к оплате: 150000
+  Проект: Проект Альфа
+scenarios:
+  - name: утвердили
+    steps:
+      - {task_for: Бухгалтерия, do: approve, comment: Сумма соответствует договору}
+    expect:
+      stage: Клиент
+      history_contains: [Сумма соответствует договору]
+      process: completed
+  - name: отклонили
+    steps:
+      - {task_for: Бухгалтерия, do: reject, comment: Нет подтверждающих документов}
+    expect:
+      stage: Доработка
+      notify: [{to: Руководитель отдела продаж}]
+      process: completed
+checklist:
+  - Бухгалтерия — группа пользователей или отдел
+  - «История» — запись в историю CRM или комментарий в карточке
+  - Повторное согласование после доработки
+  - {text: Срок на утверждение, required: false}

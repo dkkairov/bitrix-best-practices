@@ -1,0 +1,22 @@
+# Эталон T01: проверяет сами сценарии; агенту не показывается.
+bizproc: 1
+name: EVAL T01 эталон
+steps:
+  - approve:
+      id: accounting
+      Users: ["{{group:Бухгалтеры}}"]
+      ApproveType: any
+      CommentRequired: "Y"
+      Name: "Утвердите сумму заявки «{=Document:TITLE}»"
+      Description: "Сумма: {=Document:{{field:Сумма к оплате}} > printable}"
+      on_yes:
+        - crm_event:
+            EventText: "Сумма утверждена. Комментарий: {=@accounting:Comments}"
+            EventUser: ["{=@accounting:LastApprover}"]
+        - change_stage: {TargetStatus: "{{stage:Клиент}}"}
+      on_no:
+        - notify:
+            MessageSite: "Бухгалтерия отклонила заявку «{=Document:TITLE}»: {=@accounting:Comments}"
+            MessageUserFrom: ["{=@accounting:LastApprover}"]
+            MessageUserTo: ["{{user:Руководитель отдела продаж Тест}}"]
+        - change_stage: {TargetStatus: "{{stage:Доработка}}"}

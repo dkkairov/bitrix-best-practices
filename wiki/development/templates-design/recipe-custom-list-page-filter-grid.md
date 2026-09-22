@@ -3,21 +3,23 @@ title: "Своя страница-список: фильтр, грид, тулб
 type: recipe
 module: templates-design
 edition: box
-status: draft
+status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Разработка → UI — Тулбар, Кнопки, Фильтр (Обзор, Фильтры пользователя, Публичная часть, Свой фильтр), Таблицы (Обзор, Персональные настройки, Публичная часть, Панель действий); Технологии → Отложенные функции; без проверки на стенде"
+verified: "2026-09-22 / коробка в Docker, main 26.750.0: серверная часть прогнана из консоли и сверена с кодом ядра (фильтр и getValue(), описание полей, навигация, настройки грида, панель действий, событие Grid::beforeRequest); интерфейс в браузере не проверялся. Текст — «Книга разработчика Bitrix24» (снимок 2026-09-21): UI — Тулбар, Кнопки, Фильтр, Таблицы; Технологии — Отложенные функции"
 tags: [ui, фильтр, грид, тулбар, список, компонент, панель-действий, производительность]
 sources: ["[[source-devbook-ui]]"]
-related: ["[[entity-custom-filter]]", "[[entity-filter-component]]", "[[entity-grid-component]]", "[[entity-grid-options]]", "[[entity-toolbar]]", "[[concept-ui-subsystem]]"]
+related: ["[[entity-custom-filter]]", "[[entity-filter-component]]", "[[entity-grid-component]]", "[[entity-grid-options]]", "[[entity-toolbar]]", "[[concept-ui-subsystem]]", "[[concept-deferred-functions-and-page-areas]]"]
 aliases: []
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Своя страница-список: фильтр, грид, тулбар
 
-> **Черновик.** Связка целиком на стенде не прогонялась. Код ниже написан нами на именах классов и
-> методов из книги; её собственные примеры содержат ошибки, а в нескольких местах книга противоречит
-> сама себе. Всё непроверенное собрано в разделе «Проверить на стенде».
+> **Проверено на стенде** (коробка в Docker, `main` 26.750.0, 2026-09-22): серверная часть —
+> фильтр (`getValue()`, описание полей), навигация, настройки грида, панель действий — прогнана из
+> консоли и сверена с кодом ядра; итоги в разделе «Что проверено и что исправлено». Вёрстку и
+> поведение в браузере (перерисовка по AJAX, меню строки, групповое действие) на стенде не
+> смотрели — это осталось в «Проверить в браузере».
 
 **Результат:** своя страница со списком записей, которая выглядит и ведёт себя как списки продукта:
 фильтр в шапке, грид с сортировкой, настройкой колонок, пагинацией, меню строки и групповым
@@ -52,9 +54,17 @@ updated: "2026-09-21"
   `EntityDataProvider` сам подставляет подписи вместо кодов полей, но требует ещё
   `getFieldName($fieldID)`
   ([Провайдеры данных](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Filtr/Svoj_filtr.html#provajdery-dannyh)).
-- **Даты.** В примере книги провайдер переопределяет `prepareListFilterParam()` и сам превращает
-  пару `<поле>_from` / `<поле>_to` поля-даты в условия `>=` / `<=`. Ниже — та же идея нашим кодом;
-  нужен ли метод в вашей версии, проверить на стенде.
+- **Даты: метод обязателен.** `Filter::getValue()` в конце вычищает все ключи с постфиксами
+  (`_datesel`, `_from`, `_to`, `_month`, `_quarter`, `_year`, `_days`, `_numsel`, `_isEmpty`,
+  `_hasAnyValue`, `_label`). Если провайдер не переложил границы диапазона в `>=` / `<=` в
+  `prepareListFilterParam()`, **условие по дате просто исчезнет** — выборка вернёт всё (стенд).
+- **`partial: true` — не косметика.** `prepareFieldData($fieldID)` вызывается **только** для полей
+  с этим ключом и только когда поле реально понадобилось (`Field::assemble()`). Без `partial`
+  поле уходит в компонент голым — `id`, `name`, `type`, — то есть **список останется без
+  вариантов, а селектор без настроек** (стенд). Смысл ключа — не дёргать тяжёлые выборки
+  (справочники, пользователи) для полей, которые пользователь не открыл.
+- **«Показывать по умолчанию» — `'default' => true`** в параметрах `createField()`: поле попадает
+  в `getDefaultFieldIDs()` и в описание поля ключом `default` (стенд).
 - Чтобы фильтр создавала фабрика `Factory::createEntityFilter()`, нужен свой обработчик события
   `main:OnBuildFilterFactoryMethods`
   ([Получение фильтра](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Filtr/Svoj_filtr.html#polucenie-fil-tra)).
@@ -172,14 +182,11 @@ class ItemFilter extends \Bitrix\Main\Filter\Filter
 Параметры компонента — [[entity-filter-component]], фасад тулбара — [[entity-toolbar]], кнопки —
 [[entity-ui-button]].
 
-> **Книга противоречит сама себе: поля передавать в `FILTER` или в `FIELDS`?** Таблица параметров
-> компонента описывает оба ключа: `FIELDS` — как набор полей, `FILTER` — как набор их конфигураций
-> ([Обзор → Параметры](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Filtr/Obzor.html#parametry-komponenta)).
-> Вступление главы «Свой фильтр» называет обязательными `FIELDS` и `FILTER_ID`, а пример той же главы
-> передаёт `getFieldArrays()` в `FILTER`
-> ([Свой фильтр → Примеры](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Filtr/Svoj_filtr.html#primery)).
-> В коде ниже — `FILTER`, как в этом примере. **Проверить на стенде / по офф. документации
-> компонента**, какой ключ он читает. Если поля не появились в фильтре — смотреть сюда первым делом.
+> **Противоречие книги разрешено: поля передаются в `FILTER`.** Компонент `bitrix:main.ui.filter`
+> собирает поля из `$arParams["FILTER"]`; `FIELDS` — это ключ **результата** (`$arResult["FIELDS"]`),
+> куда компонент кладёт уже подготовленные поля, а не входной параметр (код `class.php` компонента,
+> коробка 26.750.0). Вступление главы «Свой фильтр», называющее обязательным `FIELDS`, ошибается —
+> прав её же пример.
 
 ```php
 <?php
@@ -226,7 +233,7 @@ class VendorItemListComponent extends CBitrixComponent
         Toolbar::addFilter([
             'FILTER_ID'      => $filter->getID(),
             'GRID_ID'        => self::GRID_ID,
-            'FILTER'         => $filter->getFieldArrays(), // или FIELDS — см. выше
+            'FILTER'         => $filter->getFieldArrays(), // именно FILTER — см. выше
             'ENABLE_LABEL'   => true,
             'DISABLE_SEARCH' => false,
         ]);
@@ -238,15 +245,22 @@ class VendorItemListComponent extends CBitrixComponent
 ## Шаг 3. Выборка: фильтр, сортировка, страница, видимые колонки
 
 - **Фильтр:** `$filter->getValue()` — массив, готовый для `filter` в `DataManager::getList()`; без
-  аргументов значения берутся из запроса, но можно передать массив явно
+  аргументов значения берутся из сохранённого фильтра пользователя, но можно передать массив явно
   ([Получение значения](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Filtr/Svoj_filtr.html#polucenie-znacenia-fil-tra)).
-- **Сортировка:** `Grid\Options::GetSorting()` учитывает параметры вызова, запрос, сессию и
-  настройки пользователя и возвращает структуру как у аргумента — `sort` и `vars`. `vars` — имена
-  параметров запроса с полем и направлением сортировки: если гридов на странице несколько (или
-  `by` / `order` заняты под другое), каждому нужны свои, иначе грид может получить сортировку по
-  несуществующему полю, вплоть до фатальной ошибки
+  Что метод выбрасывает (стенд): поля, которых нет в фильтре; служебные `FILTER_ID`,
+  `FILTER_APPLIED`, `PRESET_ID` и **строку поиска `FIND`**; все ключи с постфиксами диапазонов.
+  **Поиск по строке сам не работает** — если он нужен, обрабатывайте `FIND` до вызова `getValue()`
+  или в наследнике `Filter`.
+- **Сортировка:** `Grid\Options::GetSorting($default)` возвращает структуру как у аргумента —
+  `sort` и `vars`. В 26.750.0 метод **не смотрит в запрос**: он отдаёт либо сохранённую сортировку
+  пользователя (`last_sort_by` / `last_sort_order` из `b_user_option`), либо переданное умолчание
+  (стенд). Клик по заголовку уходит в собственный AJAX грида (`settings.ajax.php`,
+  `GRID_SET_SORT`), который сохраняет присланные `by` и `order` **как есть, без проверки**
+  (`CGridOptions::SetSorting`). Значит `sort` — это пользовательский ввод: в `order` пропускаем
+  только поля из белого списка, иначе получим ORM-ошибку на несуществующем поле.
+  `vars` компонент грида не использует — они пригодятся, только если вы сами строите ссылки
+  сортировки; тогда разным гридам и правда нужны разные имена
   ([Просчитать сортировку](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Tablicy/Personalnye_nastrojki.html#proscitat-sortirovku)).
-  Поэтому в `order` дополнительно пропускаем только поля из белого списка (вывод команды).
 - **Страница:** `GetNavParams()` отдаёт `nPageSize`, по умолчанию 20
   ([Размер страницы](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Tablicy/Personalnye_nastrojki.html#razmer-postranicnoj-navigacii));
   объект `PageNavigation` потом уходит в грид как `NAV_OBJECT`
@@ -257,8 +271,11 @@ class VendorItemListComponent extends CBitrixComponent
   1 % сотрудников
   ([Отображаемые колонки](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Tablicy/Personalnye_nastrojki.html#polucenie-otobrazaemyh-kolonok)).
   Дорогое считаем только для видимых колонок — [[entity-grid-options]].
-- **Не из книги:** `PageNavigation::getOffset()`, `getLimit()`, `setRecordCount()` и ключ
-  `count_total` — пример книги обрывается на `initFromUri()`. Сверить с офф. документацией D7.
+- **Не из книги, но работает:** `PageNavigation::getOffset()`, `getLimit()`, `setRecordCount()` и
+  ключ `count_total` проверены на стенде (страница 2 по 2 записи → `offset=2`, `limit=2`,
+  `getPageCount()` считает по общему числу). `setPageSizes()` принимает **плоский список чисел**
+  (в ядре — `range(1, 50)`) и служит белым списком для размера страницы из URL; массив
+  `NAME` / `VALUE`, как в книге, ему не подходит — тот формат нужен гриду в `PAGE_SIZES`.
 
 ```php
         // … продолжение executeComponent()
@@ -308,8 +325,10 @@ class VendorItemListComponent extends CBitrixComponent
 - Строка: `columns` — что показать, `data` — исходные значения (нужны для inline-редактирования),
   **`actions` — меню строки**
   ([Описание строк](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Tablicy/Obzor.html#opisanie-strok)).
-  В примере книги в `columns` лежит готовая HTML-ссылка, поэтому свои данные экранируем
-  `htmlspecialcharsbx`, иначе XSS через название записи (вывод команды).
+  Шаблон грида берёт `columns[<id>]`, а если ключа нет — **подставляет `data[<id>]`**; поэтому
+  полный пример книги с одним `data` тоже работает (код шаблона, 26.750.0). Значение выводится
+  **как HTML, без экранирования** — свои данные пропускаем через `htmlspecialcharsbx()`, иначе XSS
+  через название записи.
 - **Групповые действия — `ACTION_PANEL`** → `GROUPS` → `ITEMS`. Кнопка с `ONCHANGE` и действием
   `Actions::CALLBACK` вызывает глобальную JS-функцию, по желанию — после подтверждения. Скрипты из
   `DATA` выполняются цепочкой: упавший прерывает остальные
@@ -317,6 +336,9 @@ class VendorItemListComponent extends CBitrixComponent
   Типовые кнопки даёт `Grid\Panel\Snippet`
   ([Сниппеты](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Tablicy/Panel_dejstvij.html#snippety)),
   но как обработать на сервере их запросы (например, `delete`), книга не показывает.
+- **`VALUE` — не для кнопок.** Штатная кнопка панели (`Snippet\Button::toArray()`) состоит из
+  `TYPE`, `ID`, `NAME`, `CLASS`, `TEXT`, `TITLE`, `ONCHANGE`; `VALUE` есть у **пунктов
+  выпадающего списка** (`Types::DROPDOWN`) — там пара `NAME` / `VALUE` (код ядра, 26.750.0).
 - **Не путать:** `ACTIONS_LIST` / `ACTIONS` книга упоминает только в таблице параметров (со ссылкой
   на главу о панели действий), а сама глава разбирает лишь `ACTION_PANEL`. Для меню строки они не
   нужны — нужен `actions` в каждой строке.
@@ -470,29 +492,43 @@ require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php';
   `BX.Main.filterManager.getById('VENDOR_ITEM_FILTER')` возвращают объекты
   ([[entity-bx-main-filter]]); «В архив» после подтверждения получает ID отмеченных строк.
 
-## Проверить на стенде
-1. **Ключ полей фильтра — `FILTER` или `FIELDS`** (противоречие книги, шаг 2).
-2. **Что возвращает `getValue()`:** как обрабатываются даты (нужен ли свой
-   `prepareListFilterParam()`, что в него приходит, не остаются ли сырые `_from` / `_to` /
-   `_datesel`) и строка поиска `FIND` — книга этого не показывает. Если поиск не сужает выборку,
-   обработать его самим, например в наследнике `Filter`.
-3. **Ключи `createField()`:** смысл `partial` книга не объясняет; как пометить поле «показывать по
-   умолчанию», не показывает (метод `getDefaultFieldIDs()` есть).
-4. **Постраничная выборка:** `getOffset()` / `getLimit()` / `setRecordCount()` и `count_total` — не
-   из книги. В примере книги `PageNavigation::setPageSizes()` получает тот же массив `NAME` / `VALUE`,
-   что и `PAGE_SIZES` грида; формат аргумента не описан, у нас вызова нет.
-5. **Строки грида:** таблица книги описывает `columns` для вывода и `data` для исходных значений, а
-   полный пример передаёт только `data` с ключами вида `~AMOUNT`. Мы передаём оба ключа.
-6. **Панель действий:** `VALUE` назван обязательным полем элемента, но во всех примерах кнопок его
-   нет — у нас, как в примерах, без него.
-7. **`AJAX_ID`:** в таблице параметров — `CAjax::GetComponentID('bitrix:main.ui.grid', '', '')`, в
-   примере — с шаблоном `.default`. У нас — как в примере.
-8. **Свои имена в `vars`:** книга советует разводить гриды, но не показывает, как грид узнаёт
-   нестандартные имена параметров. Прежде чем менять `by` / `order`, проверить сортировку кликом
-   по заголовку.
-9. **Обработчик `Grid::beforeRequest`:** книга называет два объекта — грид и настройки запроса, — но
-   кода обработчика не приводит; порядок аргументов в примере ниже — наше предположение.
-10. **Тулбар вне шаблона Bitrix24:** параметров явного вызова компонента книга не приводит.
+## Что проверено и что исправлено
+
+Прогон из консоли и чтение кода ядра (коробка `main` 26.750.0, 2026-09-22). Десять вопросов, которые
+оставались после книги:
+
+| Вопрос | Ответ |
+|---|---|
+| `FILTER` или `FIELDS` для полей фильтра | **`FILTER`**; `FIELDS` — ключ `arResult` компонента |
+| Нужен ли свой `prepareListFilterParam()` для дат | **да**: без него границы диапазона вычищаются и условие теряется |
+| Что делает `getValue()` со строкой поиска | **выбрасывает `FIND`** — поиск обрабатываем сами |
+| Смысл `partial` | ленивая догрузка данных поля; без него `prepareFieldData()` не вызовется вовсе |
+| Как пометить поле «по умолчанию» | `'default' => true` в `createField()` → `getDefaultFieldIDs()` |
+| `getOffset()` / `getLimit()` / `count_total` | работают, проверено выборкой по страницам |
+| Формат `PageNavigation::setPageSizes()` | плоский список чисел (белый список размеров), **не** `NAME` / `VALUE` |
+| `columns` и `data` в строке | `columns` приоритетнее, при отсутствии ключа берётся `data`; экранирование — на нас |
+| Обязателен ли `VALUE` у элемента панели | только у пунктов `DROPDOWN`; у кнопки его нет |
+| Откуда грид берёт сортировку | из настроек пользователя (свой AJAX `GRID_SET_SORT`), а не из `by` / `order` в URL |
+
+Ещё два уточнения:
+
+- **`AJAX_ID`** попадает в атрибут `data-ajaxid` контейнера и добавляется к запросам грида как
+  `bxajaxid`. Обе формы вызова `CAjax::getComponentID()` (с шаблоном и без) дают валидный хеш —
+  важно, чтобы значение было **постоянным** между отрисовками страницы.
+- **Тулбар вне шаблона Bitrix24** вызывается как обычный компонент:
+  `$APPLICATION->includeComponent('bitrix:ui.toolbar', '', [])`; единственный параметр — `TOOLBAR_ID`
+  (по умолчанию `Toolbar::DEFAULT_ID`). Компонент сам регистрируется через `addBufferContent()`,
+  поэтому вызывать его нужно, пока буферизация ещё идёт.
+
+## Проверить в браузере
+
+Серверная часть проверена, интерфейс — нет. На своём стенде пройдите:
+
+1. фильтр рисуется, поля на местах, применение сужает выборку без перезагрузки;
+2. клик по заголовку колонки меняет сортировку и она переживает перезагрузку;
+3. пагинация и размер страницы; включение скрытой колонки в настройках грида;
+4. меню строки и групповое действие (подтверждение, список отмеченных ID);
+5. обработчик `Grid::beforeRequest` на странице, куда грид попадает через AJAX.
 
 ## Подводные камни
 - **Грид, вставленный через AJAX (вкладка, слайдер), теряет пагинацию, настройки и размер
@@ -500,18 +536,23 @@ require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php';
   `Grid::beforeRequest`: проверить `gridId` и подменить `url`; `cancelRequest = true` отменяет
   запрос
   ([Перед выполнением запроса](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Tablicy/Publicnaa_cast.html#pered-vypolneniem-zaprosa)).
+  Аргументы события (код грида, 26.750.0): `BX.onCustomEvent(window, 'Grid::beforeRequest',
+  [data, eventArgs])`, где `data` — объект данных грида (`BX.Grid.Data`, сам грид — `data.parent`),
+  а `eventArgs` = `{gridId, url, method, data}`.
   ```js
-  // на странице, куда грид подгружается через AJAX; порядок аргументов — проверить на стенде
-  BX.addCustomEvent('Grid::beforeRequest', function (grid, request) {
+  // на странице, куда грид подгружается через AJAX
+  BX.addCustomEvent('Grid::beforeRequest', function (gridData, request) {
       if (request && request.gridId === 'VENDOR_ITEM_LIST') {
           request.url = '/items/'; // адрес, по которому грид отрисовывается сам
+          // request.cancelRequest = true; — отменить запрос совсем
       }
   });
   ```
-- **Тулбар не появится**, если что-то выведено в буферы `pagetitle`, `inside_pagetitle` или
-  `in_pagetitle`. Вне шаблона Bitrix24 компонент тулбара вызывают явно (в книге он назван
-  `bitrix:ui.toolbar`). Страница внутри `bitrix:ui.sidepanel.wrapper` получит тулбар только с
-  `'USE_UI_TOOLBAR' => 'Y'`
+- **Тулбар.** На коробках до оформления AIR он пропадал, если что-то выведено в буферы
+  `pagetitle`, `inside_pagetitle` или `in_pagetitle`; в шаблоне 26.750.0 этих зон уже нет, а
+  тулбар подключается безусловно ([[concept-deferred-functions-and-page-areas]]). Вне шаблона
+  Bitrix24 компонент `bitrix:ui.toolbar` вызывают явно. Страница внутри
+  `bitrix:ui.sidepanel.wrapper` получит тулбар только с `'USE_UI_TOOLBAR' => 'Y'`
   ([Тулбар → Условие применения](https://bx24devbook.website.yandexcloud.net/Razrabotka/UI/Tulbar/Osnovnoe.html#uslovie-primenenia),
   [Полезные области шаблона](https://bx24devbook.website.yandexcloud.net/Razrabotka/Tehnologii/Otlozennye_funkcii.html#poleznye-oblasti-sablona-bitrix24),
   [[concept-deferred-functions-and-page-areas]]).

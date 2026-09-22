@@ -5,12 +5,12 @@ module: templates-design
 edition: box
 status: verified
 provenance: documented
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): UI / Фильтр — Обзор, Фильтры пользователя, Свой фильтр; без проверки на стенде"
+verified: "2026-09-22 / коробка в Docker, main 26.750.0: ключ полей (FILTER) сверен по коду компонента; 2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): UI / Фильтр — Обзор, Фильтры пользователя, Свой фильтр; без проверки на стенде"
 tags: [ui, фильтр, компонент, пресеты, грид]
 sources: ["[[source-devbook-ui]]"]
 related: ["[[concept-ui-subsystem]]", "[[entity-filter-field-adapter]]", "[[entity-filter-options]]", "[[entity-grid-component]]", "[[entity-custom-filter]]", "[[recipe-custom-list-page-filter-grid]]"]
 aliases: ["bitrix24-filtr-component"]
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Компонент `bitrix:main.ui.filter`
@@ -36,17 +36,17 @@ updated: "2026-09-21"
 
 | Параметр | Назначение |
 |---|---|
-| `FIELDS` / `FILTER` | описания полей ([[entity-filter-field-adapter]]) — **книга противоречит сама себе**, см. ниже |
+| `FILTER` | описания полей ([[entity-filter-field-adapter]]) — входной параметр; `FIELDS` компонент кладёт в `arResult`, см. ниже |
 | `FILTER_ROWS` | какие поля сейчас на форме (`<id> => bool`); не передан — вычисляется |
 | `FILTER_PRESETS` | системные пресеты (пользователь их не удалит) |
 | `CURRENT_PRESET`, `COMMON_PRESETS_ID` | выбранный и основной пресет |
 | `VALUE_REQUIRED`, `VALUE_REQUIRED_MODE` | обязательные параметры фильтра |
 
-**`FIELDS` или `FILTER`.** Таблица параметров книги называет оба ключа (а `FILTER_ROWS` описывает
-дважды), введение к «Своему фильтру» требует `FIELDS`, а единственный рабочий пример передаёт поля
-в `FILTER`; в JS они видны как `params.FIELDS`. Какой ключ компонент реально читает — **проверить на
-стенде или по официальной документации** (ссылку на неё даёт книга). До проверки держать один ключ,
-как в рабочем примере, — [[recipe-custom-list-page-filter-grid]].
+**`FIELDS` или `FILTER` — разрешено: `FILTER`.** Компонент читает поля из `$arParams["FILTER"]`,
+а `FIELDS` — это ключ результата: туда он складывает уже подготовленные поля, оттуда они попадают в
+JS как `params.FIELDS` (код `class.php`, коробка 26.750.0, проверено 2026-09-22). Введение книги к
+главе «Свой фильтр», называющее обязательным `FIELDS`, ошибается — прав её пример
+([[recipe-custom-list-page-filter-grid]]).
 
 Системный пресет `default_filter` добавляется сам — переопределять не нужно.
 

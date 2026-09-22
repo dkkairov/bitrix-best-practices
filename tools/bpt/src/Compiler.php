@@ -34,8 +34,8 @@ final class Compiler
 
     /**
      * $withDocumentFields: класть в .bpt поля документа из снимка. По умолчанию нет — импорт
-     * создаёт на портале поля из DOCUMENT_FIELDS, которых там нет (стенд, bizproc 26.1075.0),
-     * а пустой раздел импорт просто пропускает.
+     * создаёт на портале поля из DOCUMENT_FIELDS, которых там нет (стенд, bizproc 26.1075.0), в
+     * универсальных списках перезаписывает существующие (код ядра), а пустой раздел пропускает.
      */
     public function __construct(
         private readonly Catalog $catalog,
@@ -81,7 +81,8 @@ final class Compiler
         $snapshotFields = $this->snapshot?->documentFields() ?? [];
         if ($this->withDocumentFields) {
             $this->warning('DOCUMENT_FIELDS', $snapshotFields
-                ? 'в файл попадут DOCUMENT_FIELDS из снимка: при импорте портал создаст недостающие поля документа'
+                ? 'в файл попадут DOCUMENT_FIELDS из снимка: при импорте портал создаст недостающие поля документа,'
+                    . ' а в универсальных списках перезапишет существующие с тем же кодом'
                 : 'поля документа запрошены, но в снимке их нет');
         }
 

@@ -19,6 +19,7 @@ final class Snapshot
         private readonly array $documentFields,
         private readonly string $source,
         private readonly ?string $document = null,
+        private readonly array $related = [],
     ) {
     }
 
@@ -40,7 +41,8 @@ final class Snapshot
                 $values
             );
         }
-        return new self($sections, $data['document_fields'] ?? [], $source, $data['document'] ?? null);
+        return new self($sections, $data['document_fields'] ?? [], $source, $data['document'] ?? null,
+            self::relatedFrom($data['related'] ?? [], $source));
     }
 
     /** Поля и стадии берутся из DOCUMENT_FIELDS экспорта; людей и группы вписывают вручную. */
@@ -84,6 +86,9 @@ final class Snapshot
         if ($this->documentFields) {
             $out['document_fields'] = $this->documentFields;
         }
+        if ($this->related) {
+            $out['related'] = $this->related;
+        }
         return $out;
     }
 
@@ -98,6 +103,21 @@ final class Snapshot
         if (!isset(self::KINDS[$kind])) {
             throw new BptException("неизвестный вид плейсхолдера «{$kind}»; известные: "
                 . implode(', ', array_keys(self::KINDS)));
+        }
+        if ($kind === 'field' && str_contains($name, '/')) {
+            [$entity, $field] = array_map('trim', explode('/', $name, 2));
+            foreach ($this->related as $title => $section) {
+                if (self::normalizeKey((string) $title) !== self::normalizeKey($entity)) {
+                    continue;
+                }
+                foreach ($section['fields'] as $fieldTitle => $code) {
+                    if (self::normalizeKey((string) $fieldTitle) === self::normalizeKey($field)) {
+                        return (string) $code;
+                    }
+                }
+                throw new BptException("в снимке ({$this->source}) у «{$title}» нет поля «{$field}»; есть: "
+                    . implode(', ', array_slice(array_keys($section['fields']), 0, 10)));
+            }
         }
         $needle = self::normalizeKey($name);
         $exact = [];
@@ -131,6 +151,40 @@ final class Snapshot
         $known = array_slice(array_keys($this->sections[$kind]), 0, 10);
         throw new BptException("в снимке ({$this->source}) нет {$kind} «{$name}»"
             . ($known ? '; есть: ' . implode(', ', $known) : '; раздел пуст'));
+    }
+
+    /** Раздел related смарт-процесса по его ID (ID — из раздела smart по тому же названию). */
+    public function relatedByTypeId(string $typeId): ?array
+    {
+        foreach ($this->related as $title => $section) {
+            try {
+                $id = $this->resolve('smart', (string) $title);
+            } catch (BptException) {
+                continue;
+            }
+            if ($id === $typeId) {
+                return ['title' => (string) $title] + $section;
+            }
+        }
+        return null;
+    }
+
+    /** related: {Смарт-процесс: {fields: {Название: код}, document_fields: {код: описание}}} — связанные документы. */
+    private static function relatedFrom(mixed $related, string $source): array
+    {
+        if (!is_array($related)) {
+            throw new BptException("{$source}: раздел related должен быть объектом «смарт-процесс: {fields: …}»");
+        }
+        $out = [];
+        foreach ($related as $title => $section) {
+            $fields = is_array($section) && is_array($section['fields'] ?? null) ? $section['fields'] : null;
+            if ($fields === null) {
+                throw new BptException("{$source}: related.{$title} — нужен объект fields: {Название поля: код}");
+            }
+            $out[(string) $title] = ['fields' => array_map('strval', $fields),
+                'document_fields' => is_array($section['document_fields'] ?? null) ? $section['document_fields'] : []];
+        }
+        return $out;
     }
 
     /** @return array<string, string> раздел снимка: название → идентификатор */

@@ -101,3 +101,64 @@ test('Сборщик: --strict делает «сырые» ID ошибкой', f
     $strict = (new Compiler(Catalog::load(), null, true))->compile($spec);
     assertTrue(str_contains(implode(' ', $strict['errors']), 'сырые'), 'в строгом режиме — ошибка');
 });
+
+function relatedSnapshot(): Snapshot
+{
+    return Snapshot::fromArray([
+        'fields'  => ['Проект' => 'UF_CRM_4_PROJECT', 'Сумма/НДС' => 'UF_CRM_4_VAT'],
+        'smart'   => ['Проекты' => '1040'],
+        'related' => ['Проекты' => [
+            'fields' => ['Руководитель проекта' => 'UF_CRM_5_PM'],
+            'document_fields' => ['UF_CRM_5_PM' => ['Name' => 'Руководитель проекта', 'Type' => 'user',
+                'Multiple' => false, 'Required' => false, 'Editable' => true, 'Filterable' => true, 'BaseType' => 'user']],
+        ]],
+    ], 'тест');
+}
+
+test('Снимок: поля связанного смарт-процесса', function () {
+    $s = relatedSnapshot();
+    assertSame('UF_CRM_5_PM', $s->resolve('field', 'Проекты/Руководитель проекта'));
+    assertSame('UF_CRM_5_PM', $s->resolve('field', 'проекты / руководитель проекта'));
+    assertSame('UF_CRM_4_VAT', $s->resolve('field', 'Сумма/НДС'));          // не смарт-процесс — обычное поле
+    assertThrows(fn () => $s->resolve('field', 'Проекты/Сметчик'), 'Руководитель проекта', 'подсказка со списком полей');
+    assertSame(['Руководитель проекта' => 'UF_CRM_5_PM'], $s->toArray()['related']['Проекты']['fields']);
+    assertSame('Проекты', $s->relatedByTypeId('1040')['title']);
+    assertSame(null, $s->relatedByTypeId('999'));
+    assertThrows(fn () => Snapshot::fromArray(['related' => ['Проекты' => ['UF_CRM_5_PM']]], 'тест'), 'related.Проекты', 'формат');
+});
+
+test('Сборщик: роли из карточки связанного смарт-процесса', function () {
+    $spec = minimalSpec([
+        ['get_smart_item' => ['id' => 'project', 'DynamicTypeId' => '{{smart:Проекты}}',
+            'ReturnFields' => ['{{field:Проекты/Руководитель проекта}}'],
+            'DynamicFilterFields' => ['items' => [[['object' => 'Document', 'field' => 'ID', 'operator' => '=',
+                'value' => '{=Document:{{field:Проект}}}'], 'AND']]]]],
+        ['approve' => ['Users' => ['{=@project:{{field:Проекты/Руководитель проекта}}}'], 'Name' => 'Согласуйте',
+            'ApproveType' => 'any']],
+    ]);
+    $r = (new Compiler(Catalog::load(), relatedSnapshot(), true))->compile($spec);
+    assertSame([], $r['errors']);
+    $children = $r['bpt']['TEMPLATE'][0]['Children'];
+    $props = $children[0]['Properties'];
+    assertSame(['UF_CRM_5_PM'], $props['ReturnFields']);
+    assertSame('{=Document:UF_CRM_4_PROJECT}', $props['DynamicFilterFields']['items'][0][0]['value']);
+    assertSame(['Name' => 'Руководитель проекта', 'Options' => [], 'Type' => 'user', 'Filterable' => '1',
+        'Editable' => '1', 'Multiple' => '0', 'Required' => '0', 'BaseType' => 'user'], $props['DynamicEntityFields']['UF_CRM_5_PM']);
+    assertSame(['Type' => 'document', 'Name' => 'Проекты',
+        'Default' => ['crm', 'Bitrix\\Crm\\Integration\\BizProc\\Document\\Dynamic', 'DYNAMIC_1040']],
+        $props['DynamicEntityFields']['Document']);
+    assertSame(['{=' . $children[0]['Name'] . ':UF_CRM_5_PM}'], $children[1]['Properties']['Users']);
+});
+
+test('Сборщик: заполненный DynamicEntityFields не трогаем, без описаний — предупреждение', function () {
+    $own = ['X' => ['Name' => 'Своё', 'Type' => 'string']];
+    $spec = minimalSpec([['get_smart_item' => ['DynamicTypeId' => '{{smart:Проекты}}',
+        'ReturnFields' => ['{{field:Проекты/Руководитель проекта}}'], 'DynamicEntityFields' => $own]]]);
+    $r = (new Compiler(Catalog::load(), relatedSnapshot()))->compile($spec);
+    assertSame($own, $r['bpt']['TEMPLATE'][0]['Children'][0]['Properties']['DynamicEntityFields']);
+
+    $bare = Snapshot::fromArray(['smart' => ['Проекты' => '1040']], 'тест');
+    $spec = minimalSpec([['get_smart_item' => ['DynamicTypeId' => '{{smart:Проекты}}', 'ReturnFields' => ['TITLE']]]]);
+    $r = (new Compiler(Catalog::load(), $bare))->compile($spec);
+    assertTrue((bool) array_filter($r['warnings'], fn ($w) => str_contains($w, 'DynamicEntityFields')), 'предупреждение');
+});

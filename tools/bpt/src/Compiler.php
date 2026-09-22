@@ -253,6 +253,9 @@ final class Compiler
             $props += $this->conditionProps($meta, $label, true);
         }
         $props = $this->substitute($props, $label);
+        if ($type === 'CrmGetDynamicInfoActivity') {
+            $props = $this->fillDynamicEntityFields($props, $label);
+        }
 
         $node = $this->makeNode($type, $props, $meta, $label, $path);
         $node['Children'] = $this->buildChildren($type, $meta, $label, $path);
@@ -523,6 +526,48 @@ final class Compiler
             $out[(string) $code] = Catalog::normalizeDefinition($this->substitute($definition, "{$path}.{$code}"));
         }
         return $out;
+    }
+
+    /**
+     * Типы результатов «Получить информацию об элементе CRM» ядро берёт из DynamicEntityFields
+     * (setPropertiesTypes); дизайнер заполняет свойство из диалога, мы — из раздела related снимка.
+     */
+    private function fillDynamicEntityFields(array $props, string $label): array
+    {
+        if (!empty($props['DynamicEntityFields']) || empty($props['ReturnFields'])) {
+            return $props;
+        }
+        $typeId = (string) ($props['DynamicTypeId'] ?? '');
+        $related = $this->snapshot?->relatedByTypeId($typeId);
+        if ($related === null || !$related['document_fields']) {
+            $this->warning($label, "DynamicEntityFields не заполнено: в снимке нет описаний полей смарт-процесса {$typeId}"
+                . ' (раздел related) — типы результатов неизвестны; после импорта открыть действие в дизайнере и сохранить');
+            return $props;
+        }
+        $described = [];
+        foreach ((array) $props['ReturnFields'] as $code) {
+            $field = $related['document_fields'][$code] ?? null;
+            if ($field === null) {
+                $this->warning($label, "DynamicEntityFields: в снимке нет описания поля {$code}");
+                continue;
+            }
+            $described[(string) $code] = self::entityFieldDescription($field);
+        }
+        $described['Document'] = ['Type' => 'document', 'Name' => $related['title'],
+            'Default' => ['crm', 'Bitrix\\Crm\\Integration\\BizProc\\Document\\Dynamic', 'DYNAMIC_' . $typeId]];
+        $props['DynamicEntityFields'] = $described;
+        return $props;
+    }
+
+    /** Описание поля результата в формате дизайнера (как в корпусе): флаги — строки «1»/«0». */
+    private static function entityFieldDescription(array $field): array
+    {
+        $flag = fn (mixed $v) => in_array($v, [true, 1, '1', 'Y'], true) ? '1' : '0';
+        return ['Name' => (string) ($field['Name'] ?? ''), 'Options' => $field['Options'] ?? [],
+            'Type' => (string) ($field['Type'] ?? 'string'), 'Filterable' => $flag($field['Filterable'] ?? false),
+            'Editable' => $flag($field['Editable'] ?? false), 'Multiple' => $flag($field['Multiple'] ?? false),
+            'Required' => $flag($field['Required'] ?? false),
+            'BaseType' => (string) ($field['BaseType'] ?? $field['Type'] ?? 'string')];
     }
 
     /** Подстановка {{вид:Название}} из снимка портала. */

@@ -25,6 +25,18 @@ $ensureType = function (string $code, string $title, bool $stages) use (&$create
 };
 $requestsType = $ensureType(EVAL_REQUESTS_CODE, 'Заявки', true);
 $projectsType = $ensureType(EVAL_PROJECTS_CODE, 'Проекты', false);
+
+// 1a. Фича «Наблюдатели» нужна проверке observers (T09) — по умолчанию у типа выключена, включаем
+//     один раз, идемпотентно (создание нового типа её не задаёт — см. $ensureType)
+if (!$requestsType->getIsObserversEnabled()) {
+    $requestsType->setIsObserversEnabled(true);
+    $result = $requestsType->save();
+    if (!$result->isSuccess()) {
+        eval_fail('Заявки: наблюдатели: ' . implode('; ', $result->getErrorMessages()));
+    }
+    $created[] = 'наблюдатели у «Заявок»';
+}
+
 $requests = eval_factory(EVAL_REQUESTS_CODE);
 $projects = eval_factory(EVAL_PROJECTS_CODE);
 

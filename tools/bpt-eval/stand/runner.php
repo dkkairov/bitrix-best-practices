@@ -166,19 +166,30 @@ foreach ($acceptance['scenarios'] as $scenario) {
         $users = $roleUsers($step['task_for']);
         if ($step['do'] === 'complete') {
             $taskRow = null;
-            for ($i = 0; $i < 10 && !$taskRow; $i++) {
+            // пустой $users (роль без сотрудников — пустой отдел, незаполненное поле проекта) не идёт
+            // в фильтр ORM: цикл просто не выполняется, задача честно считается не найденной
+            for ($i = 0; $users && $i < 10 && !$taskRow; $i++) {
                 $taskRow = \Bitrix\Tasks\Internals\TaskTable::getList(['select' => ['ID', 'RESPONSIBLE_ID', 'TITLE'],
                     'filter' => ['@RESPONSIBLE_ID' => $users, '>=CREATED_DATE' => new \Bitrix\Main\Type\DateTime($since, 'Y-m-d H:i:s'),
                         '!=STATUS' => 5], 'order' => ['ID' => 'DESC'], 'limit' => 1])->fetch() ?: null;
                 $taskRow ?? sleep(1);
             }
-            $ok = $taskRow !== null;
-            if ($ok) {
-                \CTaskItem::getInstance((int) $taskRow['ID'], (int) $taskRow['RESPONSIBLE_ID'])->complete();
+            $ok = false;
+            $detail = 'задачи для роли нет';
+            if ($taskRow !== null) {
+                try {
+                    // «Задачи» бросают исключение на бизнес-правилах (обязательный чек-лист, обязательный
+                    // результат, завершение не тем пользователем) — ловим, чтобы не терять результаты
+                    // остальных шагов и проверок сценария
+                    \CTaskItem::getInstance((int) $taskRow['ID'], (int) $taskRow['RESPONSIBLE_ID'])->complete();
+                    $ok = true;
+                } catch (\Throwable $e) {
+                    $detail = "задача #{$taskRow['ID']} «{$taskRow['TITLE']}»: " . $e->getMessage();
+                }
             }
             $out['ok'] = $out['ok'] && ($ok || $step['optional']);
             $out['steps'][] = ['task_for' => $step['task_for'], 'do' => 'complete', 'ok' => $ok || $step['optional'],
-                'detail' => $ok ? "задача #{$taskRow['ID']} «{$taskRow['TITLE']}» закрыта" : 'задачи для роли нет'];
+                'detail' => $ok ? "задача #{$taskRow['ID']} «{$taskRow['TITLE']}» закрыта" : $detail];
             continue;
         }
         $found = null;
@@ -288,10 +299,12 @@ foreach ($acceptance['scenarios'] as $scenario) {
                 break;
             case 'task_created':
                 foreach ((array) $value as $t) {
+                    $respUsers = $roleUsers($t['responsible']);
                     $rows = [];
-                    for ($i = 0; $i < 10 && !$rows; $i++) {   // задачу ставит процесс — ждём до 10 секунд
+                    // пустой $respUsers (роль без сотрудников) не идёт в фильтр ORM — задачи просто нет
+                    for ($i = 0; $respUsers && $i < 10 && !$rows; $i++) {   // задачу ставит процесс — ждём до 10 секунд
                         $rows = array_filter(\Bitrix\Tasks\Internals\TaskTable::getList(['select' => ['ID', 'TITLE', 'DEADLINE'],
-                            'filter' => ['@RESPONSIBLE_ID' => $roleUsers($t['responsible']),
+                            'filter' => ['@RESPONSIBLE_ID' => $respUsers,
                                 '>=CREATED_DATE' => new \Bitrix\Main\Type\DateTime($since, 'Y-m-d H:i:s')]])->fetchAll(),
                             fn ($r) => !isset($t['title_contains']) || mb_stripos($r['TITLE'], $t['title_contains']) !== false);
                         $rows ?: sleep(1);
@@ -299,17 +312,30 @@ foreach ($acceptance['scenarios'] as $scenario) {
                     $ok = (bool) $rows;
                     $actual = $ok ? implode(' | ', array_map(fn ($r) => $r['TITLE'] . ' до ' . ($r['DEADLINE'] ? $r['DEADLINE']->format('Y-m-d') : '—'), $rows)) : 'задачи нет';
                     if ($ok && isset($t['deadline_workdays'])) {
-                        $day = new \DateTimeImmutable('today');
-                        for ($n = 0; $n < (int) $t['deadline_workdays'];) {
-                            $day = $day->modify('+1 day');
-                            $n += (int) $day->format('N') <= 5 ? 1 : 0;
-                        }
-                        $ok = (bool) array_filter($rows, function ($r) use ($day) {
+                        // «сегодня + N рабочих дней» посчитанное так же, как считает ядро (workdateadd),
+                        // может разойтись с простым подсчётом: если сейчас уже нерабочее время, ядро
+                        // отсчитывает от следующего рабочего дня, а выходные превращают этот сдвиг на 1
+                        // рабочий день в разницу до 3 календарных дней на выходе. Поэтому допуск —
+                        // несимметричный диапазон, а не ±1 день: [сегодня + max(1, N−1) раб. дней;
+                        // «сегодня + N раб. дней» + 4 календарных дня]. Срок «завтра» (N мало) или «через
+                        // месяц» (N велико) в этот диапазон всё равно не попадает — проверка не обесценена
+                        $workdaysFrom = function (int $n): \DateTimeImmutable {
+                            $day = new \DateTimeImmutable('today');
+                            for ($i = 0; $i < $n;) {
+                                $day = $day->modify('+1 day');
+                                $i += (int) $day->format('N') <= 5 ? 1 : 0;
+                            }
+                            return $day;
+                        };
+                        $n = (int) $t['deadline_workdays'];
+                        $lower = $workdaysFrom(max(1, $n - 1));
+                        $upper = $workdaysFrom($n)->modify('+4 days');
+                        $ok = (bool) array_filter($rows, function ($r) use ($lower, $upper) {
                             if (!$r['DEADLINE']) {
                                 return false;
                             }
-                            $diff = abs((new \DateTimeImmutable($r['DEADLINE']->format('Y-m-d')))->diff($day)->days);
-                            return $diff <= 1;   // допуск: праздники производственного календаря
+                            $date = new \DateTimeImmutable($r['DEADLINE']->format('Y-m-d'));
+                            return $date >= $lower && $date <= $upper;
                         });
                     }
                     $check("задача: {$t['responsible']}", $ok, $t, $actual);

@@ -329,3 +329,39 @@ test('Сборщик: без снимка DOCUMENT_FIELDS пусты, и это 
     assertSame([], $r['bpt']['DOCUMENT_FIELDS']);
     assertTrue(!str_contains(implode(' ', $r['warnings']), 'DOCUMENT_FIELDS'), 'пустые поля документа — норма');
 });
+
+test('Сборщик: лишний ключ в описании переменной — предупреждение (запятая в YAML)', function () {
+    // {Name: Срок выполнения, рабочих часов, Type: int} в YAML даёт ключ «рабочих часов» со значением null
+    $spec = minimalSpec();
+    $spec['constants'] = ['hours' => ['Name' => 'Срок выполнения', 'рабочих часов' => null, 'Type' => 'int']];
+    $r = (new Compiler(Catalog::load()))->compile($spec);
+    assertSame([], $r['errors']);
+    $found = array_filter($r['warnings'], static fn (string $w): bool => str_contains($w, 'рабочих часов'));
+    assertSame(1, count($found), 'предупреждение о неизвестном ключе');
+    assertTrue(str_contains(implode(' ', $found), 'кавычки'), 'подсказка про кавычки');
+});
+
+test('Сборщик: ключи описания, которые понимает ядро, — без предупреждений, регистр не важен', function () {
+    $spec = minimalSpec();
+    $spec['variables'] = ['amount' => ['Name' => 'Сумма', 'Description' => 'К оплате', 'Type' => 'double',
+        'Required' => true, 'Multiple' => false, 'Default' => '0', 'Options' => null, 'Settings' => []]];
+    $spec['constants'] = ['kind' => ['name' => 'Вид', 'type' => 'select', 'options' => ['a' => 'А']]];
+    $r = (new Compiler(Catalog::load()))->compile($spec);
+    assertTrue(!str_contains(implode(' ', $r['warnings']), 'неизвестные ключи описания'), 'ложное срабатывание');
+});
+
+test('Пример: уведомление на ветке «нет» — от системы', function () {
+    if (!SpecReader::hasYaml()) {
+        return;
+    }
+    // при отклонении по сроку «Последний голосовавший» пуст — отправитель из него не годится
+    $snapshot = Snapshot::load(dirname(__DIR__) . '/examples/example.portal.yaml');
+    $spec = SpecReader::read(dirname(__DIR__) . '/examples/invoice-approval.bizproc.yaml');
+    $built = (new Compiler(Catalog::load(), $snapshot))->compile($spec);
+    $notify = array_values(array_filter(allActivities($built['bpt']['TEMPLATE'][0]),
+        static fn (array $a): bool => $a['Type'] === 'IMNotifyActivity'));
+    assertSame(1, count($notify));
+    assertSame('4', $notify[0]['Properties']['MessageType']);
+    assertTrue(!str_contains(json_encode($notify[0]['Properties'], JSON_UNESCAPED_UNICODE), 'LastApprover'),
+        'отправитель не из LastApprover');
+});

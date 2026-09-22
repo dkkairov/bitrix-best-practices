@@ -37,7 +37,9 @@ steps:
       on_no:
         - notify:
             MessageSite: "Счёт отклонён: {=@fin:Comments}"
-            MessageUserFrom: ["{=@fin:LastApprover}"]   # отправитель обязателен: без него портал не примет импорт
+            # «от системы»: при отклонении по сроку никто не голосовал и LastApprover пуст
+            MessageType: "4"
+            MessageUserFrom: ["{{user:Иванов Иван}}"]  # при типе 4 не используется, но без него портал не примет импорт
             MessageUserTo: ["{{user:Иванов Иван}}"]
         - change_stage:
             TargetStatus: "{{stage:Общая/Доработка}}"

@@ -15,6 +15,13 @@ final class Compiler
     private const META_KEYS = ['id', 'title', 'off', 'comment', 'name', 'raw',
         'on_yes', 'on_no', 'steps', 'branches', 'when', 'else'];
 
+    /**
+     * Ключи описания поля (параметр, переменная, константа), которые понимает ядро:
+     * Bizproc\FieldType::normalizeProperty, регистр не важен (bizproc 26.1075.0).
+     */
+    private const DEFINITION_KEYS = ['NAME', 'TITLE', 'DESCRIPTION', 'TYPE', 'BASETYPE', 'REQUIRED',
+        'MULTIPLE', 'DEFAULT', 'OPTIONS', 'SETTINGS', 'ID'];
+
     /** Заголовок последовательности по умолчанию — так пишет дизайнер (экспорты 2026-09). */
     public const SEQUENCE_TITLE = 'Последовательность действий';
 
@@ -504,6 +511,13 @@ final class Compiler
             if (!is_array($definition)) {
                 $this->error("{$path}.{$code}", 'описание поля должно быть объектом {Name, Type, …}');
                 continue;
+            }
+            // {Name: Срок, рабочих часов} в YAML — два ключа: запятая внутри {…} разделяет пары
+            $unknown = array_filter(array_map('strval', array_keys($definition)),
+                static fn (string $key): bool => !in_array(mb_strtoupper($key), self::DEFINITION_KEYS, true));
+            if ($unknown) {
+                $this->warning("{$path}.{$code}", 'неизвестные ключи описания: ' . implode(', ', $unknown)
+                    . ' — если это часть значения с запятой, возьмите значение в кавычки');
             }
             $out[(string) $code] = Catalog::normalizeDefinition($this->substitute($definition, "{$path}.{$code}"));
         }

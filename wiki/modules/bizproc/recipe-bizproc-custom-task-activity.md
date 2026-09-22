@@ -5,10 +5,10 @@ module: bizproc
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-06-08 / коробка: классический дизайнер БП + новый UI заданий в карточке смарт-процесса; сверено с «Книгой разработчика Bitrix24» 2026-09-21 и с курсом 57 и кодом стенда (bizproc 26.1075.0) 2026-09-22: базовый класс, результаты, тип делегирования и коды разделов — см. врезку"
+verified: "2026-06-08 / коробка: классический дизайнер БП + новый UI заданий в карточке смарт-процесса; сверено с «Книгой разработчика Bitrix24» 2026-09-21 и с курсом 57 и кодом стенда (bizproc 26.1075.0) 2026-09-22: базовый класс, результаты, тип делегирования и коды разделов — см. врезку; прогон на стенде 2026-09-22: исключение прерывает действие, а не процесс"
 tags: [bizproc, активити, задание, CBPTaskService, дизайнер, форма]
 sources: ["[[source-devbook-bizproc]]", "[[source-course57-actions-core]]", "[[source-course57-developer]]"]
-related: ["[[pattern-robots-vs-bizproc-decision]]", "[[recipe-module-structure-and-install]]", "[[concept-change-invasiveness-hierarchy]]", "[[entity-robots-triggers]]", "[[entity-cbp-task-service]]", "[[entity-cbp-activity]]", "[[entity-bizproc-activity-description]]", "[[antipattern-bizproc-php-code-activity]]", "[[concept-bizproc-activity-catalog]]"]
+related: ["[[pattern-robots-vs-bizproc-decision]]", "[[recipe-module-structure-and-install]]", "[[concept-change-invasiveness-hierarchy]]", "[[entity-robots-triggers]]", "[[entity-cbp-task-service]]", "[[entity-cbp-activity]]", "[[entity-bizproc-activity-description]]", "[[antipattern-bizproc-php-code-activity]]", "[[concept-bizproc-activity-catalog]]", "[[recipe-bizproc-custom-activity-baseactivity]]"]
 aliases: ["bitrix24-bp-task-activity"]
 updated: "2026-09-22"
 ---
@@ -266,12 +266,17 @@ $arActivityDescription = [
 | Задание не появляется в попапе | `ACTIVITY` в `CreateTask` ≠ имени класса без `CBP` | привести в соответствие |
 | Задание не удаляется при отмене БП | нет `Cancel()` / `HandleFault()` | добавить оба, оба зовут `Unsubscribe()` |
 | Поле-пользователь сохраняется строкой | не использован `CBPHelper` | конвертировать в обе стороны |
-| `Call to FaultActivity() on null` | `$this->Execution` в действии не существует | прерывать через `throw new Exception(...)` — движок вызовет `HandleFault` (эмпирика; штатный путь по книге — статус `Faulting`, см. [[entity-cbp-activity]]) |
+| `Call to FaultActivity() on null` | `$this->Execution` в действии не существует | прервать **действие** — `throw new Exception(...)`: движок вызовет `HandleFault()`, тот — `Cancel()`, задание снимется. Процесс при этом идёт к следующему шагу (стенд); остановить процесс — признак-результат, условие и «Прерывание процесса» в шаблоне ([[entity-cbp-activity]]) |
 | **Свой JS в диалоге настроек не отрабатывает** | диалог грузится AJAX-ом, inline `<script>` исполняется ненадёжно (особенно в редакторе автоматизации CRM) | лёгкий случай — progressive enhancement (`<textarea>` + билдер поверх); надёжно — вынести сложное редактирование на отдельную страницу |
 | **Нужна загрузка файлов в настройках действия** | диалог сохраняется AJAX-ом и multipart не принимает в принципе | отдельная админ-страница с обычным multipart-POST и `CFile::SaveFile`; действие хранит только ID сущности |
 | **Админ-страница из `/local/admin/` даёт 404** | Bitrix не роутит `/local/admin/` по URL | реальную страницу класть в `/local/admin/`, а в `/bitrix/admin/<file>.php` — тонкий загрузчик `require($_SERVER['DOCUMENT_ROOT'].'/local/admin/<file>.php');`; снимать при удалении модуля; само-ссылки строить от `$_SERVER['SCRIPT_NAME']` |
 
+> **Изменено 2026-09-22.** Строка про `throw` уточнена прогоном на стенде (bizproc 26.1075.0):
+> исключение прерывает действие, но не процесс; книжный статус `Faulting` процесс тоже не
+> останавливает. Разбор — [[entity-cbp-activity]], раздел «Ошибки и остановка процесса».
+
 ## Альтернативы
+- Действие не ждёт человека — проще на `BaseActivity`: [[recipe-bizproc-custom-activity-baseactivity]].
 - `OnBeforeProlog` + свой URL — не интегрирован в UI заданий.
 - `IBPEventActivity` без `CBPTaskService` — внешнее событие без UI: подходит для интеграций по
   REST/вебхуку, не для человека.

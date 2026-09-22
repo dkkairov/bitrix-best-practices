@@ -8,7 +8,7 @@ provenance: mixed
 verified: "2026-06-19 / Bitrix24 cloud + box; строка про REST — 2026-09-16 / apidocs.bitrix24.ru; типы процессов, лимиты и правила для «при изменении» — 2026-09-22 / курс 57 dev.1c-bitrix.ru"
 tags: [автоматизация, роботы, триггеры, бизнес-процессы]
 sources: ["[[source-course57-basics]]", "[[source-course57-expressions]]", "[[source-course57-actions-crm-disk]]"]
-related: ["[[entity-robots-triggers]]", "[[entity-smart-process]]", "[[pattern-crm-sales-funnel-design]]", "[[entity-bizproc-template-rest-methods]]", "[[concept-bizproc-bpt-format]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[concept-bizproc-engine]]"]
+related: ["[[entity-robots-triggers]]", "[[entity-smart-process]]", "[[pattern-crm-sales-funnel-design]]", "[[entity-bizproc-template-rest-methods]]", "[[concept-bizproc-bpt-format]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[concept-bizproc-engine]]", "[[concept-bizproc-state-machine]]", "[[recipe-bizproc-approval-route]]", "[[recipe-bizproc-request-intake]]", "[[checklist-bizproc-template-review]]"]
 aliases: ["robots-vs-bizproc-decision"]
 updated: "2026-09-22"
 ---
@@ -53,11 +53,13 @@ updated: "2026-09-22"
   [[antipattern-bizproc-hardcoded-portal-ids|зашитые ID портала]].
 
 ## Последовательный БП или со статусами
-- **Последовательный** — цепочка шагов: согласование, заявка, расчёт.
+- **Последовательный** — цепочка шагов: согласование, заявка, расчёт. Рецепты —
+  [[recipe-bizproc-approval-route|маршрут согласования]], [[recipe-bizproc-request-intake|заявка]].
 - **Со статусами** — у документа есть состояния, переходы по командам и свои права в каждом
   состоянии. Курс: неудачный выбор типа сильно усложняет шаблон
   ([урок 3468](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3468)). Для CRM
   состояния чаще всего — это стадии воронки, и тогда вместо БП со статусами — роботы на стадиях.
+  Устройство — [[concept-bizproc-state-machine]].
 
 ## Как реализовать
 1. Опиши логику словами. Если она формулируется как «на стадии X сделать Y» — это роботы.
@@ -80,5 +82,6 @@ updated: "2026-09-22"
 - [[entity-robots-triggers|Роботы и триггеры]] (термины), [[entity-smart-process|Смарт-процесс (СПА)]], [[pattern-crm-sales-funnel-design|Проектирование воронки]]
 - [[concept-bizproc-engine|Устройство движка БП]] — типы процессов и лимиты модуля
 - [[concept-bizproc-bpt-format|Формат .bpt]], [[pattern-bizproc-ai-assisted-generation|AI-генерация БП]]
+- [[checklist-bizproc-template-review|Ревью шаблона БП]] — ошибки проектирования
 
 [← Бизнес-процессы](_index-bizproc.md)

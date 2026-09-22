@@ -72,6 +72,8 @@ updated: "2026-09-22"
 - [[antipattern-bizproc-php-code-activity]] — разбор примеров 5368 и 8411 и штатная замена.
 - [[concept-bizproc-bpt-format]] — что проверить после импорта.
 - [[concept-bizproc-activity-catalog]] — период утверждения и «срок» из 6851.
+- Новые черновики: [[recipe-bizproc-approval-route]] (2791–2793), [[recipe-bizproc-request-intake]]
+  (5270–5272, 5518, 7107), [[concept-bizproc-state-machine]] (счёт на 11 статусов, 5384).
 
 ## Противоречия и оговорки
 - 2792: в тексте «Любой сотрудник», на скриншоте «Все сотрудники».

@@ -10,7 +10,7 @@ tags: [bizproc, активити, условия, окружение, типы, 
 sources: []
 related: ["[[concept-bizproc-engine]]", "[[entity-cbp-activity]]", "[[entity-cbp-activity-condition]]", "[[entity-bizproc-field-type]]", "[[entity-bizproc-globals-manager]]", "[[entity-bizproc-activity-description]]", "[[antipattern-bizproc-php-code-activity]]", "[[recipe-bizproc-custom-task-activity]]", "[[entity-cbp-task-service]]"]
 aliases: []
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Конспект: модуль бизнес-процессов
@@ -87,6 +87,8 @@ dev.1c-bitrix.ru как «официальная документация», п�
 - Эмпирическая часть — форма задания, `CBPTaskService`, коды разделов дизайнера, ловушки вёрстки —
   остаётся в [[recipe-bizproc-custom-task-activity]] и [[entity-cbp-task-service]]: книга её не
   покрывает.
+- Дополнено 2026-09-22: [[recipe-bizproc-custom-activity-baseactivity]] — своё действие на
+  `BaseActivity` по книге, проверенное на стенде.
 
 ## Сверка 2026-09-21
 | Страница вики | Что было | Что в книге | Решение |
@@ -94,7 +96,7 @@ dev.1c-bitrix.ru как «официальная документация», п�
 | все страницы кластера | `verified`: dev.1c-bitrix.ru, курс 57, «официальная документация» | материал — из книги, курс 57 — только ссылка | атрибуция исправлена |
 | [[entity-cbp-activity-condition]], прежний конспект | у условия нет `$this->workflow`, журнала, переменных — как факт книги | книга прямо говорит только про журнал; окружение — через `$ownerActivity->workflow` | уточнено, остальное помечено как вывод команды |
 | [[entity-cbp-activity-condition]] | диалог условия — как у действия | `GetPropertiesDialog` без `$activityName`, с `$popupWindow`; `GetPropertiesDialogValues` — 7 параметров, возвращает значения | исправлено |
-| [[entity-cbp-activity]] | `checkProperties()` — валидация формы; прерывание через `throw` как норма | проверки во время выполнения; штатно — статус `Faulting` или `ErrorCollection` | исправлено; `throw` помечен как эмпирика команды |
+| [[entity-cbp-activity]] | `checkProperties()` — валидация формы; прерывание через `throw` как норма | проверки во время выполнения; штатно — статус `Faulting` или `ErrorCollection` | исправлено; `throw` помечен как эмпирика команды. **2026-09-22, стенд:** ни `Faulting`, ни исключение, ни `ErrorCollection` процесс не останавливают, фатальная ошибка PHP его вешает — книга неточна |
 | [[entity-bizproc-field-type]] | тип в `RETURN` должен совпадать с `getPropertiesDialogMap()` | тип результата регистрируется через `SetPropertiesTypes()` | исправлено |
 | [[entity-bizproc-globals-manager]] | перенос шаблонов через глобалы и поиск глобала по имени — как факты | в книге нет | помечено как практика команды, «проверить перенос» |
 | [[concept-bizproc-engine]] | «или поставляем модулем» — без уточнения, куда; `properties_dialog.php` обязателен | каталога модуля среди каталогов поиска нет; при `getPropertiesDialogMap()` файл не нужен | уточнено: модуль копирует действие в `/local/activities/custom/` |
@@ -112,11 +114,17 @@ dev.1c-bitrix.ru как «официальная документация», п�
   в тексте; в «Своих действиях» обрывается фраза про `CATEGORY`.
 
 ## Открытые вопросы
-- Базовый класс штатных заданий дистрибутива: `CBPActivity` или `CBPCompositeActivity`.
-- Виден ли результат из одного `RETURN` во «Вставке значения» — в дизайнере и в роботах.
-- Прерывают ли ошибки из `ErrorCollection` в `BaseActivity` сам процесс.
-- Полный набор `CBPActivityExecutionStatus::*` и `CBPTrackingType::*`.
-- Где лежат системные классы условий для штатных блоков.
+- Базовый класс штатных заданий дистрибутива: `CBPActivity` или `CBPCompositeActivity`. **Снято
+  2026-09-22** по ядру: оба, по наличию веток ([[source-course57-developer]]).
+- Виден ли результат из одного `RETURN` во «Вставке значения» — в дизайнере и в роботах. **Для
+  дизайнера снято 2026-09-22** (курс 57, ядро): виден; в роботах — открыто.
+- Прерывают ли ошибки из `ErrorCollection` в `BaseActivity` сам процесс. **Снято 2026-09-22**
+  (стенд): нет — [[entity-cbp-activity]].
+- Полный набор `CBPActivityExecutionStatus::*` и `CBPTrackingType::*`. **Снято 2026-09-22** по ядру —
+  таблица констант в [[entity-cbp-activity]].
+- Где лежат системные классы условий для штатных блоков. **Снято 2026-09-22** по ядру:
+  `/bitrix/activities/bitrix/` — `fieldcondition`, `propertyvariablecondition`, `mixedcondition`,
+  `truecondition`, `codecondition` ([[entity-cbp-activity-condition]]).
 - Совпадает ли набор типов глобальных переменных с `FieldType`.
 
 [← Конспекты источников](_index-sources.md)

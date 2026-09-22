@@ -8,7 +8,7 @@ provenance: mixed
 verified: "2026-09-22 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21); курс 57 dev.1c-bitrix.ru (снимок 2026-09-22): глоссарий, типы процессов, настройки модуля, глава для разработчика; код стенда (коробка, bizproc 26.1075.0): поиск действий, лимиты, базовые классы заданий"
 tags: [bizproc, активити, шаблон, инстанс, роботы, окружение, лимиты, автозапуск]
 sources: ["[[source-devbook-bizproc]]", "[[source-course57-basics]]", "[[source-course57-templates-designer]]", "[[source-course57-developer]]"]
-related: ["[[recipe-bizproc-custom-task-activity]]", "[[pattern-robots-vs-bizproc-decision]]", "[[concept-bizproc-bpt-format]]", "[[entity-robots-triggers]]", "[[concept-change-invasiveness-hierarchy]]", "[[entity-bizproc-activity-description]]", "[[antipattern-bizproc-php-code-activity]]", "[[concept-bizproc-activity-catalog]]"]
+related: ["[[recipe-bizproc-custom-task-activity]]", "[[pattern-robots-vs-bizproc-decision]]", "[[concept-bizproc-bpt-format]]", "[[entity-robots-triggers]]", "[[concept-change-invasiveness-hierarchy]]", "[[entity-bizproc-activity-description]]", "[[antipattern-bizproc-php-code-activity]]", "[[concept-bizproc-activity-catalog]]", "[[concept-bizproc-state-machine]]", "[[recipe-bizproc-debugging]]", "[[recipe-bizproc-custom-activity-baseactivity]]"]
 aliases: ["bitrix24-bizproc"]
 updated: "2026-09-22"
 ---
@@ -63,7 +63,7 @@ updated: "2026-09-22"
 - **Последовательный** — цепочка шагов от начала до конца.
 - **Со статусами** — у документа есть состояния, переходы по командам или времени и свои права в каждом
   статусе. У статуса до четырёх подпроцессов: вход, выход, команда, выполнение через время. Если смена
-  статуса не задана, процесс завершается.
+  статуса не задана, процесс завершается. Подробно — [[concept-bizproc-state-machine]].
 
 Курс предупреждает: неудачный выбор типа сильно усложняет шаблон
 ([выбор типа](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3468)). Утилита
@@ -197,5 +197,8 @@ if (\Bitrix\Main\Loader::includeModule('bizproc')) { /* … */ }
 - [[concept-bizproc-bpt-format]] — как шаблон выглядит в экспортном файле
 - [[concept-bizproc-activity-catalog]] — штатные действия: свойства, поведение, результаты
 - [[recipe-bizproc-custom-task-activity]] — своё действие с заданием целиком
+- [[recipe-bizproc-custom-activity-baseactivity]] — своё действие на `BaseActivity`
+- [[concept-bizproc-state-machine]] — процессы со статусами
+- [[recipe-bizproc-debugging]] — журнал, зависшие процессы, сообщения ядра
 
 [← Бизнес-процессы](_index-bizproc.md)

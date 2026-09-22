@@ -1,0 +1,134 @@
+---
+title: "Заявка: уточнение, исполнитель, задача со сроком, контроль"
+type: recipe
+module: bizproc
+edition: both
+status: draft
+provenance: mixed
+verified: ""
+tags: [бизнес-процессы, заявка, задача, исполнитель, срок, типовой-процесс]
+sources: ["[[source-course57-actions-notify-other]]", "[[source-course57-actions-crm-disk]]", "[[source-course57-examples]]"]
+related: ["[[recipe-bizproc-approval-route]]", "[[checklist-bizproc-template-review]]", "[[concept-bizproc-activity-catalog]]", "[[concept-bizproc-expressions]]", "[[entity-smart-process]]"]
+aliases: []
+updated: "2026-09-22"
+---
+
+# Заявка: уточнение, исполнитель, задача со сроком, контроль
+
+**Результат:** новая заявка (элемент смарт-процесса или списка) получает исполнителя, автор при
+необходимости уточняет её, исполнитель получает задачу с крайним сроком в рабочих часах, процесс ждёт
+закрытия задачи и фиксирует итог; удалённая задача не теряется — о ней узнаёт контролёр.
+
+> **Черновик.** Спецификация ниже собирается `tools/bpt` без предупреждений и проходит проверку
+> импорта на стенде (`validateTemplate`, коробка, bizproc 26.1075.0, 2026-09-22); целиком процесс не
+> прогонялся. Поведение действий — по курсу 57 и коду ядра.
+
+## Предусловия
+- Тип документа — смарт-процесс «Заявки» или универсальный список; у смарт-процесса включены дизайнер
+  БП и роботы ([[entity-smart-process]]).
+- Шаблон запускается **при создании** — в процессе «при изменении» задача и ожидания недопустимы
+  (курс, [урок 8445](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=8445)).
+- Роли — константы шаблона: «Контролёр заявок», срок в рабочих часах.
+
+## Шаги
+1. **Назначить исполнителя** (вне спецификации: этих действий в каталоге `tools/bpt` пока нет):
+   - в CRM — «Изменить ответственного»: «Случайно», «Последовательно» (по кругу) или «Конкретно»,
+     «Пропускать отсутствующих» — с bizproc 21.400.0; можно указать группу вместе с пользователями
+     ([урок 8539](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=8539));
+   - в списках и ленте — «Выбор сотрудника»: случайный, последовательный или начальник с резервными
+     пользователями и пропуском отсутствующих; результат — «Выбранный сотрудник»
+     ([урок 3809](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3809)).
+2. **Уточнить заявку** — «Запрос дополнительной информации» автору со сроком: поля запроса становятся
+   переменными процесса ([урок 3845](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3845)).
+   По истечении срока задание закрывается само, процесс идёт дальше с пустым ответом.
+3. **Поставить задачу** с «Остановить процесс на время выполнения задачи» (`HoldToClose`): процесс ждёт,
+   пока задача не будет завершена. Крайний срок — в рабочих часах исполнителя:
+   `=workdateadd({=System:Now}, {=Constant:hours} & "h", {=Document:ASSIGNED_BY_ID})`. Постановщик
+   обязателен — без `CREATED_BY` шаблон не примется при импорте. Привязка к текущему элементу CRM —
+   по умолчанию ([урок 3805](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3805)).
+4. **Проверить итог:** результаты задачи — `TaskId`, `ClosedBy`, `ClosedDate`, `IsDeleted` (задача
+   удалена). Удалённую задачу — контролёру уведомлением «от системы»; выполненную — записью в историю и
+   сменой стадии последним шагом.
+
+```yaml
+# Формат — tools/bpt/SPEC.md; плейсхолдеры {{…}} берутся из снимка портала
+bizproc: 1
+name: Обработка заявки
+document: DYNAMIC_1000
+constants:
+  controller: {Name: Контролёр заявок, Type: user, Required: true, Default: "{{user:Иванов Иван}}"}
+  hours: {Name: "Срок выполнения, рабочих часов", Type: int, Required: true, Default: "16"}
+variables:
+  details: {Name: Уточнение от автора, Type: text}
+  deleted: {Name: Задача удалена, Type: int, Default: "0"}
+steps:
+  - request_info:
+      id: clarify
+      title: Уточнить заявку
+      Users: ["{=Document:CREATED_BY}"]
+      Name: "Уточните заявку {=Document:TITLE}"
+      RequestedInformation:
+        - {Name: details, Title: Что нужно сделать, Type: text, Required: true}
+      TimeoutDuration: "1"
+      TimeoutDurationType: d
+  - task:
+      id: work
+      title: Выполнить заявку
+      HoldToClose: "Y"
+      Fields:
+        TITLE: "Заявка: {=Document:TITLE}"
+        DESCRIPTION: "{=Variable:details}"
+        CREATED_BY: "{=Constant:controller}"
+        RESPONSIBLE_ID: "{=Document:ASSIGNED_BY_ID}"
+        DEADLINE: "=workdateadd({=System:Now}, {=Constant:hours} & \"h\", {=Document:ASSIGNED_BY_ID})"
+  - set_var:
+      title: Запомнить, удалена ли задача
+      VariableValue: {deleted: "{=@work:IsDeleted}"}
+  - if:
+      title: Задача выполнена?
+      branches:
+        - title: Задачу удалили
+          when: {propertyvariablecondition: [[deleted, "=", "1", "0"]]}
+          steps:
+            - notify:
+                title: Сообщить контролёру
+                MessageSite: "Задачу по заявке {=Document:TITLE} удалили, заявка не выполнена"
+                MessageType: "4"
+                MessageUserFrom: ["{=Constant:controller}"]
+                MessageUserTo: ["{=Constant:controller}"]
+        - title: Выполнена
+          else: true
+          steps:
+            - crm_event:
+                EventText: "Заявка выполнена: {=@work:ClosedBy > printable}, {=@work:ClosedDate}"
+            - change_stage: {TargetStatus: "{{stage:Общая/Клиент}}"}
+```
+
+## Варианты из курса
+- **Заявки на закупку на списках** — роли в переменных со значением по умолчанию, два процесса: при
+  добавлении и при изменении ([уроки 5270–5272](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=5272)).
+  Правка из первого процесса не должна запускать второй — в CRM так и есть по умолчанию, в списках
+  проверить.
+- **Заявка на отпуск** — начальник автора через «Выбор сотрудника» с пропуском отсутствующих, резерв —
+  переменная с директором; запись в график отсутствий
+  ([урок 5518](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=5518)).
+- **Обслуживание заявок клиентов** — цикл повторных звонков с паузой и напоминаниями
+  ([урок 7107](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=7107)); одна
+  переменная-список не обслуживает две ветки с разными вариантами — заводить отдельные.
+
+## Проверка результата
+- `bpt.php analyze` без ошибок и предупреждений.
+- На тестовом портале: заявку создали → автор ответил или истёк срок → задача поставлена с верным
+  крайним сроком → задачу закрыли (стадия сменилась) или удалили (контролёр получил уведомление).
+
+## Откат и проблемы
+- Точное время крайнего срока — с bizproc 24.0.0; время в задаче всегда в поясе пользователя.
+- Без подключённого модуля задач действие «Поставить задачу» недоступно.
+
+## Источники и связанное
+- Курс 57: [[source-course57-actions-notify-other]] («Поставить задачу», «Выбор сотрудника», пример
+  3845), [[source-course57-actions-crm-disk]] («Изменить ответственного»), [[source-course57-examples]]
+- [[recipe-bizproc-approval-route]] — согласование с доработкой и сроком
+- [[checklist-bizproc-template-review]] — проверка перед выкладкой
+
+[← Бизнес-процессы](_index-bizproc.md)

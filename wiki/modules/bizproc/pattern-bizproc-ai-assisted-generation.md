@@ -8,7 +8,7 @@ provenance: mixed
 verified: ""
 tags: [бизнес-процессы, ai, claude-code, агент, bpt, генерация, mcp, тестирование]
 sources: ["[[source-course57-actions-core]]"]
-related: ["[[concept-bizproc-bpt-format]]", "[[entity-bizproc-template-rest-methods]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[pattern-robots-vs-bizproc-decision]]", "[[recipe-rest-oauth-app-setup]]", "[[concept-bizproc-activity-catalog]]"]
+related: ["[[concept-bizproc-bpt-format]]", "[[entity-bizproc-template-rest-methods]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[pattern-robots-vs-bizproc-decision]]", "[[recipe-rest-oauth-app-setup]]", "[[concept-bizproc-activity-catalog]]", "[[checklist-bizproc-template-review]]", "[[recipe-bizproc-approval-route]]"]
 aliases: []
 updated: "2026-09-22"
 ---
@@ -177,5 +177,7 @@ steps:
 - [[concept-bizproc-bpt-format|Формат .bpt]], [[entity-bizproc-template-rest-methods|REST-методы шаблонов]],
   [[antipattern-bizproc-hardcoded-portal-ids|Зашитые ID портала]],
   [[pattern-robots-vs-bizproc-decision|Роботы vs БП]], [[recipe-rest-oauth-app-setup|OAuth-приложение]]
+- [[checklist-bizproc-template-review|Ревью шаблона БП]] — проверка сгенерированного перед выкладкой
+- Спецификации типовых процессов: [[recipe-bizproc-approval-route|согласование]], [[recipe-bizproc-request-intake|заявка]]
 
 [← Бизнес-процессы](_index-bizproc.md)

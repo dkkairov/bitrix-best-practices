@@ -8,7 +8,7 @@ provenance: mixed
 verified: "2026-09-22 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21); курс 57 dev.1c-bitrix.ru (уроки 23034, 12409, 3771); код стенда (коробка, bizproc 26.1075.0): ActivitySearcher\\Searcher, ActivityFilterChecker, PropertiesDialog, компонент bizproc.workflow.edit. Видимость результатов в интерфейсе роботов не проверялась"
 tags: [bizproc, активити, робот, условие, description-php, метаописание]
 sources: ["[[source-devbook-bizproc]]", "[[source-course57-developer]]", "[[source-course57-templates-designer]]", "[[source-course57-actions-core]]"]
-related: ["[[entity-cbp-activity]]", "[[concept-bizproc-engine]]", "[[recipe-bizproc-custom-task-activity]]", "[[entity-bizproc-field-type]]", "[[concept-bizproc-activity-catalog]]", "[[antipattern-bizproc-php-code-activity]]"]
+related: ["[[entity-cbp-activity]]", "[[concept-bizproc-engine]]", "[[recipe-bizproc-custom-task-activity]]", "[[entity-bizproc-field-type]]", "[[concept-bizproc-activity-catalog]]", "[[antipattern-bizproc-php-code-activity]]", "[[recipe-bizproc-custom-activity-baseactivity]]"]
 aliases: []
 updated: "2026-09-22"
 ---

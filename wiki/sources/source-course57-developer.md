@@ -80,6 +80,8 @@ updated: "2026-09-22"
   пользователь у роботов.
 - [[entity-bizproc-template-rest-methods]] — действия приложений, `bizproc.task.complete`.
 - [[entity-robots-triggers]] — автозапуск из кода и в `Service\Operation`.
+- [[recipe-bizproc-custom-activity-baseactivity]] — новое: своё действие на `BaseActivity` (алгоритм урока
+  23034 на текущем ядре), проверка при импорте, результат, поведение при ошибках — стенд.
 
 ## Сверка 2026-09-22
 | Страница вики | Что было | Что в курсе и ядре | Решение |
@@ -88,6 +90,7 @@ updated: "2026-09-22"
 | [[recipe-bizproc-custom-task-activity]], [[entity-cbp-task-service]] | спор: задание на `CBPActivity` (команда) или `CBPCompositeActivity` (книга) | курс не решает; ядро: `CBPReviewActivity` — `CBPActivity`, `CBPApproveActivity` и `CBPRequestInformationActivity` — `CBPCompositeActivity` | **спор снят**: задание без веток штатно на `CBPActivity`, с ветками — на `CBPCompositeActivity` |
 | [[entity-bizproc-activity-description]] | `RETURN` / `ADDITIONAL_RESULT` — книга противоречит себе | курс: `ADDITIONAL_RESULT` с 17.0.3; ядро: `ADDITIONAL_RESULT` перечисляет свойства-карты (`EntityFields`, `DynamicEntityFields`) | снято: постоянные результаты — `RETURN`, динамические — свойство-карта в `ADDITIONAL_RESULT` |
 | [[entity-bizproc-activity-description]] | свои действия — в `/local/activities/custom/` | курс: `/bitrix/activities/custom/` | оставляем `/local`: ядро ищет его раньше, курс устарел |
+| [[entity-cbp-activity]], [[antipattern-bizproc-php-code-activity]] | по книге `Faulting` и исключение останавливают процесс | курс (13378): ошибка разбора PHP роняет хит, процесс зависает; стенд: `Exception` и `Faulting` — шаг закрыт с ошибкой, процесс идёт дальше; фатальная ошибка PHP — процесс висит «Выполняется» без записи в журнале | исправлено; курс подтверждён для фатальных ошибок |
 
 ## Ошибки в примерах курса — не копировать
 - 5815: `CBPDocument::SendExternalEvent` вызван с тремя аргументами, а в текущем ядре четвёртый

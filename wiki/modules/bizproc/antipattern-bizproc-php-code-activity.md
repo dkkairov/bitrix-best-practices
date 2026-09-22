@@ -5,10 +5,10 @@ module: bizproc
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-22 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы / Действие: PHP код, Работа с окружением; курс 57 (уроки 3806, 13378, 23038, 3789, 5368, 8411); без проверки на стенде"
+verified: "2026-09-22 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы / Действие: PHP код, Работа с окружением; курс 57 (уроки 3806, 13378, 23038, 3789, 5368, 8411); стенд 2026-09-22 (коробка, bizproc 26.1075.0): что фатальная ошибка PHP и исключение делают с процессом"
 tags: [bizproc, php-код, CodeActivity, активити, журнал, сопровождение]
 sources: ["[[source-devbook-bizproc]]", "[[source-course57-developer]]", "[[source-course57-actions-notify-other]]", "[[source-course57-examples]]"]
-related: ["[[entity-cbp-activity]]", "[[entity-bizproc-activity-description]]", "[[recipe-bizproc-custom-task-activity]]", "[[concept-bizproc-activity-catalog]]", "[[concept-bizproc-bpt-format]]"]
+related: ["[[entity-cbp-activity]]", "[[entity-bizproc-activity-description]]", "[[recipe-bizproc-custom-task-activity]]", "[[concept-bizproc-activity-catalog]]", "[[concept-bizproc-bpt-format]]", "[[recipe-bizproc-custom-activity-baseactivity]]"]
 aliases: []
 updated: "2026-09-22"
 ---
@@ -32,7 +32,10 @@ updated: "2026-09-22"
 ## Почему это плохо
 Недостатки по книге
 ([Действие: PHP код](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/PHP_kod.html#dejstvie-php-kod)):
-- **Ошибка в коде блокирует процесс.** Некорректный код может остановить его выполнение.
+- **Ошибка в коде блокирует процесс.** Некорректный код может остановить его выполнение. Стенд
+  уточняет (2026-09-22): фатальную ошибку PHP (`Error`, в том числе ошибку разбора из `eval`) движок
+  не перехватывает — хит падает, процесс остаётся «Выполняется», в журнале процесса записи нет.
+  `Exception` движок ловит: шаг закрывается с ошибкой, процесс идёт дальше ([[entity-cbp-activity]]).
 - **Шаблон может править только администратор.** Если в схеме есть это действие, изменять шаблон
   может лишь сотрудник с правом менять файлы портала. Владелец процесса больше не поправит его сам —
   каждая правка идёт через администратора.
@@ -96,7 +99,8 @@ $title = (string)$this->ParseValue('{' . '=Document:TITLE}');
 2. **Своё действие:** каталог в `/local/activities/custom/`, паспорт —
    [[entity-bizproc-activity-description|.description.php]], класс на `BaseActivity`: настройки —
    `getPropertiesDialogMap()`, логика — `internalExecute()`, ошибки — `ErrorCollection`
-   ([[entity-cbp-activity]]). Действие, которое ждёт человека, —
+   ([[entity-cbp-activity]]; пошагово — [[recipe-bizproc-custom-activity-baseactivity]]). Действие,
+   которое ждёт человека, —
    [[recipe-bizproc-custom-task-activity]].
 3. **Значения — через настройки действия**, а не подстановкой в код: в поле настройки значение
    вводят явно или выбирают «Вставкой значения»
@@ -155,8 +159,10 @@ try {
   одинаково, но разделять их по смыслу полезно для последующего разбора
   ([Типы сообщений](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/PHP_kod.html#tipy-soobsenij)).
 - **Вывод команды:** `catch` без повторного выброса пускает процесс дальше, будто ничего не
-  случилось. Если следующие шаги зависят от результата, запишите признак ошибки в переменную
-  процесса (`setVariable()`) и проверьте его условием.
+  случилось. Повторный выброс `Exception` процесс тоже не остановит: движок закроет шаг с ошибкой и
+  запустит следующий (стенд 2026-09-22). Если следующие шаги зависят от результата, запишите признак
+  ошибки в переменную процесса (`setVariable()`), проверьте его условием и при необходимости
+  поставьте «Прерывание процесса».
 
 ## Профилактика
 - Пункт ревью шаблона: в том, что уходит в релиз, нет «PHP кода».
@@ -170,6 +176,7 @@ try {
 ## Связанное
 - [[entity-bizproc-activity-description]] — паспорт своего действия
 - [[entity-cbp-activity]] — классы действия и доступ к окружению процесса
+- [[recipe-bizproc-custom-activity-baseactivity]] — своё действие на `BaseActivity` целиком
 - [[recipe-bizproc-custom-task-activity]] — своё действие с заданием целиком
 - [[concept-bizproc-activity-catalog]] — `CodeActivity` в каталоге и запрет генерации
 - [[concept-bizproc-bpt-format]] — проверка шаблона перед переносом

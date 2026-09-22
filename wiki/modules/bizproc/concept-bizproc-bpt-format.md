@@ -8,7 +8,7 @@ provenance: mixed
 verified: "2026-09-22 / коробка клиента: 16 экспортов из дизайнера БП (VERSION 2); стенд Docker, bizproc 26.1075.0: импорт и исходники ядра; apidocs.bitrix24.ru; курс 57 dev.1c-bitrix.ru (снимок 2026-09-22): экспорт и импорт, выражения, условия"
 tags: [бизнес-процессы, bpt, экспорт, импорт, шаблон, роботы, формат, выражения]
 sources: ["[[source-course57-templates-designer]]", "[[source-course57-expressions]]", "[[source-course57-actions-core]]", "[[source-course57-examples]]"]
-related: ["[[entity-bizproc-template-rest-methods]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[pattern-robots-vs-bizproc-decision]]", "[[concept-bizproc-activity-catalog]]", "[[concept-bizproc-engine]]"]
+related: ["[[entity-bizproc-template-rest-methods]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[pattern-robots-vs-bizproc-decision]]", "[[concept-bizproc-activity-catalog]]", "[[concept-bizproc-engine]]", "[[concept-bizproc-expressions]]", "[[concept-bizproc-state-machine]]", "[[checklist-bizproc-template-review]]"]
 aliases: []
 updated: "2026-09-22"
 ---
@@ -100,6 +100,8 @@ ID портала.
   `WhileActivity`, `EmptyBlockActivity`.
 
 ## Выражения
+Полный разбор синтаксиса, функций и модификаторов — [[concept-bizproc-expressions]].
+
 | Запись | Смысл |
 |--------|-------|
 | `{=Document:TITLE}` | поле документа |
@@ -226,5 +228,8 @@ php tools/bpt/bpt.php snapshot bp-154.bpt -o portal.yaml                     # �
 - [[pattern-bizproc-ai-assisted-generation|AI-генерация БП]]
 - [[antipattern-bizproc-hardcoded-portal-ids|Зашитые ID портала]]
 - [[pattern-robots-vs-bizproc-decision|Роботы vs бизнес-процессы]]
+- [[concept-bizproc-expressions|Выражения БП]]
+- [[concept-bizproc-state-machine|БП со статусами]] — корень `StateMachineWorkflowActivity`
+- [[checklist-bizproc-template-review|Ревью шаблона]] — что проверить перед выкладкой
 
 [← Бизнес-процессы](_index-bizproc.md)

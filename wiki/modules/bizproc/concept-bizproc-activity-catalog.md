@@ -8,7 +8,7 @@ provenance: mixed
 verified: "2026-09-22 / коробка клиента: корпус 16 экспортов из дизайнера БП (VERSION 2); курс 57 dev.1c-bitrix.ru (снимок 2026-09-22): смысл полей и поведение; стенд Docker, bizproc 26.1075.0: ValidateProperties, validateTemplate без записи в базу, прогон процессов"
 tags: [бизнес-процессы, действия, активити, каталог, bpt, генерация, роботы]
 sources: ["[[source-course57-actions-core]]", "[[source-course57-actions-notify-other]]", "[[source-course57-actions-crm-disk]]"]
-related: ["[[concept-bizproc-bpt-format]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[concept-bizproc-engine]]", "[[entity-cbp-activity]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[entity-cbp-task-service]]"]
+related: ["[[concept-bizproc-bpt-format]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[concept-bizproc-engine]]", "[[entity-cbp-activity]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[entity-cbp-task-service]]", "[[concept-bizproc-expressions]]", "[[recipe-bizproc-approval-route]]", "[[recipe-bizproc-request-intake]]", "[[checklist-bizproc-template-review]]"]
 aliases: []
 updated: "2026-09-22"
 ---
@@ -229,6 +229,9 @@ updated: "2026-09-22"
 - [[pattern-bizproc-ai-assisted-generation|AI-генерация БП]] — как каталог используется при генерации
 - [[entity-cbp-task-service|CBPTaskService]] — как устроены задания внутри
 - [[antipattern-bizproc-hardcoded-portal-ids|Зашитые ID портала]]
+- [[concept-bizproc-expressions|Выражения БП]] — что можно писать в свойствах
+- [[recipe-bizproc-approval-route|Маршрут согласования]], [[recipe-bizproc-request-intake|Заявка]] — действия в типовых процессах
+- [[checklist-bizproc-template-review|Ревью шаблона]] — ошибки проектирования
 - Формат спецификации — [`tools/bpt/SPEC.md`](../../../tools/bpt/SPEC.md)
 
 [← Бизнес-процессы](_index-bizproc.md)

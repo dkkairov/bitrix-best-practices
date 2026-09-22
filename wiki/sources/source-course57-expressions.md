@@ -90,6 +90,8 @@ updated: "2026-09-22"
 - [[antipattern-bizproc-hardcoded-portal-ids]] — `{=System:HostUrl}` и `getdocumenturl()` вместо
   адреса портала в тексте.
 - [[concept-bizproc-activity-catalog]] — ошибки проектирования как проверки при сборке и ревью.
+- Новые черновики: [[concept-bizproc-expressions]] — синтаксис, функции, модификаторы, коды;
+  [[checklist-bizproc-template-review]] — «Распространенные ошибки» (8445) как чек-лист ревью.
 
 ## Сверка 2026-09-22
 | Страница вики | Что было | Что в курсе | Решение |

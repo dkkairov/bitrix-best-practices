@@ -77,11 +77,14 @@ try {
             printf("%s: сборка %s, импорт %s, сценарии %d/%d%s\n", $task, $result['compile'], $result['import'],
                 count(array_filter($result['scenarios'], fn ($s) => $s['ok'])), count($result['scenarios']),
                 $result['reason'] ? " — {$result['reason']}" : '');
+            if ($result['cleanup_error']) {   // не влияет на итог задачи, но стенд остался грязным — видно сразу
+                echo "Внимание: {$result['cleanup_error']}\n";
+            }
             exit(0);
         case 'reference':
             $checker = new CheckRunner(Stand::fromEnv(), $root, $run);
             $tasks = ($positional[0] ?? 'all') === 'all'
-                ? array_map(fn ($d) => explode('-', basename($d))[0], glob(__DIR__ . '/tasks/*', GLOB_ONLYDIR) ?: [])
+                ? array_map(fn ($d) => explode('-', basename($d))[0], glob("{$root}/tools/bpt-eval/tasks/*", GLOB_ONLYDIR) ?: [])
                 : [(string) $positional[0]];
             $failed = 0;
             foreach ($tasks as $task) {
@@ -91,9 +94,11 @@ try {
                     continue;
                 }
                 $result = $checker->check($task, $reference, "{$runDir}/_reference/{$task}");
-                $ok = $result['compile'] === 'ok' && $result['import'] === 'ok' && $result['reason'] === '';
+                // Грязный после уборки стенд — тоже не «эталон прошёл», даже если сам процесс отработал
+                $reasons = array_filter([$result['reason'], $result['cleanup_error']]);
+                $ok = $result['compile'] === 'ok' && $result['import'] === 'ok' && !$reasons;
                 $failed += $ok ? 0 : 1;
-                printf("%s: %s%s\n", $task, $ok ? 'эталон прошёл' : 'ЭТАЛОН НЕ ПРОШЁЛ', $result['reason'] ? " — {$result['reason']}" : '');
+                printf("%s: %s%s\n", $task, $ok ? 'эталон прошёл' : 'ЭТАЛОН НЕ ПРОШЁЛ', $reasons ? ' — ' . implode('; ', $reasons) : '');
             }
             exit($failed ? 1 : 0);
         default:

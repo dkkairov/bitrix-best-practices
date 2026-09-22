@@ -32,7 +32,7 @@ final class CheckRunner
         @mkdir($outDir, 0777, true);
         $result = ['task' => $task, 'run' => $this->run, 'spec' => $specFile, 'compile' => 'skip', 'compile_errors' => [],
             'import' => 'skip', 'import_error' => '', 'template_id' => null, 'constants_matched' => [],
-            'constants_unmatched' => [], 'scenarios' => [], 'reason' => '', 'category' => '', 'note' => ''];
+            'constants_unmatched' => [], 'scenarios' => [], 'reason' => '', 'category' => '', 'note' => '', 'cleanup_error' => ''];
         if (!is_file($specFile)) {
             if ($acceptance->scenarios()) {   // задача со сценариями без решения — провал, а не «0 из 0»
                 $result['compile'] = 'fail';
@@ -64,29 +64,39 @@ final class CheckRunner
         $result['import'] = 'ok';
         $result['template_id'] = $import['template_id'];
 
+        // Результат сохраняется ровно один раз, после уборки (ниже) — чтобы cleanup_error попадал в
+        // тот же result.json, ранние return здесь не годятся: try/finally отдаёт control в finally
+        // раньше, чем return долетает до вызывающего кода, а после save() дописать cleanup_error
+        // было бы уже некуда.
         try {
             $constants = ConstantMatcher::match($import['constants'], $roles);
             $result['constants_matched'] = $constants['matched'];
             $result['constants_unmatched'] = $constants['unmatched'];
             if ($constants['unmatched']) {
                 $result['reason'] = 'константы без сопоставления: ' . implode(', ', $constants['unmatched']);
-                return $this->save($outDir, $result);
-            }
-            if ($acceptance->scenarios()) {
+            } elseif ($acceptance->scenarios()) {
                 try {
                     $run = $this->stand->run('runner', ['task' => $task, 'template_id' => $import['template_id'],
                         'acceptance' => $acceptance->toArray(), 'roles' => $roles->toArray(), 'constants' => $constants['matched']]);
+                    $result['scenarios'] = $run['scenarios'];
+                    $failed = array_filter($run['scenarios'], fn ($s) => !$s['ok']);
+                    $result['reason'] = $failed ? 'сценарий: ' . implode(', ', array_column($failed, 'name')) : '';
                 } catch (EvalException $e) {   // упал сам прогонщик — не против навыка: чиним и перегоняем
                     $result['reason'] = 'прогонщик: ' . $e->getMessage();
                     $result['category'] = 'harness';
-                    return $this->save($outDir, $result);
                 }
-                $result['scenarios'] = $run['scenarios'];
-                $failed = array_filter($run['scenarios'], fn ($s) => !$s['ok']);
-                $result['reason'] = $failed ? 'сценарий: ' . implode(', ', array_column($failed, 'name')) : '';
             }
         } finally {
-            $this->stand->run('cleanup', ['template_id' => $import['template_id']]);
+            // Сбой самой уборки не должен ронять уже посчитанный результат задачи (и весь reference
+            // all вместе с ним) — фиксируем как cleanup_error, category/reason от него не зависят.
+            try {
+                $cleanup = $this->stand->run('cleanup', ['template_id' => $import['template_id']]);
+                if (!empty($cleanup['errors'])) {
+                    $result['cleanup_error'] = 'процессы не остановлены: ' . implode('; ', $cleanup['errors']);
+                }
+            } catch (EvalException $e) {
+                $result['cleanup_error'] = 'уборка не выполнена: ' . $e->getMessage();
+            }
         }
         return $this->save($outDir, $result);
     }

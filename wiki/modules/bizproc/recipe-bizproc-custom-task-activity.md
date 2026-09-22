@@ -5,12 +5,12 @@ module: bizproc
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-06-08 / коробка: классический дизайнер БП + новый UI заданий в карточке смарт-процесса; сверено с «Книгой разработчика Bitrix24» 2026-09-21 (Модуль Бизнес-процессы — Действия): базовый класс и RETURN/ADDITIONAL_RESULT расходятся с книгой, см. врезку"
+verified: "2026-06-08 / коробка: классический дизайнер БП + новый UI заданий в карточке смарт-процесса; сверено с «Книгой разработчика Bitrix24» 2026-09-21 и с курсом 57 и кодом стенда (bizproc 26.1075.0) 2026-09-22: базовый класс, результаты, тип делегирования и коды разделов — см. врезку"
 tags: [bizproc, активити, задание, CBPTaskService, дизайнер, форма]
-sources: ["[[source-devbook-bizproc]]"]
-related: ["[[pattern-robots-vs-bizproc-decision]]", "[[recipe-module-structure-and-install]]", "[[concept-change-invasiveness-hierarchy]]", "[[entity-robots-triggers]]", "[[entity-cbp-task-service]]", "[[entity-cbp-activity]]", "[[entity-bizproc-activity-description]]", "[[antipattern-bizproc-php-code-activity]]"]
+sources: ["[[source-devbook-bizproc]]", "[[source-course57-actions-core]]", "[[source-course57-developer]]"]
+related: ["[[pattern-robots-vs-bizproc-decision]]", "[[recipe-module-structure-and-install]]", "[[concept-change-invasiveness-hierarchy]]", "[[entity-robots-triggers]]", "[[entity-cbp-task-service]]", "[[entity-cbp-activity]]", "[[entity-bizproc-activity-description]]", "[[antipattern-bizproc-php-code-activity]]", "[[concept-bizproc-activity-catalog]]"]
 aliases: ["bitrix24-bp-task-activity"]
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Своё действие БП с заданием
@@ -19,25 +19,30 @@ updated: "2026-09-21"
 задание попадает в штатный список заданий БП и в живую ленту, как встроенные «Утверждение» и
 «Ознакомление».
 
-> **Сверено с книгой 2026-09-21: три расхождения, рецепт оставлен как практика команды.**
-> 1. **Базовый класс.** По книге задание — событийное действие, которое наследует
->    `CBPCompositeActivity` и реализует те же интерфейсы
->    ([Действия → классификация](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#klassifikacia-dejstvij)).
->    У нас — `CBPActivity` + `IBPEventActivity` + `IBPActivityExternalEventListener`, и это работает на
->    стенде (2026-06-08). **Решение:** оставить как осознанную практику; при обновлении коробки или
->    странностях выполнения сверить со штатными заданиями дистрибутива и при необходимости перейти на
->    `CBPCompositeActivity` ([[entity-cbp-task-service]], открытый вопрос).
-> 2. **`CATEGORY`.** Книга называет только `['ID' => 'other']` и свой раздел через `OWN_ID`/`OWN_NAME`
->    ([CATEGORY](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#category)).
->    Таблица встроенных кодов в шаге 5 — наблюдения команды.
-> 3. **`RETURN` и `ADDITIONAL_RESULT`.** По книге `ADDITIONAL_RESULT` перечисляет **свойства-карты**
->    результатов, состав которых определяется на ходу, а не дублирует ключи `RETURN`
->    ([ADDITIONAL_RESULT](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#additional-result)).
->    Наш тезис «`RETURN` — для классического дизайнера, `ADDITIONAL_RESULT` — для роботов, указывать
->    оба» — эмпирика, книгой не подтверждается; сама книга здесь противоречит себе
->    ([[entity-bizproc-activity-description]]). **Решение:** до проверки на стенде постоянный
->    результат объявлять в `RETURN` + `SetPropertiesTypes()`, `ADDITIONAL_RESULT` — только со
->    свойством-картой; после выкладки проверить «Вставку значения» и в дизайнере, и в роботах.
+> **Сверено с книгой 2026-09-21 и с курсом 57 и ядром 2026-09-22.**
+> 1. **Базовый класс — спор снят.** Книга называет базовым классом задания `CBPCompositeActivity`
+>    ([Действия → классификация](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#klassifikacia-dejstvij)),
+>    у нас — `CBPActivity` + `IBPEventActivity` + `IBPActivityExternalEventListener`. В ядре (bizproc
+>    26.1075.0) штатны оба: «Ознакомление» (`CBPReviewActivity`, без веток) наследует `CBPActivity`,
+>    «Утверждение» и «Запрос информации» (с ветками) — `CBPCompositeActivity`. **Решение:** задание без
+>    веток, как в этом рецепте, — на `CBPActivity`; нужны ветки «да/нет» — `CBPCompositeActivity` по
+>    образцу `CBPApproveActivity`.
+> 2. **`CATEGORY` — сверено с ядром.** Встроенные разделы дизайнера заданы в компоненте
+>    `bizproc.workflow.edit`: `document`, `task`, `logic`, `interaction`, `rest`, `other` плюс свои через
+>    `OWN_ID`/`OWN_NAME`. Коды `constructs` и `notification` из прежней таблицы команды в ядре не
+>    встречаются — таблица в шаге 5 исправлена.
+> 3. **`RETURN` и `ADDITIONAL_RESULT` — снято для дизайнера.** Курс: результаты заданий, у которых в
+>    описании только `RETURN`, доступны во «Вставке значения → Дополнительные результаты» сразу после
+>    добавления действия ([урок 3771](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3771)).
+>    Ядро: список результатов для дизайнера строится из `RETURN`, а `ADDITIONAL_RESULT` читается, только
+>    если `RETURN` пуст, и ждёт свойства-карты (`PropertiesDialog::extractChildProperties`). Ключ из
+>    `RETURN`, повторённый в `ADDITIONAL_RESULT`, ничего не даёт. **Решение:** постоянный результат —
+>    `RETURN` + `SetPropertiesTypes()`; `ADDITIONAL_RESULT` — только со свойством-картой. Видимость в
+>    роботах проверить в интерфейсе роботов.
+> 4. **Тип делегирования — исправлено.** `DELEGATION_TYPE => 0` раньше был подписан «запретить
+>    делегирование». По ядру `0` — «только подчинённым», запрет — `CBPTaskDelegationType::None` (`2`);
+>    курс называет эти варианты «Только подчиненным» и «Никому»
+>    ([урок 3771](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3771)).
 
 ## Предусловия
 - Решено, что нужен полноценный БП, а не робот — [[pattern-robots-vs-bizproc-decision]].
@@ -57,7 +62,7 @@ updated: "2026-09-21"
 ### 1. Класс активити
 
 ```php
-// практика команды: CBPActivity; книга для заданий называет CBPCompositeActivity (см. врезку вверху)
+// задание без веток — CBPActivity, как штатное «Ознакомление»; с ветками — CBPCompositeActivity (см. врезку)
 class CBPMyActivity extends CBPActivity
     implements IBPEventActivity, IBPActivityExternalEventListener
 {
@@ -86,7 +91,7 @@ class CBPMyActivity extends CBPActivity
             'NAME'          => $this->AssignmentName,
             'PARAMETERS'    => ['KEY' => 'value'], // данные для ShowTaskForm
             'IS_INLINE'     => 'N',
-            'DELEGATION_TYPE' => 0,                // запретить делегирование
+            'DELEGATION_TYPE' => CBPTaskDelegationType::None,  // 2 — никому; 0 — только подчинённым
             'DOCUMENT_NAME' => CBPRuntime::GetRuntime()
                 ->GetService('DocumentService')->GetDocumentName($this->GetDocumentId()),
         ]);
@@ -210,31 +215,38 @@ public static function PostTaskForm($arTask, $userId, $arRequest, &$arErrors, $u
 
 ```php
 $arActivityDescription = [
-    'CLASS'             => 'MyActivity',      // без префикса CBP
-    'JSCLASS'           => 'BizProcActivity',
-    'CATEGORY'          => ['ID' => 'task'],  // см. таблицу ниже
-    'RETURN'            => ['ResultField' => ['NAME' => '…', 'TYPE' => 'int']],
-    'ADDITIONAL_RESULT' => ['ResultField'],   // эмпирика команды; по книге здесь свойство-карта — см. врезку
+    'CLASS'    => 'MyActivity',      // без префикса CBP
+    'JSCLASS'  => 'BizProcActivity',
+    'CATEGORY' => ['ID' => 'task'],  // см. таблицу ниже
+    'RETURN'   => ['ResultField' => ['NAME' => '…', 'TYPE' => 'int']],
+    // ADDITIONAL_RESULT не нужен: он для свойств-карт с результатами, которые определяются на ходу
 ];
 ```
 
-Встроенные коды разделов — наблюдения команды; в книге есть только `other` и свой раздел:
+Встроенные разделы дизайнера — по ядру (bizproc 26.1075.0, компонент `bizproc.workflow.edit`):
 
 | `CATEGORY['ID']` | Раздел дизайнера |
 |---|---|
 | `document` | Обработка документа |
 | `task` | **Задания** |
-| `constructs` | Конструкции |
-| `notification` | Уведомления |
+| `logic` | Конструкции |
+| `interaction` | Уведомления |
+| `rest` | Действия приложений |
 | `other` | Прочее |
 
-`OWN_ID` + `OWN_NAME` создают **свой** раздел — не указывать, если нужна встроенная категория.
-Неизвестный `ID` → действие падает в «Мои действия» либо не отображается вовсе.
+> **Изменено 2026-09-22.** Раньше в таблице были коды `constructs` и `notification` (наблюдения
+> команды) — в ядре их нет, исправлено на `logic` и `interaction`.
 
-`RETURN` делает результаты выбираемыми в классическом дизайнере, `ADDITIONAL_RESULT` — в
-D7-движке и роботах. Указывать оба безопасно и покрывает обе среды. **Расходится с книгой
-(2026-09-21):** книга описывает `ADDITIONAL_RESULT` иначе — как список свойств-карт для
-динамических результатов; до проверки на стенде следовать решению из врезки вверху.
+`OWN_ID` + `OWN_NAME` создают **свой** раздел — не указывать, если нужна встроенная категория
+(штатное «Утверждение» кладёт себя в «Задания» как `['ID' => 'document', 'OWN_ID' => 'task']`).
+Неизвестный `ID` без `OWN_ID` — по опыту команды действие не отображается в панели.
+
+Результат из `RETURN` дизайнер показывает во «Вставке значения → Дополнительные результаты» сразу;
+`ADDITIONAL_RESULT` он читает, только если `RETURN` пуст (см. врезку, п. 3).
+
+> **Изменено 2026-09-22.** Раньше здесь было «`RETURN` — для классического дизайнера,
+> `ADDITIONAL_RESULT` — для роботов, указывать оба». Курс и ядро этого не подтверждают: для дизайнера
+> хватает `RETURN`, ключ `RETURN` в `ADDITIONAL_RESULT` не используется. В роботах проверить отдельно.
 
 ## Проверка результата
 - Действие видно в разделе «Задания» дизайнера БП (после сброса кэша).
@@ -246,7 +258,9 @@ D7-движке и роботах. Указывать оба безопасно 
 
 | Симптом | Причина | Решение |
 |---|---|---|
-| Действия нет в дизайнере / упало в «Мои действия» | нестандартный `CATEGORY['ID']` или лишний `OWN_ID` | `['ID' => 'task']`, затем сбросить кэш |
+| Действия нет в дизайнере | нестандартный `CATEGORY['ID']` (например, `constructs`) или лишний `OWN_ID` | код из таблицы шага 5, например `['ID' => 'task']`, затем сбросить кэш |
+| Своё действие подменило штатное во всех шаблонах | папка названа как штатная (`logactivity`, `task2activity` — так в примерах курса) | префикс вендора в имени: ядро берёт первую найденную папку, `/local` — раньше `/bitrix` |
+| Кнопка «Делегировать» осталась | `DELEGATION_TYPE => 0` — это «только подчинённым» | `CBPTaskDelegationType::None` (`2`) |
 | **Тело задания пустое в новом UI**, кнопки есть | `ShowTaskForm` вернул `<tr>`, контейнер нового UI — `<div>` | `<div>`-вёрстка; данные из `$arTask['PARAMETERS']`, не перезагружать workflow |
 | БП не просыпается | `SendExternalEvent` вызван как метод экземпляра | только статически: `CBPRuntime::SendExternalEvent(...)` |
 | Задание не появляется в попапе | `ACTIVITY` в `CreateTask` ≠ имени класса без `CBP` | привести в соответствие |

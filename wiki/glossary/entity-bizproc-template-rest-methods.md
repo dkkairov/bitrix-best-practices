@@ -5,12 +5,12 @@ module: bizproc
 edition: cloud
 status: verified
 provenance: documented
-verified: "2026-09-16 / apidocs.bitrix24.ru (через MCP)"
+verified: "2026-09-22 / apidocs.bitrix24.ru (через MCP): шаблоны — 2026-09-16, bizproc.task.complete, bizproc.activity.add, bizproc.event.send, bizproc.activity.log — 2026-09-22; курс 57 (уроки 3858, 23036)"
 tags: [rest, бизнес-процессы, шаблоны, bpt, приложение, роботы]
-sources: []
+sources: ["[[source-course57-developer]]", "[[source-course57-templates-designer]]"]
 related: ["[[concept-bizproc-bpt-format]]", "[[recipe-rest-oauth-app-setup]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[entity-robots-triggers]]", "[[antipattern-bizproc-hardcoded-portal-ids]]"]
 aliases: []
-updated: "2026-09-18"
+updated: "2026-09-22"
 ---
 
 # REST-методы шаблонов БП (`bizproc.workflow.template.*`)
@@ -65,9 +65,22 @@ updated: "2026-09-18"
 - `bizproc.workflow.instances` — список запущенных процессов. `bizproc.workflow.terminate`
   останавливает процесс с сохранением данных, `bizproc.workflow.kill` удаляет его вместе с данными.
 - `bizproc.task.list` / `bizproc.task.complete` — задания (утверждение, ознакомление, запрос
-  информации), пригодятся для автотестов.
+  информации), пригодятся для автотестов. У `complete` параметры `TASK_ID`, `STATUS` (`1`/`yes` —
+  утверждено, `2`/`no` — отклонено, `3`/`ok` — ознакомлен, `4`/`cancel` — отмена; набор зависит от типа
+  задания), `COMMENT` и `FIELDS` — значения полей запроса информации
+  ([bizproc.task.complete](https://apidocs.bitrix24.ru/api-reference/bizproc/bizproc-task/bizproc-task-complete.html)).
 - `bizproc.robot.add` / `bizproc.activity.add` — регистрируют **своего** робота или действие
   приложения (нужен контекст приложения и права администратора). Роботов на стадии они не расставляют.
+  У действия: `CODE`, `HANDLER` (URL на домене приложения), `USE_SUBSCRIPTION` (ждать ответа),
+  `PROPERTIES`, `RETURN_PROPERTIES`, `FILTER`
+  ([bizproc.activity.add](https://apidocs.bitrix24.ru/api-reference/bizproc/bizproc-activity/bizproc-activity-add.html)).
+  В дизайнере такое действие — в разделе «Действия приложений»; обработчик получает `event_token` и
+  отвечает `bizproc.event.send` с `RETURN_VALUES` и `LOG_MESSAGE`
+  ([bizproc.event.send](https://apidocs.bitrix24.ru/api-reference/bizproc/bizproc-robot/bizproc-event-send.html)),
+  а до ответа может писать в журнал `bizproc.activity.log` — если журнал включён в шаблоне. Курс
+  (уроки [23036](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=23036), 7771)
+  предупреждает, что действия приложения удаляются при его удалении и обновлении; в документации об
+  обновлении не сказано, зато есть `bizproc.activity.update`.
 
 ## Пример
 ```js
@@ -94,8 +107,12 @@ $base64Content = base64_encode(file_get_contents('bp-invoice.bpt'));
 - `DOCUMENT_TYPE` должен совпадать с объектом запуска: шаблон для сделок не запустить для лида.
 - ID смарт-процессов, стадий и полей различаются между порталами — сверять перед загрузкой
   ([[antipattern-bizproc-hardcoded-portal-ids|Зашитые ID портала]]).
-- Что происходит при загрузке, если полей из `DOCUMENT_FIELDS` нет на целевом портале, документация
-  не описывает — проверять на тестовом портале.
+- Что происходит при загрузке, если полей из `DOCUMENT_FIELDS` нет на целевом портале, REST-документация
+  не описывает. Курс: импорт создаёт недостающие поля
+  ([урок 3858](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3858)); на стенде
+  коробки так и вышло ([[concept-bizproc-bpt-format]]).
+- Загружать шаблон можно только в документ того же типа, что и при экспорте: курс называет это
+  запретом.
 
 ## Связанное
 - [[concept-bizproc-bpt-format|Формат .bpt]], [[pattern-bizproc-ai-assisted-generation|AI-генерация БП]],

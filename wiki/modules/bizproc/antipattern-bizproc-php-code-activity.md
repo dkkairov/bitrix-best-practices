@@ -5,12 +5,12 @@ module: bizproc
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы / Действие: PHP код, Работа с окружением; без проверки на стенде"
+verified: "2026-09-22 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы / Действие: PHP код, Работа с окружением; курс 57 (уроки 3806, 13378, 23038, 3789, 5368, 8411); без проверки на стенде"
 tags: [bizproc, php-код, CodeActivity, активити, журнал, сопровождение]
-sources: ["[[source-devbook-bizproc]]"]
+sources: ["[[source-devbook-bizproc]]", "[[source-course57-developer]]", "[[source-course57-actions-notify-other]]", "[[source-course57-examples]]"]
 related: ["[[entity-cbp-activity]]", "[[entity-bizproc-activity-description]]", "[[recipe-bizproc-custom-task-activity]]", "[[concept-bizproc-activity-catalog]]", "[[concept-bizproc-bpt-format]]"]
 aliases: []
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Действие «PHP код» в шаблонах БП
@@ -42,6 +42,16 @@ updated: "2026-09-21"
 - **Глобальное окружение ненадёжно.** Код выполняется и при открытии страницы, и на cron: текущего
   пользователя может не быть или он окажется не тем, ID сайта может отсутствовать
   ([Правила](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/PHP_kod.html#pravila)).
+- **Курс добавляет** ([урок 13378](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=13378),
+  [урок 23038](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=23038)):
+  - ошибка разбора PHP после подстановки значений роняет хит — процесс зависает;
+  - значение `{=Variable:…}` в SQL без фильтрации — инъекция;
+  - права нельзя повышать через `$USER->Authorize()`;
+  - у роботов и триггеров нет пользователя-инициатора;
+  - модули не подключены — подключать самим; типы приводить явно.
+- **Только коробка и только администратор.** Задавать код может только администратор
+  ([урок 3806](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3806)); в облаке
+  действия нет — своя логика там только через свои действия приложения по REST.
 
 ## Ловушка автоподстановки
 Перед выполнением значения подставляются в текст кода как есть — книга сравнивает это с
@@ -96,8 +106,21 @@ $title = (string)$this->ParseValue('{' . '=Document:TITLE}');
 
 В блоках «Условие» и «Цикл» тоже есть вариант «PHP код»
 ([Свои условия](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Svoi_uslovia.html#svoi-uslovia));
-замена ему — своё условие ([[entity-cbp-activity-condition]]). Книга разбирает риски только для
-действия; что у условия они те же, — вывод команды.
+его задаёт только администратор, код должен вернуть `true` или `false`
+([урок 3789](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3789)). Замена ему —
+своё условие ([[entity-cbp-activity-condition]]). Книга разбирает риски только для действия; что у
+условия они те же, — вывод команды.
+
+## Примеры курса — не копировать
+Курс сам советует читать значения через `$this->GetVariable()`, а не подставлять `{=…}` в код, но его
+примеры делают наоборот:
+- урок 3806, примеры 3 и 4, уроки 2172 и 2905 — `{=…}` прямо в тексте кода;
+- [урок 5368](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=5368) — подстановки без
+  кавычек: код в показанном виде не выполнится и открыт для инъекции;
+- [урок 8411](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=8411) — задача с
+  приоритетом, ID исполнителя и постановщика зашиты числами. Штатная замена — «Поставить задачу» с
+  признаком важности и «Остановить процесс на время выполнения задачи»; при переменной важности — два
+  действия в ветках «Условия».
 
 ## Если без «PHP кода» не обойтись
 Книга возражает против этого действия именно в релизах; для быстрой проверки идеи на тестовом

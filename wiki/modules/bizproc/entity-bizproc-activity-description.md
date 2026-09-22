@@ -3,14 +3,14 @@ title: "Файл .description.php действия БП"
 type: entity
 module: bizproc
 edition: box
-status: draft
+status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы / Действия, Создание своего действия, Свои условия; без проверки на стенде"
+verified: "2026-09-22 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21); курс 57 dev.1c-bitrix.ru (уроки 23034, 12409, 3771); код стенда (коробка, bizproc 26.1075.0): ActivitySearcher\\Searcher, ActivityFilterChecker, PropertiesDialog, компонент bizproc.workflow.edit. Видимость результатов в интерфейсе роботов не проверялась"
 tags: [bizproc, активити, робот, условие, description-php, метаописание]
-sources: ["[[source-devbook-bizproc]]"]
+sources: ["[[source-devbook-bizproc]]", "[[source-course57-developer]]", "[[source-course57-templates-designer]]", "[[source-course57-actions-core]]"]
 related: ["[[entity-cbp-activity]]", "[[concept-bizproc-engine]]", "[[recipe-bizproc-custom-task-activity]]", "[[entity-bizproc-field-type]]", "[[concept-bizproc-activity-catalog]]", "[[antipattern-bizproc-php-code-activity]]"]
 aliases: []
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Файл `.description.php` действия БП
@@ -20,8 +20,10 @@ updated: "2026-09-21"
 списке роботов, в каких документах действие доступно и что оно возвращает
 ([Действия → .description.php](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#description-php)).
 
-> **Черновик** из-за противоречия книги о `RETURN` и `ADDITIONAL_RESULT` (раздел ниже). Остальное —
-> по книге, кроме пунктов с пометкой «вывод команды».
+> **Изменено 2026-09-22: из черновика — в проверенные.** Страница была черновиком из-за противоречия
+> книги о `RETURN` и `ADDITIONAL_RESULT`. Курс 57 и код ядра его сняли для дизайнера (раздел ниже);
+> порядок поиска, «первое совпадение», `FILTER` и разделы `CATEGORY` подтверждены кодом ядра. Открыт
+> только вопрос, как результаты видны в интерфейсе роботов.
 
 ## Ключевые факты
 | Поле | Значение |
@@ -52,9 +54,16 @@ updated: "2026-09-21"
 - Класс — в файле с тем же именем: `vendordealcheckactivity/vendordealcheckactivity.php`. Рядом —
   `.description.php`, `properties_dialog.php` (настройки в дизайнере), `robot_properties_dialog.php`
   (настройки робота) и `lang/` — см. [[concept-bizproc-engine|структуру каталога]].
-- **Вывод команды:** раз берётся первое совпадение, одноимённый каталог выше по списку перекрывает
-  штатное действие из `/bitrix/modules/bizproc/activities/`. Так можно подменить штатное действие —
-  и так же легко сделать это нечаянно. На стенде не проверялось.
+- **Первое совпадение перекрывает штатное действие** — подтверждено кодом ядра
+  (`Bitrix\Bizproc\Runtime\ActivitySearcher\Searcher`: уже найденное имя папки дальше пропускается).
+  Штатные действия на стенде лежат в `/bitrix/activities/bitrix/`. Так можно подменить штатное
+  действие — и так же легко сделать это нечаянно: примеры курса `logactivity` и `task2activity`
+  ([урок 2906](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=2906),
+  [урок 2904](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=2904)) совпадают со
+  штатными «Запись в отчет» и «Поставить задачу».
+- Курс кладёт свои действия в `/bitrix/activities/custom/`
+  ([урок 23034](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=23034)) — это
+  устаревший совет: `/local/activities/…` ищется раньше и не затрагивается обновлениями.
 
 ## Ключи `$arActivityDescription`
 
@@ -70,6 +79,11 @@ updated: "2026-09-21"
 | `FILTER` | array | в шаблонах каких документов действие показывать |
 | `RETURN` | array | возвращаемые значения |
 | `ADDITIONAL_RESULT` | array | коды свойств-карт с результатами, состав которых определяется на ходу |
+
+В ядре 26.x встречаются ещё `EXCLUDED` (скрыть действие по условию), `PRESETS` (варианты одного
+действия с заданными свойствами — так «…элемента смарт-процесса» стало вариантом «…элемента CRM»),
+`SORT`, а описание всё чаще собирают классом `Bitrix\Bizproc\Activity\ActivityDescription`. Курс
+называет `ADDITIONAL_RESULT` доступным с bizproc 17.0.3.
 
 Регистр `CLASS` и каталога может различаться: в примере книги `HelloWorldActivity` лежит в
 `helloworldactivity/`
@@ -89,8 +103,13 @@ updated: "2026-09-21"
   ([CATEGORY](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#category)).
 - Свой раздел — ключи `OWN_ID` (символьный код) и `OWN_NAME` (название); в примере книги `ID`
   равен `OWN_ID`.
-- Другие встроенные коды разделов книга не перечисляет. Список, собранный командой на практике, и
-  симптомы ошибок — в [[recipe-bizproc-custom-task-activity]].
+- Встроенные разделы в ядре (bizproc 26.1075.0, компонент `bizproc.workflow.edit`): `document`
+  «Обработка документа», `task` «Задания», `logic` «Конструкции», `interaction` «Уведомления», `rest`
+  «Действия приложений», `other` «Прочее»; к ним добавляются разделы из `OWN_ID`/`OWN_NAME` действий.
+  Книга называет только `other` и свой раздел; курс — `OWN_ID`/`OWN_NAME` и предупреждает, что правка
+  `.description.php` системных действий затрётся обновлением
+  ([урок 12409](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=12409)). Симптомы
+  ошибок — в [[recipe-bizproc-custom-task-activity]].
 
 ### `ROBOT_SETTINGS` — место в списке роботов
 `GROUP` — массив кодов групп, в которых показывается робот; `SORT` — порядок внутри группы
@@ -141,8 +160,10 @@ updated: "2026-09-21"
 ],
 ```
 
-- **Проверить на стенде:** для сделок тип задан без кода типа — судя по примеру, такой фильтр
-  действует на все типы этого класса документа. Прямо книга этого не говорит.
+- **Неполный тип — фильтр по префиксу** (код ядра `Bitrix\Bizproc\Activity\Mixins\ActivityFilterChecker`):
+  правило сравнивается с типом документа по порядку элементов и заканчивается там, где заканчивается
+  правило. `['crm', 'CCrmDocumentDeal']` действует на все сделки, `['crm']` — на всю CRM. Правило-строка
+  сравнивается с редакцией продукта, ключ `MIN_API_VERSION` скрывает действие на старом API.
 - **Вывод команды:** в `DYNAMIC_<ID>` зашит ID типа [[entity-smart-process|смарт-процесса]]
   конкретного портала; после переноса фильтр укажет на чужой тип или ни на что
   ([[antipattern-bizproc-hardcoded-portal-ids]]).
@@ -197,24 +218,27 @@ foreach (array_keys($map) as $fieldCode) {
 }
 ```
 
-## `RETURN` и `ADDITIONAL_RESULT`: книга противоречит себе
+## `RETURN` и `ADDITIONAL_RESULT`: противоречие книги снято
 
-> **Проверить на стенде.**
-> - [RETURN](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#return)
->   и [ADDITIONAL_RESULT](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#additional-result):
->   результаты из `RETURN`, не перечисленные в `ADDITIONAL_RESULT`, другим действиям недоступны — их
->   нельзя использовать при настройке следующих шагов. В заметке ключ назван `RESULT` — опечатка, по
->   смыслу это `RETURN`.
-> - [Свои действия → файл класса](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Svoi_dejstvia.html#fajl-helloworldactivity-php):
->   в `.description.php` примера есть только `RETURN`, и книга утверждает, что результат уже можно
->   подставить в другие действия, например в «Запись в отчёт». Во вступлении пример обещает отдавать
->   сообщение как дополнительный результат, но `ADDITIONAL_RESULT` в итоговом коде нет.
-> - У команды третий вариант: [[recipe-bizproc-custom-task-activity]] указывает оба ключа, причём в
->   `ADDITIONAL_RESULT` кладёт сам ключ из `RETURN`, а не свойство-карту, как описывает книга.
+> **Решено 2026-09-22 (курс 57 и код ядра).** Книга противоречила себе: заметка в
+> [RETURN](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#return)
+> говорила, что результаты без `ADDITIONAL_RESULT` другим действиям недоступны, а пример
+> [helloworldactivity](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/Dejstvia.html#additional-result)
+> обходится одним `RETURN`. Прав пример:
+> - курс: результаты штатных заданий доступны во «Вставке значения → Дополнительные результаты» сразу
+>   после добавления действия ([урок 3771](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3771)),
+>   а в их `.description.php` только `RETURN`;
+> - ядро: список результатов для дизайнера строится из `RETURN`; `ADDITIONAL_RESULT` читается, только
+>   если `RETURN` пуст, и перечисляет **свойства-карты** (`PropertiesDialog::extractChildProperties`).
+>   Для ссылок и роботов `CBPRuntime::getActivityReturnProperties()` объединяет `RETURN` и карты из
+>   `ADDITIONAL_RESULT`. Штатные образцы карт — `EntityFields` («Выбор данных crm»),
+>   `DynamicEntityFields` («Получить информацию об элементе CRM»), `FieldsMap` (элемент списка);
+> - практика команды «указывать в `ADDITIONAL_RESULT` ключ из `RETURN`» ничего не даёт — убрана из
+>   [[recipe-bizproc-custom-task-activity]].
 >
-> До проверки: постоянные результаты объявлять в `RETURN`, динамические — через `ADDITIONAL_RESULT`
-> со свойством-картой. После выкладки убедиться, что результат виден во «Вставке значения» и в
-> дизайнере БП, и в настройках роботов.
+> Правило: постоянные результаты — в `RETURN` (+ `SetPropertiesTypes()`), динамические — свойство-карта
+> в `ADDITIONAL_RESULT`, и тогда без `RETURN`. Как результаты видны в интерфейсе роботов — проверить
+> на своём действии.
 
 ## Условие: минимальное описание
 Условию хватает `NAME` и `TYPE => 'condition'`, при необходимости — `FILTER`. `CLASS` в примере книги
@@ -276,8 +300,8 @@ $arActivityDescription = [
 - **`FILTER` с `DYNAMIC_<ID>`** привязывает действие к конкретному порталу (вывод команды).
 - **Действие не появилось в дизайнере** — по опыту команды: проверить `CATEGORY['ID']` и сбросить
   кэш ([[recipe-bizproc-custom-task-activity]]).
-- **Результат не виден во «Вставке значения»** — см. противоречие про `RETURN` и
-  `ADDITIONAL_RESULT`; проверять и в дизайнере, и в роботах.
+- **Результат не виден во «Вставке значения»** — проверить, что ключ есть в `RETURN`; если у действия
+  есть и `RETURN`, и `ADDITIONAL_RESULT`, дизайнер покажет только `RETURN`.
 
 ## Связанное
 - [[entity-cbp-activity]] — класс действия, которое описывает файл

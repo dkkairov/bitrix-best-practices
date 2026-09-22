@@ -5,12 +5,12 @@ module: bizproc
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы — Свои условия"
+verified: "2026-09-22 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы — Свои условия; курс 57 (уроки 3789, 3792); код стенда (bizproc 26.1075.0): getJoiner, ConditionGroup"
 tags: [bizproc, условие, класс, цикл, ветвление]
-sources: ["[[source-devbook-bizproc]]"]
-related: ["[[entity-cbp-activity]]", "[[concept-bizproc-engine]]", "[[entity-bizproc-field-type]]", "[[entity-bizproc-activity-description]]"]
+sources: ["[[source-devbook-bizproc]]", "[[source-course57-actions-core]]"]
+related: ["[[entity-cbp-activity]]", "[[concept-bizproc-engine]]", "[[entity-bizproc-field-type]]", "[[entity-bizproc-activity-description]]", "[[concept-bizproc-bpt-format]]"]
 aliases: ["bitrix24-cbp-activity-condition"]
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # `CBPActivityCondition`
@@ -51,6 +51,22 @@ class CBPDiceCondition extends \CBPActivityCondition
 ```
 
 `$ownerActivity` — родительское активити («Условие» или «Цикл»). `true` — условие выполнено.
+
+## Штатные условия и связка «и»/«или»
+- Виды в дизайнере: «Смешанное», «PHP код», «Значение переменной», «Поле документа», «Истина»; «PHP
+  код» задаёт только администратор, код возвращает `true` или `false`. Константы и глобальные значения
+  доступны только в «Смешанном»
+  ([урок 3789](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3789)). В ядре это
+  классы `fieldcondition`, `propertyvariablecondition`, `mixedcondition`, `truecondition`,
+  `codecondition` в `/bitrix/activities/bitrix/`.
+- Штатные условия собирают строки в `Bizproc\Activity\ConditionGroup`. Связка берётся из
+  `getJoiner()`: пусто или `0` — «и», иначе «или». Группы делятся по «или», внутри — «и»: «и» сильнее
+  «или». Первая группа изначально истинна, поэтому «или» в первой строке делает условие истинным всегда
+  (код ядра, bizproc 26.1075.0).
+- Курс предупреждает: проверку «не равно» для нескольких значений строят только через «и» — с «или»
+  она всегда истинна. «Содержится в» и «Содержит» чувствительны к регистру.
+- Своё условие может унаследовать `getJoiner()` и `ConditionGroup`, чтобы вести себя как штатные
+  (вывод команды).
 
 ## Чего у условий нет
 

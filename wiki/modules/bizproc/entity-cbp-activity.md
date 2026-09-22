@@ -5,12 +5,12 @@ module: bizproc
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы — Действия, Окружение, PHP код, Свои действия; прерывание через throw и inline-скрипты диалога — эмпирика команды"
+verified: "2026-09-22 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы — Действия, Окружение, PHP код, Свои действия; курс 57 (уроки 3471, 3470, 23034, 13378); код стенда (bizproc 26.1075.0): BaseActivity::execute; inline-скрипты диалога — эмпирика команды"
 tags: [bizproc, активити, класс, диалог-настроек, журнал]
-sources: ["[[source-devbook-bizproc]]"]
-related: ["[[concept-bizproc-engine]]", "[[recipe-bizproc-custom-task-activity]]", "[[entity-bizproc-field-type]]", "[[entity-cbp-activity-condition]]", "[[entity-main-result]]", "[[entity-bizproc-activity-description]]"]
+sources: ["[[source-devbook-bizproc]]", "[[source-course57-developer]]"]
+related: ["[[concept-bizproc-engine]]", "[[recipe-bizproc-custom-task-activity]]", "[[entity-bizproc-field-type]]", "[[entity-cbp-activity-condition]]", "[[entity-main-result]]", "[[entity-bizproc-activity-description]]", "[[entity-cbp-task-service]]"]
 aliases: ["bitrix24-cbp-activity"]
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # `CBPActivity` и `BaseActivity`
@@ -54,6 +54,13 @@ class CBPMyActivity extends \CBPActivity
 ```
 
 Свойства читаются и пишутся магией: `$this->MyText`. Значения по умолчанию — в `$arProperties`.
+Параметры процесса — это свойства корневого действия (`GetRootActivity()`); свойство выполненного
+раньше действия доступно как `{=ИмяДействия:Свойство}`
+([урок 3471](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3471)). Составное
+действие запускает дочерние через `$this->workflow->ExecuteActivity()` и подписывается на их
+закрытие (`AddStatusChangeHandler`); пример курса в
+[уроке 3470](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3470) устарел (неверный
+интерфейс, `protected OnEvent`) — образец лучше брать из штатного `CBPApproveActivity`.
 
 **Возврат `Execute()`:** `Closed` — завершено; `Executing` — ещё работает (событийные действия);
 `Faulting` — критическая ошибка, процесс прекращается.
@@ -101,9 +108,10 @@ class CBPMyActivity extends \CBPActivity
 | `checkProperties(): ErrorCollection` | проверки параметров **во время выполнения** (с доступом к `$preparedProperties`), не валидация формы при сохранении |
 | `$this->preparedProperties[<key>]` | способ вернуть результат; ключ должен быть объявлен в `RETURN` `.description.php`, тип — через `SetPropertiesTypes()` |
 
-Результат можно вернуть и как `$this->Key` — тогда в `arProperties` ключ должен быть `null`. Про
-`RETURN` и `ADDITIONAL_RESULT` книга противоречит сама себе —
-[[entity-bizproc-activity-description]].
+Результат можно вернуть и как `$this->Key` — тогда в `arProperties` ключ должен быть `null`.
+Результат из `RETURN` дизайнер показывает во «Вставке значения» сразу; `ADDITIONAL_RESULT` — для
+свойств-карт с результатами, которые определяются на ходу (противоречие книги снято курсом и кодом
+ядра — [[entity-bizproc-activity-description]]).
 
 ```php
 protected function internalExecute(): \Bitrix\Main\ErrorCollection
@@ -150,11 +158,17 @@ public static function getPropertiesDialogMap(?PropertiesDialog $dialog = null):
 - **Код может выполняться на cron:** текущего пользователя и ID сайта может не быть или они окажутся
   чужими — не полагайтесь на глобальные `$USER` и `SITE_ID`
   ([правила](https://bx24devbook.website.yandexcloud.net/Modul_Biznes_processy/Dejstvia/PHP_kod.html#pravila)).
-- **Штатно ошибку возвращают** статусом `Faulting` из `Execute()`, а в `BaseActivity` — через
-  `ErrorCollection` (книга). **Эмпирика команды:** `$this->Execution` в действии не существует;
-  прерывать можно через `throw new Exception(...)` — движок поймает и вызовет `HandleFault`, а вызов
-  `$this->Execution->FaultActivity()` даст «Call to a member function on null». Прерывают ли ошибки
-  `ErrorCollection` сам процесс — по книге неочевидно, проверить на стенде.
+  Курс добавляет: права не повышать через `$USER->Authorize()`, у роботов и триггеров нет
+  пользователя-инициатора ([урок 13378](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=13378)).
+- **Ошибка в `ErrorCollection` процесс не останавливает.** По коду ядра (`BaseActivity::execute`,
+  bizproc 26.1075.0) ошибки из `checkProperties()` и `internalExecute()` только пишутся в журнал
+  (`logError`), действие закрывается, процесс идёт дальше. Остановить процесс — статусом `Faulting` из
+  `Execute()` у `CBPActivity` или исключением: движок поймает его и вызовет `HandleFault`.
+  **Эмпирика команды:** `$this->Execution` в действии не существует — вызов
+  `$this->Execution->FaultActivity()` даст «Call to a member function on null».
+
+> **Изменено 2026-09-22.** Раньше вопрос «прерывают ли ошибки `ErrorCollection` процесс» был открыт —
+> ответ взят из кода ядра.
 - Диалог настроек грузится AJAX-ом: **inline `<script>` исполняется ненадёжно**, особенно в
   редакторе автоматизации CRM (эмпирика команды). Сложное редактирование выносить на отдельную
   страницу — подробно в [[recipe-bizproc-custom-task-activity]].

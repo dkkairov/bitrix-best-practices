@@ -5,12 +5,12 @@ module: bizproc
 edition: both
 status: verified
 provenance: mixed
-verified: "2026-06-19 / Bitrix24 cloud + box"
-tags: [роботы, триггеры, автоматизация, crm]
-sources: []
-related: ["[[pattern-robots-vs-bizproc-decision]]", "[[pattern-rest-webhooks-and-events]]", "[[entity-bizproc-template-rest-methods]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[entity-bizproc-activity-description]]"]
+verified: "2026-06-19 / Bitrix24 cloud + box; автозапуск и запуск из кода — 2026-09-22 / курс 57 dev.1c-bitrix.ru (уроки 20686, 3122, 7399, 8445) и код стенда (коробка, bizproc 26.1075.0, crm 26.800.0)"
+tags: [роботы, триггеры, автоматизация, crm, автозапуск]
+sources: ["[[source-course57-developer]]", "[[source-course57-templates-designer]]", "[[source-course57-actions-crm-disk]]"]
+related: ["[[pattern-robots-vs-bizproc-decision]]", "[[pattern-rest-webhooks-and-events]]", "[[entity-bizproc-template-rest-methods]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[entity-bizproc-activity-description]]", "[[concept-bizproc-engine]]"]
 aliases: ["robots-triggers"]
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Роботы и триггеры
@@ -32,12 +32,40 @@ updated: "2026-09-21"
 **Свой робот в коробке** — то же действие бизнес-процесса, только с `TYPE` `robot_activity` в
 `.description.php`; группу и порядок в списке роботов задаёт `ROBOT_SETTINGS`
 ([[entity-bizproc-activity-description|паспорт действия]], по «Книге разработчика», 2026-09-21).
+Классы у роботов и действий БП общие, но поведение может различаться: часть действий настраивается
+только в роботах (рекламные аудитории), а идентификатор, заданный в действии БП «Создать QR-код»,
+триггер «Сканирование QR-кода» не видит — курс советует робот
+([урок 12605](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=12605)).
+
+## Автозапуск бизнес-процессов
+- Шаблон БП запускается «при создании» и/или «при изменении» документа
+  ([урок 3816](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3816)).
+- **Каждая правка пользователя или API запускает новый экземпляр**, даже если прежний не закончен: на
+  стенде создание и две правки дали три параллельных согласования (2026-09-22). Ограничитель —
+  лимит одновременных процессов на документ: в облаке 2, в коробке — настройка модуля; сверх лимита
+  новый процесс не стартует ([[concept-bizproc-engine|лимиты модуля]]).
+- **Изменения, которые делает сам процесс,** в смарт-процессах автозапуск БП не вызывают, пока не
+  включена опция CRM `start_bp_within_bp`, а роботов не запускают вовсе (код ядра crm 26.800.0:
+  операция из БП идёт с `runAutomation: false`). Для инфоблоков курс предупреждает об обратном:
+  процесс «при изменении», который меняет свой документ, зациклится
+  ([урок 3122](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3122)) — там на стенде
+  не проверяли.
+- Своя бизнес-логика, которая меняет сущность CRM старым API, сама запускает автоматизацию:
+  `\CCrmBizProcHelper::AutoStartWorkflows(...)` и `\Bitrix\Crm\Automation\Starter` с `runOnAdd()` /
+  `runOnUpdate()` ([урок 20686](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=20686)).
+  Операции `\Bitrix\Crm\Service\Operation` в CRM 26.x делают это сами (отключение —
+  `disableAutomation()`, `disableBizProc()`).
 
 ## Подводные камни
 - **Порядок роботов** на стадии важен — выполняются последовательно.
 - **Зацикливание:** триггер двигает стадию → робот возвращает → снова триггер. Избегать.
 - Условия запуска проверять явно, чтобы робот не срабатывал «вхолостую».
 - Для сложных маршрутов/согласований — бизнес-процессы ([[pattern-robots-vs-bizproc-decision|Роботы vs бизнес-процессы]]).
+- **В шаблонах «при изменении» — никаких ожиданий.** «Ожидание стадии сделки» и «Ожидание статуса
+  лида» срока не имеют: при запуске на изменение копятся экземпляры, которые срабатывают разом;
+  курс советует ставить их только в шаблоны «при создании»
+  ([урок 7399](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=7399),
+  [урок 8445](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=8445)).
 - **Шаблоны роботов недоступны в REST:** их нельзя получить, изменить или удалить, а
   `bizproc.workflow.template.add` не привязывает шаблон к стадии. `bizproc.robot.add` лишь
   регистрирует робота приложения. Перенос роботов между порталами — вручную
@@ -49,5 +77,6 @@ updated: "2026-09-21"
 - [[pattern-robots-vs-bizproc-decision|Роботы vs бизнес-процессы]] — когда роботов недостаточно
 - [[pattern-rest-webhooks-and-events|Вебхуки и события]] — внешняя реакция на те же события
 - [[entity-bizproc-template-rest-methods|REST-методы шаблонов БП]] — что можно развернуть программно
+- [[concept-bizproc-engine|Устройство движка БП]] — автозапуск и лимиты модуля
 
 [← Глоссарий](_index-glossary.md)

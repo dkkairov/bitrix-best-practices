@@ -5,12 +5,12 @@ module: bizproc
 edition: box
 status: verified
 provenance: documented
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы — Действия (RETURN, ADDITIONAL_RESULT), Свои действия (поля диалога)"
+verified: "2026-09-22 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы — Действия (RETURN, ADDITIONAL_RESULT), Свои действия (поля диалога); константы типов сверены с кодом стенда (bizproc 26.1075.0); курс 57 (уроки 12407, 3816)"
 tags: [bizproc, типы, поля, класс, диалог-настроек]
-sources: ["[[source-devbook-bizproc]]"]
+sources: ["[[source-devbook-bizproc]]", "[[source-course57-expressions]]"]
 related: ["[[entity-cbp-activity]]", "[[concept-bizproc-engine]]", "[[recipe-bizproc-custom-task-activity]]", "[[entity-bizproc-activity-description]]"]
 aliases: ["bitrix24-bizproc-fieldtype"]
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # `\Bitrix\Bizproc\FieldType`
@@ -45,6 +45,13 @@ updated: "2026-09-21"
 
 Базовые типы одинаковы для всех документов. Кроме них бывают **пользовательские** типы — они
 определяются документом, над которым запущен процесс, и меняются вместе с ним.
+
+В ядре 26.x есть ещё служебные константы: `CUSTOM`, `DOCUMENT` (ссылка на документ — так
+«Получить информацию об элементе CRM» отдаёт результат `Document`), `DOCUMENT_TYPE`, `JSON`, `RULES`,
+`ENTITYSELECTOR` (код стенда, bizproc 26.1075.0). Приводить значение к типу в выражении —
+модификаторами `> int`, `> date`, `> user` и т. п.
+([урок 12407](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=12407)); таблица,
+какие типы во что приводятся, — там же.
 
 ## Расширенные настройки
 

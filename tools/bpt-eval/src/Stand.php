@@ -35,24 +35,34 @@ final class Stand
     public function run(string $script, array $input = []): array
     {
         $cmd = ['docker', 'compose', 'exec', '-T', '--user=bitrix', 'php', 'php'];
-        $proc = proc_open($cmd, [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, $this->dir);
-        if (!is_resource($proc)) {
-            throw new EvalException("не удалось запустить docker compose в {$this->dir}");
+        // stderr — во временный файл, а не в pipe: два pipe (stdout+stderr), которые родитель читает
+        // последовательно, — стандартная ловушка proc_open (дочерний процесс может заполнить буфер
+        // второго потока, пока первый ещё не вычитан, и всё зависнет без исключения и диагностики).
+        $errFile = tempnam(sys_get_temp_dir(), 'bpteval');
+        if ($errFile === false) {
+            throw new EvalException('не удалось создать временный файл для stderr стенда');
         }
-        fwrite($pipes[0], self::compose($script, $input));
-        fclose($pipes[0]);
-        $out = (string) stream_get_contents($pipes[1]);
-        $err = (string) stream_get_contents($pipes[2]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        $code = proc_close($proc);
-        $json = json_decode(trim($out), true);
-        if ($code !== 0 || !is_array($json)) {
-            throw new EvalException("стенд, {$script}: код {$code}; " . mb_substr(trim($err . ' ' . $out), 0, 1500));
+        try {
+            $proc = proc_open($cmd, [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['file', $errFile, 'w']], $pipes, $this->dir);
+            if (!is_resource($proc)) {
+                throw new EvalException("не удалось запустить docker compose в {$this->dir}");
+            }
+            fwrite($pipes[0], self::compose($script, $input));
+            fclose($pipes[0]);
+            $out = (string) stream_get_contents($pipes[1]);
+            fclose($pipes[1]);
+            $code = proc_close($proc);
+            $err = (string) file_get_contents($errFile);
+            $json = json_decode(trim($out), true);
+            if ($code !== 0 || !is_array($json)) {
+                throw new EvalException("стенд, {$script}: код {$code}; " . mb_substr(trim($err . ' ' . $out), 0, 1500));
+            }
+            if (isset($json['error'])) {
+                throw new EvalException("стенд, {$script}: {$json['error']}");
+            }
+            return $json;
+        } finally {
+            @unlink($errFile);
         }
-        if (isset($json['error'])) {
-            throw new EvalException("стенд, {$script}: {$json['error']}");
-        }
-        return $json;
     }
 }

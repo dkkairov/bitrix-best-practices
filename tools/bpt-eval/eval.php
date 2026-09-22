@@ -33,9 +33,11 @@ if ($run === '' || !preg_match('/^[\w.-]+$/u', $run)) {
     exit(2);
 }
 $runDir = "{$root}/work/eval/{$run}";
-@mkdir($runDir, 0777, true);
 
 try {
+    if (!is_dir($runDir) && !@mkdir($runDir, 0777, true)) {
+        throw new EvalException("не удалось создать каталог прогона: {$runDir}");
+    }
     switch ($command) {
         case 'prepare':
             $stand = Stand::fromEnv();
@@ -51,9 +53,17 @@ try {
                 $snapshot['related'][$title] = ['fields' => Snapshot::fromBpt(['DOCUMENT_FIELDS' => $fields], $title)->section('field'),
                     'document_fields' => $fields];
             }
-            file_put_contents("{$runDir}/portal.yaml", "# Снимок тестового стенда для оценки, прогон {$run}, "
+            $portalFile = "{$runDir}/portal.yaml";
+            $portalWritten = file_put_contents($portalFile, "# Снимок тестового стенда для оценки, прогон {$run}, "
                 . date('Y-m-d H:i') . ". Настоящий, не синтетический.\n" . SpecReader::dump($snapshot));
-            file_put_contents("{$runDir}/setup.json", json_encode($setup, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+            if ($portalWritten === false) {
+                throw new EvalException("не удалось записать {$portalFile}");
+            }
+            $setupFile = "{$runDir}/setup.json";
+            $setupWritten = file_put_contents($setupFile, json_encode($setup, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+            if ($setupWritten === false) {
+                throw new EvalException("не удалось записать {$setupFile}");
+            }
             echo 'Стенд готов: ', ($setup['created'] ? implode(', ', $setup['created']) : 'всё уже было'), PHP_EOL;
             if ($setup['deactivated']) {
                 echo 'Деактивированы чужие шаблоны с автозапуском: #', implode(', #', $setup['deactivated']), PHP_EOL;

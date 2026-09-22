@@ -232,9 +232,10 @@ function cmdCatalog(array $files, array $opts): int
     }
     $lines[] = 'Свойства:';
     foreach ($catalog->props($type) as $prop => $spec) {
-        $lines[] = sprintf('  %-24s %-9s %s', $prop, $spec['type'],
+        $lines[] = sprintf('  %-24s %-9s %s%s', $prop, $spec['type'],
             ($spec['required'] ?? false) ? 'обязательное'
-                : (array_key_exists('default', $spec) ? 'по умолчанию: ' . BptFile::flatJson($spec['default']) : '—'));
+                : (array_key_exists('default', $spec) ? 'по умолчанию: ' . BptFile::flatJson($spec['default']) : '—'),
+            isset($spec['values']) ? '; допустимо: ' . implode(', ', $spec['values']) : '');
     }
     $returns = $catalog->returns($type);
     $lines[] = 'Возвращает: ' . ($returns ? implode(', ', $returns)

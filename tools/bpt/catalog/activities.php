@@ -210,7 +210,9 @@ return [
                 'MessageSite'     => ['type' => 'text', 'required' => true],
                 'MessageOut'      => ['type' => 'text', 'default' => ''],
                 'MessageType'     => ['type' => 'str', 'default' => '2'],   // в корпусе встречались 2 и 4
-                'MessageUserFrom' => ['type' => 'list', 'default' => []],
+                // Обязателен: ValidateProperties отклоняет импорт без отправителя; импортирующий не
+                // администратор может указать только себя (bizproc 26.1075.0, стенд 2026-09-22)
+                'MessageUserFrom' => ['type' => 'list', 'required' => true],
                 'MessageUserTo'   => ['type' => 'list', 'required' => true],
             ],
             'observed' => 20,
@@ -278,7 +280,8 @@ return [
             'shape'    => 'waiting-branches',
             // array_merge, а не «+»: частные значения должны перекрывать общие
             'props'    => array_merge($waitingCommon, [
-                'ApproveType'        => ['type' => 'str', 'default' => 'all'],
+                // Значения — из ApproveActivity::ValidateProperties (bizproc 26.1075.0, стенд 2026-09-22)
+                'ApproveType'        => ['type' => 'str', 'default' => 'all', 'values' => ['all', 'any', 'vote']],
                 'ApproveMinPercent'  => ['type' => 'str', 'default' => '50'],
                 'ApproveWaitForAll'  => ['type' => 'yn', 'default' => 'N'],
                 'Parameters'         => ['type' => 'str', 'default' => ''],

@@ -270,6 +270,15 @@ final class Compiler
                 $this->error($label, "нет обязательного свойства {$required}");
             }
         }
+        foreach ($props as $prop => $value) {
+            $allowed = $this->catalog->allowedValues($type, (string) $prop);
+            // Выражения ({=…}, формулы) проверяет только портал при запуске
+            if ($allowed && is_string($value) && !str_contains($value, '{=') && !str_starts_with($value, '=')
+                && !in_array($value, $allowed, true)) {
+                $this->error($label, "{$prop}: значение «{$value}» вне допустимых (" . implode(', ', $allowed)
+                    . ') — такой шаблон портал не примет при импорте');
+            }
+        }
 
         $ordered = [];
         foreach (array_keys($this->catalog->entry($type)['props']) as $prop) {

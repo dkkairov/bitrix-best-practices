@@ -36,6 +36,16 @@ test('Каталог: значения по умолчанию и обязате
     assertSame(['TITLE'], $c->returns('CrmGetRelationsInfoActivity', ['ParentEntityFields' => ['TITLE' => ['Name' => 'Название']]]));
 });
 
+test('Каталог: обязательность и допустимые значения — как в проверке ядра', function () {
+    $c = Catalog::load();
+    // IMNotifyActivity::ValidateProperties требует отправителя (bizproc 26.1075.0, стенд 2026-09-22)
+    assertTrue(in_array('MessageUserFrom', $c->requiredProps('IMNotifyActivity'), true), 'отправитель уведомления обязателен');
+    assertTrue(!isset($c->defaults('IMNotifyActivity')['MessageUserFrom']), 'у обязательного отправителя нет значения по умолчанию');
+    // ApproveActivity::ValidateProperties принимает только any, all, vote
+    assertSame(['all', 'any', 'vote'], $c->allowedValues('ApproveActivity', 'ApproveType'));
+    assertSame(null, $c->allowedValues('ApproveActivity', 'Name'));
+});
+
 test('Каталог: частные значения заданий перекрывают общие', function () {
     // У ознакомления своя подпись поля комментария, у утверждения — общая
     assertSame('Комментарий', Catalog::load()->defaults('ReviewActivity')['CommentLabelMessage']);

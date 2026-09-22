@@ -119,6 +119,15 @@ final class Catalog
         return $defaults;
     }
 
+    /**
+     * Допустимые значения свойства — если каталог их знает (из проверки ядра ValidateProperties).
+     * @return string[]|null
+     */
+    public function allowedValues(string $type, string $prop): ?array
+    {
+        return $this->props($type)[$prop]['values'] ?? null;
+    }
+
     /** @return string[] */
     public function requiredProps(string $type): array
     {

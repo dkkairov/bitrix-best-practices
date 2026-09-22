@@ -32,7 +32,9 @@ test('BptFile: не шаблон и мусор отклоняются', function
     file_put_contents($notTemplate, gzcompress(serialize(['foo' => 1]), 9));
     assertThrows(fn () => BptFile::read($notTemplate), 'не шаблон БП', 'массив без TEMPLATE');
     $garbage = tmpPath('.bpt');
-    file_put_contents($garbage, random_bytes(200));
+    // Не random_bytes: ~0,75% случайных строк распаковывает gzinflate, и тест «мигал».
+    // 0xFF — неверный заголовок zlib/gzip и зарезервированный тип блока deflate.
+    file_put_contents($garbage, str_repeat("\xFF", 200));
     assertThrows(fn () => BptFile::read($garbage), 'распаковать', 'повреждённый файл');
 });
 

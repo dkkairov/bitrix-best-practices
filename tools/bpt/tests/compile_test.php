@@ -83,6 +83,25 @@ test('Сборщик: нет обязательного свойства', funct
     assertTrue(str_contains($errors, 'TargetStatus'), "обязательное свойство: {$errors}");
 });
 
+test('Сборщик: значение вне допустимых — ошибка, выражение — нет', function () {
+    $approve = fn (string $type) => minimalSpec([['approve' => [
+        'Users' => ['user_42'], 'Name' => 'Согласование', 'ApproveType' => $type, 'on_yes' => [], 'on_no' => [],
+    ]]]);
+    $c = new Compiler(Catalog::load());
+    $errors = implode(' ', $c->compile($approve('anyone'))['errors']);
+    assertTrue(str_contains($errors, 'ApproveType') && str_contains($errors, 'all, any, vote'), "вне допустимых: {$errors}");
+    assertSame([], $c->compile($approve('any'))['errors']);
+    $withVariable = $approve('{=Variable:approve_type}') + ['variables' => ['approve_type' => ['Name' => 'Тип', 'Type' => 'string']]];
+    assertSame([], $c->compile($withVariable)['errors']);   // выражение не проверяем
+});
+
+test('Сборщик: уведомление без отправителя не собирается', function () {
+    $errors = implode(' ', (new Compiler(Catalog::load()))->compile(minimalSpec([['notify' => [
+        'MessageSite' => 'Текст', 'MessageUserTo' => ['user_42'],
+    ]]]))['errors']);
+    assertTrue(str_contains($errors, 'MessageUserFrom'), "отправитель обязателен: {$errors}");
+});
+
 test('Сборщик: запрещённое действие не собирается', function () {
     $errors = implode(' ', (new Compiler(Catalog::load()))->compile(minimalSpec([['php_code' => ['ExecuteCode' => 'echo 1;']]]))['errors']);
     assertTrue(str_contains($errors, 'PHP-кода'), "запрещённое действие: {$errors}");

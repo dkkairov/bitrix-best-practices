@@ -5,12 +5,12 @@ module: server-admin
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-21 / Windows 11 + Docker Desktop 29.7, env-docker 369e01a (BitrixVM 9.0.10); Битрикс24 коробка: main 26.750.0, bizproc 26.1075.0, crm 26.800.0, pull 26.100.0; PHP 8.2.33, Percona 8.0.46"
+verified: "2026-09-22 / Windows 11 + Docker Desktop 29.7, env-docker 369e01a (BitrixVM 9.0.10); Битрикс24 коробка: main 26.750.0, bizproc 26.1075.0, crm 26.800.0, pull 26.100.0; PHP 8.2.33, Percona 8.0.46"
 tags: [docker, стенд, тестовый портал, env-docker, установка, лицензия, push, cron, агенты]
 sources: []
 related: ["[[checklist-dev-environment-and-git]]", "[[recipe-mysql-connection-refused]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[antipattern-cli-php-as-root]]", "[[recipe-cli-script-bootstrap]]"]
 aliases: []
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Тестовый стенд коробки Битрикс24 в Docker
@@ -72,8 +72,32 @@ services:
     profiles: ["off"]            # поиск для тестов не нужен
   lego:
     profiles: ["off"]            # Let's Encrypt не нужен; публикует порт 80 (на Windows его держат OSPanel, IIS)
+  php-loopback:                  # «localhost:8588/8589» внутри контейнера php -> nginx
+    image: quay.io/bitrix24/nginx:1.30.5-v1-alpine   # образ уже скачан для nginx
+    container_name: dev_php_loopback
+    restart: unless-stopped
+    network_mode: "service:php"  # общее сетевое пространство с php
+    command: ["nginx", "-c", "/etc/nginx-loopback/nginx.conf", "-g", "daemon off;"]
+    volumes:
+      - ./confs-local/loopback-nginx.conf:/etc/nginx-loopback/nginx.conf:ro
+    depends_on: [php, nginx]
 ```
-Проверка: `docker compose config --services` — девять сервисов, без `postgres`, `sphinx`, `lego`.
+Зачем `php-loopback`: портал и «Проверка системы» обращаются к сайту по его адресу. Проверка берёт
+адрес из браузера (`localhost:8588`), а внутри контейнера `php` `localhost` — это сам контейнер. Без
+проброса падают «Работа с сокетами», push-сервер, «Ускорение открытия страниц» и «Оценка
+производительности». `confs-local/loopback-nginx.conf` — TCP-проброс модулем `stream`:
+```nginx
+worker_processes 1;
+error_log /dev/stderr warn;
+pid /tmp/nginx-loopback.pid;
+events { worker_connections 256; }
+stream {
+    resolver 127.0.0.11 valid=30s ipv6=off;    # DNS Docker: адрес nginx может смениться
+    server { listen 127.0.0.1:8588; set $site_http nginx:80;   proxy_pass $site_http; }
+    server { listen 127.0.0.1:8589; set $site_https nginx:443; proxy_pass $site_https; }
+}
+```
+Проверка: `docker compose config --services` — десять сервисов, без `postgres`, `sphinx`, `lego`.
 
 ### 4. Запуск и установщик
 ```bash
@@ -142,8 +166,14 @@ $hostSecure = 'localhost:8589';
 COption::SetOptionString('main', 'server_name', $host);
 (new CSite())->Update('s1', ['SERVER_NAME' => $host]);
 COption::SetOptionString('main', 'update_autocheck', '');   // без автопроверки обновлений
+
+// 4) Рекомендации README окружения: быстрая отдача файлов через nginx (он для неё настроен)
+//    и без продления сессии по активности — иначе проверка push-сервера жёлтая
+COption::SetOptionString('main', 'bx_fast_download', 'Y');
+COption::SetOptionString('main', 'session_expand', 'N');
 ```
-Набор адресов push-сервера — из README окружения; разделение на «браузер» и «сервер» — наше.
+Набор адресов push-сервера и две опции из пункта 4 — из README окружения; разделение адресов на
+«браузер» и «сервер» — наше.
 
 ## Проверка результата
 - **Портал:** `http://localhost:8588/` отдаёт 200.
@@ -156,7 +186,17 @@ COption::SetOptionString('main', 'update_autocheck', '');   // без автоп
   `curl -s -o /dev/null -w '%{http_code}' http://nginx/bitrix/pub/` возвращает 400. Это ответ самого
   push-сервера на пустой запрос; 502 или 000 означали бы, что до него не достучаться.
 - **Проверка системы** (`/bitrix/admin/site_checker.php`, вкладка «Работа портала») — финальная
-  сверка, в том числе push-сервера.
+  сверка. На стенде 2026-09-22 картина такая:
+
+  | Раздел | Результат | Почему |
+  |--------|-----------|--------|
+  | Общая работа портала (модули PHP, сокеты, UTF, cron…) | без ошибок | — |
+  | Push and Pull, живые комментарии, видеозвонки, Диск, поиск, REST API, облачные сервисы | работают | проброс `php-loopback`, опции из шага 6 |
+  | Мобильное приложение, push на телефоны, Google Docs и MS Office Online, доступ снаружи к экстранету | ошибки и замечания — **ожидаемо** | нужен внешний адрес с настоящим HTTPS |
+  | Отправка почты, интеграция с почтой и соцсетями, публикация в ленту из почты | ошибки и замечания — **ожидаемо** | почта намеренно не настроена, чтобы стенд не рассылал письма |
+
+  Push-сервер проверка считает жёлтым, пока включено продление сессии (`session_expand`), даже если
+  сообщение доставлено — так устроен код проверки.
 
 ## Лицензия
 - Один ключ — **не более двух установок**. Одна из них должна быть закрыта от публичного доступа и
@@ -176,6 +216,7 @@ COption::SetOptionString('main', 'update_autocheck', '');   // без автоп
 ## Откат и проблемы
 | Симптом | Причина | Что делать |
 |---------|---------|------------|
+| «Проверка системы»: красные сокеты, push, ускорение страниц, производительность | портал стучится сам к себе по `localhost:8588` изнутри контейнера `php` | проброс `php-loopback`, шаг 3 |
 | `(2002) No such file or directory` на шаге базы | сервер `localhost`: PHP ищет сокет MySQL в своём контейнере, а база — в соседнем | сервер `mysql`; не путать с `(2002) Connection refused`, когда база лежит ([[recipe-mysql-connection-refused]]) |
 | `lego` спорит с локальным веб-сервером за порт 80 | `lego` публикует `80:80`; у нас порт держит OSPanel | выключить профилем, шаг 3 (сделали заранее) |
 | В настройках адрес сайта `_` | мастер взял `server_name _` из конфига nginx | шаг 6, пункт 3 |

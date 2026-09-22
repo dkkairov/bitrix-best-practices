@@ -8,7 +8,7 @@ provenance: empirical
 verified: "2026-09-22 / анализ экспортов из дизайнера БП, смарт-процессы коробки клиента (до 2026-09-21 ошибочно считались роботами облака); способы исправления сверены с курсом 57 dev.1c-bitrix.ru (уроки 12383, 3817, 5272, 5384, 5383, 12321)"
 tags: [бизнес-процессы, роботы, перенос, тиражирование, bpt, идентификаторы]
 sources: ["[[source-course57-expressions]]", "[[source-course57-examples]]", "[[source-course57-actions-crm-disk]]"]
-related: ["[[concept-bizproc-bpt-format]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[entity-bizproc-template-rest-methods]]", "[[entity-smart-process]]", "[[entity-bizproc-globals-manager]]"]
+related: ["[[concept-bizproc-bpt-format]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[entity-bizproc-template-rest-methods]]", "[[entity-smart-process]]", "[[entity-bizproc-globals-manager]]", "[[source-course57-examples]]"]
 aliases: []
 updated: "2026-09-22"
 ---
@@ -47,7 +47,11 @@ updated: "2026-09-22"
 - Выбрать конкретного человека быстрее, чем завести роль.
 - Так сделаны и примеры официального курса: во всех ролях шаблона-примера стоит пользователь с ID 1
   ([урок 5383](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=5383)), согласующие —
-  группами прямо в действии, в «PHP коде» ID зашиты числами.
+  группами прямо в действии, в «PHP коде» ID зашиты числами. Файлы-примеры курса (разбор
+  2026-09-22, [[source-course57-examples]]) это подтверждают: `user_1`, `user_59`, `user_63`, `user_67` в
+  константах и переменных, поля `UF_CRM_*`, стадии `C1:*`, а в «Заявке на отпуск» (урок 5518) ссылка на
+  задание собрана из переменной с адресом портала автора в локальной сети — после импорта она ведёт в
+  никуда. Замена — `{=System:HostUrl}` (ниже).
 
 ## Как исправить
 В генерации — снимок портала и подстановка ID по названиям

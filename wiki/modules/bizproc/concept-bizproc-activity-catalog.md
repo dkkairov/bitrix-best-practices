@@ -8,7 +8,7 @@ provenance: mixed
 verified: "2026-09-22 / коробка клиента: корпус 16 экспортов из дизайнера БП (VERSION 2); курс 57 dev.1c-bitrix.ru (снимок 2026-09-22): смысл полей и поведение; стенд Docker, bizproc 26.1075.0: ValidateProperties, validateTemplate без записи в базу, прогон процессов"
 tags: [бизнес-процессы, действия, активити, каталог, bpt, генерация, роботы]
 sources: ["[[source-course57-actions-core]]", "[[source-course57-actions-notify-other]]", "[[source-course57-actions-crm-disk]]"]
-related: ["[[concept-bizproc-bpt-format]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[concept-bizproc-engine]]", "[[entity-cbp-activity]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[entity-cbp-task-service]]", "[[concept-bizproc-expressions]]", "[[recipe-bizproc-approval-route]]", "[[recipe-bizproc-request-intake]]", "[[checklist-bizproc-template-review]]"]
+related: ["[[concept-bizproc-bpt-format]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[concept-bizproc-engine]]", "[[entity-cbp-activity]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[entity-cbp-task-service]]", "[[concept-bizproc-expressions]]", "[[recipe-bizproc-approval-route]]", "[[recipe-bizproc-request-intake]]", "[[checklist-bizproc-template-review]]", "[[source-course57-examples]]"]
 aliases: []
 updated: "2026-09-22"
 ---
@@ -205,7 +205,11 @@ updated: "2026-09-22"
   («Утвердить документ», «Отклонить»).
 - **Корпус — шаблоны смарт-процессов одной коробки.** Действий для списков, Диска, задач и других
   документов, облачных экспортов и своих действий из `/local/activities/` здесь пока нет, как и
-  «Итератора», «Параллельного ожидания действия», «Команды» и «Установить статус».
+  «Итератора», «Параллельного ожидания действия», «Команды» и «Установить статус». Файлы-примеры
+  курса 57 (`raw/sources/2026-09-22-course57-bizproc-files/`, [[source-course57-examples]]) содержат 20 таких типов, от
+  «Записи в отчет» и «Установки прав» до процессов со статусами, — кандидаты на пополнение.
+  `bpt.php analyze` их разбирает и предупреждает, что свойства не сверялись; собрать такой шаблон
+  из спецификации нельзя.
 
 ## Как пополнять
 1. Положить новые экспорты в папку корпуса и запустить

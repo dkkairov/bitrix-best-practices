@@ -8,7 +8,7 @@ provenance: mixed
 verified: ""
 tags: [бизнес-процессы, ревью, ошибки-проектирования, таймаут, цикл, автозапуск, нагрузка]
 sources: ["[[source-course57-expressions]]", "[[source-course57-actions-core]]", "[[source-course57-actions-crm-disk]]", "[[source-course57-examples]]"]
-related: ["[[concept-bizproc-activity-catalog]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[antipattern-bizproc-php-code-activity]]", "[[pattern-robots-vs-bizproc-decision]]", "[[recipe-bizproc-debugging]]", "[[concept-bizproc-expressions]]", "[[recipe-bizproc-approval-route]]", "[[recipe-bizproc-custom-activity-baseactivity]]"]
+related: ["[[concept-bizproc-activity-catalog]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[antipattern-bizproc-php-code-activity]]", "[[pattern-robots-vs-bizproc-decision]]", "[[recipe-bizproc-debugging]]", "[[concept-bizproc-expressions]]", "[[recipe-bizproc-approval-route]]", "[[recipe-bizproc-custom-activity-baseactivity]]", "[[source-course57-examples]]"]
 aliases: []
 updated: "2026-09-22"
 ---
@@ -94,7 +94,9 @@ updated: "2026-09-22"
   [[recipe-bizproc-custom-activity-baseactivity|своё действие]]).
 
 ### Проверка
-- [ ] `php tools/bpt/bpt.php analyze <файл.bpt>` без ошибок, предупреждения разобраны.
+- [ ] `php tools/bpt/bpt.php analyze <файл.bpt>` без ошибок, предупреждения разобраны. Проверка импорта
+  в ядре ссылки на необъявленные переменные и константы пропускает: четыре примера курса с такими
+  ошибками её проходят (стенд, [[source-course57-examples]]).
 - [ ] Прогон на тестовом портале: обе ветки каждого задания, истечение срока, повторный запуск на том
   же документе; журнал включён ([[recipe-bizproc-debugging|отладка]]).
 

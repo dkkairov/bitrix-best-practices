@@ -8,7 +8,7 @@ provenance: mixed
 verified: "2026-09-22 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Бизнес-процессы / Действие: PHP код, Работа с окружением; курс 57 (уроки 3806, 13378, 23038, 3789, 5368, 8411); стенд 2026-09-22 (коробка, bizproc 26.1075.0): что фатальная ошибка PHP и исключение делают с процессом"
 tags: [bizproc, php-код, CodeActivity, активити, журнал, сопровождение]
 sources: ["[[source-devbook-bizproc]]", "[[source-course57-developer]]", "[[source-course57-actions-notify-other]]", "[[source-course57-examples]]"]
-related: ["[[entity-cbp-activity]]", "[[entity-bizproc-activity-description]]", "[[recipe-bizproc-custom-task-activity]]", "[[concept-bizproc-activity-catalog]]", "[[concept-bizproc-bpt-format]]", "[[recipe-bizproc-custom-activity-baseactivity]]"]
+related: ["[[entity-cbp-activity]]", "[[entity-bizproc-activity-description]]", "[[recipe-bizproc-custom-task-activity]]", "[[concept-bizproc-activity-catalog]]", "[[concept-bizproc-bpt-format]]", "[[recipe-bizproc-custom-activity-baseactivity]]", "[[source-course57-examples]]"]
 aliases: []
 updated: "2026-09-22"
 ---
@@ -117,8 +117,14 @@ $title = (string)$this->ParseValue('{' . '=Document:TITLE}');
 
 ## Примеры курса — не копировать
 Курс сам советует читать значения через `$this->GetVariable()`, а не подставлять `{=…}` в код, но его
-примеры делают наоборот:
+примеры делают наоборот или ставят вставку там, где уже есть штатное действие:
 - урок 3806, примеры 3 и 4, уроки 2172 и 2905 — `{=…}` прямо в тексте кода;
+- шаблон «последовательного создания задач» из урока 7125 (`bp-31.bpt`) читает переменные правильно,
+  через `GetVariable()`, но сама вставка уже лишняя: «PHP код» в цикле по одному вынимает сотрудников
+  из множественной переменной, а сейчас это делает штатный «Итератор»
+  (`ForEachActivity`: перебирает значения множественной переменной, текущее — результат
+  «Значение», код ядра); он есть в примере курса `bp-7.bpt`. В том же шаблоне крайний срок задачи
+  берётся из необъявленной переменной — `bpt.php analyze` это находит ([[source-course57-examples]]);
 - [урок 5368](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=5368) — подстановки без
   кавычек: код в показанном виде не выполнится и открыт для инъекции;
 - [урок 8411](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=8411) — задача с

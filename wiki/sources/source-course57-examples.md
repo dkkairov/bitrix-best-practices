@@ -5,10 +5,10 @@ module: bizproc
 edition: both
 status: verified
 provenance: documented
-verified: "2026-09-22 / dev.1c-bitrix.ru, курс 57, снимок-манифест 2026-09-22"
+verified: "2026-09-22 / dev.1c-bitrix.ru, курс 57, снимок-манифест 2026-09-22; файлы-примеры .bpt — разбор tools/bpt и проверка импорта на стенде (коробка, bizproc 26.1075.0)"
 tags: [bizproc, курс-57, примеры, согласование, заявка, отпуск, роли, импорт]
 sources: []
-related: ["[[antipattern-bizproc-hardcoded-portal-ids]]", "[[antipattern-bizproc-php-code-activity]]", "[[concept-bizproc-bpt-format]]", "[[source-course57-actions-notify-other]]"]
+related: ["[[antipattern-bizproc-hardcoded-portal-ids]]", "[[antipattern-bizproc-php-code-activity]]", "[[concept-bizproc-bpt-format]]", "[[source-course57-actions-notify-other]]", "[[concept-bizproc-state-machine]]", "[[recipe-bizproc-request-intake]]", "[[checklist-bizproc-template-review]]"]
 aliases: []
 updated: "2026-09-22"
 ---
@@ -22,7 +22,7 @@ updated: "2026-09-22"
 | Издатель | 1С-Битрикс, dev.1c-bitrix.ru |
 | Главы и уроки | «Каталог примеров»: [7125 «Список шаблонов для импорта»](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=7125), 3140; «Пример создания бизнес-процесса» — 2794, [2791](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=2791), [2792](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=2792), [2793](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=2793), 2790; [6844](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=6844), 6850, [6851](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=6851), 22098; «БП и списки» — 12305, 5270, 5271, [5272](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=5272); «БП со статусами: счёт в CRM» — 12293, [5383](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=5383), [5384](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=5384); [5368](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=5368); изменение типовых — 7993, [8387](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=8387), [8391](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=8391); [8411](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=8411), [5518](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=5518), [7107](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=7107), 5519 — 26 уроков |
 | Дата | уроки изменены с 2019-06-07 по 2026-04-23 |
-| Где лежит | снимок-манифест без текста: [`raw/sources/2026-09-22-course57-bizproc-manifest.md`](../../raw/sources/2026-09-22-course57-bizproc-manifest.md) |
+| Где лежит | снимок-манифест без текста: [`raw/sources/2026-09-22-course57-bizproc-manifest.md`](../../raw/sources/2026-09-22-course57-bizproc-manifest.md); файлы-примеры — 11 шаблонов `.bpt` в [`raw/sources/2026-09-22-course57-bizproc-files/`](../../raw/sources/2026-09-22-course57-bizproc-files/README.md) |
 
 ## TL;DR
 Около пятнадцати разобранных процессов: согласование подотчётных денег, заявки на закупку на списках,
@@ -38,9 +38,9 @@ updated: "2026-09-22"
 | 6851 | «утверждение с учётом времени»: срок проверяется условием после выполнения задания | [[concept-bizproc-activity-catalog]] |
 | 6844 | права на документ по ходу процесса: простой и расширенный режим | — |
 | 5270–5272 | заявки на закупку на списках: роли в переменных | [[antipattern-bizproc-hardcoded-portal-ids]] |
-| 5383, 5384 | счёт в CRM процессом со статусами: 11 статусов, импорт шаблона | [[concept-bizproc-bpt-format]] |
-| 8387, 8391, 7993 | доработка типовых: отпуск, исходящие документы, выдача наличных | [[antipattern-bizproc-hardcoded-portal-ids]] |
-| 5518, 7107 | заявка на отпуск; обслуживание заявок и лидов в цикле | — |
+| 5383, 5384 | счёт в CRM процессом со статусами: 11 статусов, импорт шаблона (`crm_bp.bpt`) | [[concept-bizproc-bpt-format]], [[concept-bizproc-state-machine]] |
+| 8387, 8391, 7993 | доработка типовых: отпуск, исходящие документы, выдача наличных (`bp-196`, `bp-200`, `bp-168`) | [[antipattern-bizproc-hardcoded-portal-ids]], [[concept-bizproc-bpt-format]] |
+| 5518, 7107 | заявка на отпуск; обслуживание заявок и лидов в цикле (`bp_vacation`, `25_03_2015`) | [[recipe-bizproc-request-intake]] |
 | 5368, 8411 | «PHP код»: запись в инфоблок, задача с приоритетом | [[antipattern-bizproc-php-code-activity]] |
 | 7125, 3140, 22098, 6850, 5519 | шаблоны для импорта, пример работы, время клиента, пользователь в процессе, ссылки | — |
 
@@ -66,6 +66,37 @@ updated: "2026-09-22"
   8411 есть штатная альтернатива — «Поставить задачу» с остановкой процесса и признаком важности.
 - **Хиты.** Процесс выполняется на хитах; для точности по времени на портале должны быть хиты (6851).
 
+## Файлы-примеры: что показал разбор (2026-09-22)
+Семь шаблонов из урока 7125 и ещё четыре из уроков про действия и статусы скачаны в `raw/`
+([манифест](../../raw/sources/2026-09-22-course57-bizproc-files/README.md)); архивы уроков 2903 и 7771 не скачались. Разбор —
+`bpt.php analyze`, проверка импорта — на стенде (коробка, bizproc 26.1075.0, без записи в базу).
+
+- **Все 11 шаблонов проходят проверку импорта** на текущем ядре и хранятся в UTF-8, хотя сделаны в
+  2013–2023 годах. Почти в каждом — действия вне каталога `tools/bpt` (20 типов: «Запись в отчет»,
+  «Пауза в выполнении», «Установка прав», «Выбор сотрудника», «Прерывание процесса», «Итератор»,
+  действия Диска и статусов), поэтому собрать их заново из спецификации нельзя — только разобрать.
+- **Проверка импорта ядра пропускает ссылки на необъявленные данные** — их находит только
+  `analyze`. В примерах таких четыре: в `bp-168` (7993) условие ссылается на константу `Manager`,
+  а объявлены `Manager1`–`Manager3`; в `bp-196` (8387) константа `BookkeeperPay` в двух уведомлениях
+  записана как переменная — получатель пуст; в `bp_vacation` (5518) текст статуса берёт переменную
+  `ceo2`, которой нет; в `bp-31` крайний срок задачи — из необъявленной переменной.
+- **Ожидания без срока.** В `25_03_2015` (7107) — 10 запросов информации без срока, в `crm_bp`
+  (5384) — 11 заданий. Процесс может ждать бесконечно ([[checklist-bizproc-template-review]]).
+- **Привязки к порталу автора:** `user_1`, `user_59`, `user_63`, `user_67` в константах и
+  переменных, поля `UF_CRM_*`, стадии `C1:*`. В `bp_vacation` ссылка на задание собрана из
+  переменной с адресом портала автора в локальной сети — после импорта она ведёт в никуда
+  ([[antipattern-bizproc-hardcoded-portal-ids]]).
+- **Процессы со статусами** (`statuses_simple` — урок 3861, `crm_bp`) обходятся без команд: всё
+  делают обработчики входа, переход — «Установить статус». Начальный статус задан свойством корня. В
+  конечном статусе 3861 стоит «Прерывание процесса» — оно не нужно и меняет итог на «Прерван»
+  ([[concept-bizproc-state-machine]]).
+- **«PHP код» в `bp-31`** (последовательные задачи) по одному вынимает сотрудников из
+  множественной переменной — сейчас это делает штатный «Итератор» (`ForEachActivity`, есть в `bp-7`)
+  ([[antipattern-bizproc-php-code-activity]]).
+- **Доработанные типовые процессы** (`bp-168`, `bp-196`, `bp-200`) — для универсальных списков, и у
+  6–8 полей в `DOCUMENT_FIELDS` есть `settings`: импорт поверх типового процесса перезапишет у этих
+  полей название, обязательность и настройки (код ядра, [[concept-bizproc-bpt-format]]).
+
 ## Что встроено в вики
 - [[antipattern-bizproc-hardcoded-portal-ids]] — ID 1 и группы в примерах, роли в переменных и
   константах, сброс «Доступной сущности» после импорта.
@@ -74,12 +105,17 @@ updated: "2026-09-22"
 - [[concept-bizproc-activity-catalog]] — период утверждения и «срок» из 6851.
 - Новые черновики: [[recipe-bizproc-approval-route]] (2791–2793), [[recipe-bizproc-request-intake]]
   (5270–5272, 5518, 7107), [[concept-bizproc-state-machine]] (счёт на 11 статусов, 5384).
+- Файлы-примеры (2026-09-22): [[concept-bizproc-state-machine]] — устройство по `statuses_simple` и
+  `crm_bp`, [[concept-bizproc-bpt-format]] — перезапись полей списков, [[antipattern-bizproc-php-code-activity]]
+  — «Итератор» вместо «PHP кода» из `bp-31`, [[antipattern-bizproc-hardcoded-portal-ids]] — зашитая
+  ссылка из `bp_vacation`, [[checklist-bizproc-template-review]] — `analyze` ловит то, что пропускает импорт.
 
 ## Противоречия и оговорки
 - 2792: в тексте «Любой сотрудник», на скриншоте «Все сотрудники».
 - 5384: на первом этапе стадия сделки меняется, а процесс идёт дальше — значит, не действием «Сменить
-  стадию» (оно завершает процесс), а изменением поля. Готовый `crm_bp.bpt` из урока не скачивали: на
-  загрузку файлов нужно разрешение пользователя.
+  стадию» (оно завершает процесс), а изменением поля. **Подтверждено файлом 2026-09-22:** в
+  `crm_bp.bpt` стадия меняется «Изменением документа» (поле `STAGE_ID`, пять раз), «Сменить стадию»
+  не используется.
 - 6851: про хиты — для коробки с агентами на cron и для облака формулировка устарела.
 
 [← Конспекты источников](_index-sources.md)

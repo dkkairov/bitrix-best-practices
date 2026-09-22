@@ -8,7 +8,7 @@ provenance: mixed
 verified: "2026-09-22 / коробка клиента: 16 экспортов из дизайнера БП (VERSION 2); стенд Docker, bizproc 26.1075.0: импорт и исходники ядра; apidocs.bitrix24.ru; курс 57 dev.1c-bitrix.ru (снимок 2026-09-22): экспорт и импорт, выражения, условия"
 tags: [бизнес-процессы, bpt, экспорт, импорт, шаблон, роботы, формат, выражения]
 sources: ["[[source-course57-templates-designer]]", "[[source-course57-expressions]]", "[[source-course57-actions-core]]", "[[source-course57-examples]]"]
-related: ["[[entity-bizproc-template-rest-methods]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[pattern-robots-vs-bizproc-decision]]", "[[concept-bizproc-activity-catalog]]", "[[concept-bizproc-engine]]", "[[concept-bizproc-expressions]]", "[[concept-bizproc-state-machine]]", "[[checklist-bizproc-template-review]]"]
+related: ["[[entity-bizproc-template-rest-methods]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[pattern-robots-vs-bizproc-decision]]", "[[concept-bizproc-activity-catalog]]", "[[concept-bizproc-engine]]", "[[concept-bizproc-expressions]]", "[[concept-bizproc-state-machine]]", "[[checklist-bizproc-template-review]]", "[[source-course57-examples]]"]
 aliases: []
 updated: "2026-09-22"
 ---
@@ -57,7 +57,9 @@ ID портала.
 **универсальных списках** импорт перезаписывает у существующего поля название, обязательность,
 множественность, настройки и значение по умолчанию, если у поля в файле есть `settings`
 (`lists`: `BizprocDocument::updateDocumentField`); у документов **CRM** метода обновления нет —
-существующие поля не меняются. Импорт **в документ другого типа запрещён**:
+существующие поля не меняются. Так устроены и примеры курса — доработанные типовые процессы на
+списках (уроки 7993, 8387, 8391): `settings` есть у 6–8 полей, и импорт поверх типового процесса
+перезапишет их ([[source-course57-examples]]). Импорт **в документ другого типа запрещён**:
 на приёмнике заранее создают такой же тип документа, проще всего — импортировать в «пустой». После
 импорта проверяют список полей и их упоминания в действиях
 ([урок «Экспорт и импорт»](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3858)).

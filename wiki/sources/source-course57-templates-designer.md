@@ -39,7 +39,7 @@ CRM такие изменения по умолчанию автозапуск �
 | [3816](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3816) | вкладки параметров шаблона: параметры, переменные, константы, доступ, журнал | [[concept-bizproc-engine]] |
 | [23718](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=23718) | глобальные переменные и константы в интерфейсе | [[entity-bizproc-globals-manager]] |
 | [12385](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=12385), [12409](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=12409) | дизайнер: области, копирование действий, свои группы в панели | [[entity-bizproc-activity-description]] |
-| [3868](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3868), [3860](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3860), [3861](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3861), [3863](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3863) | последовательный процесс и процесс со статусами, примеры с параметрами и доработкой документа | [[concept-bizproc-engine]] |
+| [3868](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3868), [3860](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3860), [3861](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3861), [3863](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3863) | последовательный процесс и процесс со статусами, примеры с параметрами и доработкой документа (к 3861 — файл `statuses_simple.bpt`) | [[concept-bizproc-engine]], [[concept-bizproc-state-machine]] |
 | [3858](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3858) | экспорт и импорт шаблона | [[concept-bizproc-bpt-format]] |
 | 2752, 2767, 5080, 3870 | процессы организации (ленты), библиотека документов, конструктор | [[concept-bizproc-engine]] |
 | 24826, 24828, 13024, 13042 | тесты и практические задания | — |
@@ -102,6 +102,9 @@ CRM такие изменения по умолчанию автозапуск �
 ## Открытые вопросы
 - Как импорт поступает с именем и автозапуском заменяемого шаблона.
 - Автозапуск инфоблока по-прежнему только из административного раздела?
-- Названия восьми прав статуса для списков и двух для инфоблоков — только на скриншотах.
+- Названия восьми прав статуса для списков и двух для инфоблоков — только на скриншотах. **Снято
+  2026-09-22** на стенде: списки — задачи прав инфоблока («Нет доступа», «Добавление», «Чтение»,
+  «Просмотр в панели», «Добавление в панели», «Изменение с ограничениями», «Изменение», «Полный
+  доступ»), инфоблок с простыми правами — «Чтение» и «Запись» ([[concept-bizproc-state-machine]]).
 
 [← Конспекты источников](_index-sources.md)

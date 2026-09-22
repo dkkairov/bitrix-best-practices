@@ -8,7 +8,7 @@ provenance: mixed
 verified: ""
 tags: [бизнес-процессы, заявка, задача, исполнитель, срок, типовой-процесс]
 sources: ["[[source-course57-actions-notify-other]]", "[[source-course57-actions-crm-disk]]", "[[source-course57-examples]]"]
-related: ["[[recipe-bizproc-approval-route]]", "[[checklist-bizproc-template-review]]", "[[concept-bizproc-activity-catalog]]", "[[concept-bizproc-expressions]]", "[[entity-smart-process]]"]
+related: ["[[recipe-bizproc-approval-route]]", "[[checklist-bizproc-template-review]]", "[[concept-bizproc-activity-catalog]]", "[[concept-bizproc-expressions]]", "[[entity-smart-process]]", "[[source-course57-examples]]"]
 aliases: []
 updated: "2026-09-22"
 ---
@@ -115,6 +115,9 @@ steps:
 - **Обслуживание заявок клиентов** — цикл повторных звонков с паузой и напоминаниями
   ([урок 7107](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=7107)); одна
   переменная-список не обслуживает две ветки с разными вариантами — заводить отдельные.
+- **Шаблоны этих примеров** (`bp_vacation.bpt`, `25_03_2015.bpt`) лежат в `raw/sources/2026-09-22-course57-bizproc-files/`. Перед
+  импортом: заменить `user_1` на роли, ссылку на портал автора — на `{=System:HostUrl}`, добавить
+  сроки запросам информации (в `25_03_2015` их нет у десяти) ([[source-course57-examples]]).
 
 ## Проверка результата
 - `bpt.php analyze` без ошибок и предупреждений.

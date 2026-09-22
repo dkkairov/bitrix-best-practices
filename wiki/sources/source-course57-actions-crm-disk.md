@@ -8,7 +8,7 @@ provenance: documented
 verified: "2026-09-22 / dev.1c-bitrix.ru, курс 57, снимок-манифест 2026-09-22; классы, свойства и завершение процесса — по коду стенда (коробка, bizproc 26.1075.0, crm 26.800.0)"
 tags: [bizproc, курс-57, crm, смарт-процесс, стадия, воронка, диск, роботы]
 sources: []
-related: ["[[concept-bizproc-activity-catalog]]", "[[entity-robots-triggers]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[entity-smart-process]]", "[[source-course57-actions-core]]"]
+related: ["[[concept-bizproc-activity-catalog]]", "[[entity-robots-triggers]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[entity-smart-process]]", "[[source-course57-actions-core]]", "[[source-course57-examples]]"]
 aliases: []
 updated: "2026-09-22"
 ---
@@ -92,6 +92,10 @@ updated: "2026-09-22"
 - [[entity-smart-process]] — правило «меняется первый по ID» и итератор.
 - Новые черновики: [[recipe-bizproc-request-intake]] — «Изменить ответственного»;
   [[checklist-bizproc-template-review]] — смена стадии и воронки последним шагом.
+- Файлы-примеры (2026-09-22, `raw/sources/2026-09-22-course57-bizproc-files/`): к уроку 23568 — «Получить информацию о
+  товарной позиции» с «Итератором» (`bp-7.bpt`), к 7731 — «Создать папку» и «Копировать/Переместить»
+  в Диске (`bp-disk-1.bpt`). Оба проходят проверку импорта на стенде; этих действий нет в каталоге
+  `tools/bpt` ([[source-course57-examples]]).
 
 ## Сверка 2026-09-22
 | Страница вики | Что было | Что в курсе и ядре | Решение |

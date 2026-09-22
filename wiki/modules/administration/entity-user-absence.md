@@ -5,12 +5,12 @@ module: administration
 edition: box
 status: verified
 provenance: documented
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Интранет — Отсутствия"
+verified: "2026-09-22 / коробка в Docker: состав типов отсутствий и сброс кэша при записи проверены прогоном; 2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Интранет — Отсутствия"
 tags: [интранет, отсутствия, отпуска, класс, d7, кэш, события]
 sources: ["[[source-devbook-intranet]]"]
 related: ["[[entity-cintranet-utils]]", "[[concept-org-structure]]", "[[entity-config-option]]", "[[recipe-intranet-absence-import]]"]
 aliases: ["bitrix24-user-absence"]
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # `\Bitrix\Intranet\UserAbsence`
@@ -46,14 +46,19 @@ updated: "2026-09-21"
 | Метод | Что отдаёт |
 |---|---|
 | `getIblockId(): int` | **общий** ID инфоблока отсутствий; при повреждённых настройках может вернуть `0` |
-| `getVacationTypes(): array` | типы отсутствий с метаданными |
-| `getCurrentMonth(): array` | **кэшируемо** — отсутствия текущего месяца, `userId → idx → отсутствие` |
+| `getVacationTypes(): array` | типы отсутствий: ключ — символьный код, внутри `ENUM_ID`, `NAME`, `ACTIVE`; значения берутся из **общего** инфоблока |
+| `getCurrentMonth(): array` | **кэшируемо** — отсутствия текущего месяца, `userId → idx → отсутствие`; кэш сбрасывается сам при записи элемента через API инфоблока |
 
 ID инфоблока для конкретного сайта:
 
 ```php
 $iblockId = \Bitrix\Main\Config\Option::get('intranet', 'iblock_absence', '-1', $siteId);
 ```
+
+> **Стенд 2026-09-22.** На коробке типов восемь: `VACATION`, `ASSIGNMENT`, `LEAVESICK`,
+> `LEAVEMATERINITY`, `LEAVEUNPAYED`, `UNKNOWN`, `OTHER`, `PERSONAL`. Флаг `ACTIVE` означает «это
+> отпуск», а не «тип включён»: у командировки и прогула он `false`. Импорт отсутствий —
+> [[recipe-intranet-absence-import]].
 
 Поля одного отсутствия в `getCurrentMonth()`: `ID`, `USER_ID`, `ENTRY_TYPE` (символьный код),
 `ENTRY_TYPE_ID`, `ENTRY_TYPE_VALUE` (название), `IS_VACATION`, `DATE_FROM_TS`, `DATE_TO_TS`.

@@ -164,6 +164,23 @@ foreach ($acceptance['scenarios'] as $scenario) {
     // Шаги
     foreach ($scenario['steps'] as $step) {
         $users = $roleUsers($step['task_for']);
+        if ($step['do'] === 'complete') {
+            $taskRow = null;
+            for ($i = 0; $i < 10 && !$taskRow; $i++) {
+                $taskRow = \Bitrix\Tasks\Internals\TaskTable::getList(['select' => ['ID', 'RESPONSIBLE_ID', 'TITLE'],
+                    'filter' => ['@RESPONSIBLE_ID' => $users, '>=CREATED_DATE' => new \Bitrix\Main\Type\DateTime($since, 'Y-m-d H:i:s'),
+                        '!=STATUS' => 5], 'order' => ['ID' => 'DESC'], 'limit' => 1])->fetch() ?: null;
+                $taskRow ?? sleep(1);
+            }
+            $ok = $taskRow !== null;
+            if ($ok) {
+                \CTaskItem::getInstance((int) $taskRow['ID'], (int) $taskRow['RESPONSIBLE_ID'])->complete();
+            }
+            $out['ok'] = $out['ok'] && ($ok || $step['optional']);
+            $out['steps'][] = ['task_for' => $step['task_for'], 'do' => 'complete', 'ok' => $ok || $step['optional'],
+                'detail' => $ok ? "задача #{$taskRow['ID']} «{$taskRow['TITLE']}» закрыта" : 'задачи для роли нет'];
+            continue;
+        }
         $found = null;
         for ($i = 0; $i < 10 && !$found; $i++) {
             foreach ($openTasks($itemId) as $t) {
@@ -254,7 +271,58 @@ foreach ($acceptance['scenarios'] as $scenario) {
                         $hit ? 'есть' : 'нет; уведомлений роли: ' . count($messages));
                 }
                 break;
+            case 'fields':
+                foreach ((array) $value as $name => $want) {
+                    $code = $fields[eval_norm((string) $name)] ?? null;
+                    $actual = $code === null ? '(нет поля)' : $item->get($code);
+                    if ($actual instanceof \Bitrix\Main\Type\Date) {
+                        $actual = $actual->toString();   // формат сайта, как вводит пользователь: 01.10.2026
+                    }
+                    if (is_string($want) && isset($roles[$want])) {        // значение — роль: сравниваем сотрудников
+                        $ok = (bool) array_intersect(array_map('intval', (array) $actual), $roleUsers($want));
+                    } else {
+                        $ok = eval_norm(is_array($actual) ? implode(',', $actual) : (string) $actual) === eval_norm((string) $want);
+                    }
+                    $check("поле «{$name}»", $ok, $want, $actual);
+                }
+                break;
+            case 'task_created':
+                foreach ((array) $value as $t) {
+                    $rows = [];
+                    for ($i = 0; $i < 10 && !$rows; $i++) {   // задачу ставит процесс — ждём до 10 секунд
+                        $rows = array_filter(\Bitrix\Tasks\Internals\TaskTable::getList(['select' => ['ID', 'TITLE', 'DEADLINE'],
+                            'filter' => ['@RESPONSIBLE_ID' => $roleUsers($t['responsible']),
+                                '>=CREATED_DATE' => new \Bitrix\Main\Type\DateTime($since, 'Y-m-d H:i:s')]])->fetchAll(),
+                            fn ($r) => !isset($t['title_contains']) || mb_stripos($r['TITLE'], $t['title_contains']) !== false);
+                        $rows ?: sleep(1);
+                    }
+                    $ok = (bool) $rows;
+                    $actual = $ok ? implode(' | ', array_map(fn ($r) => $r['TITLE'] . ' до ' . ($r['DEADLINE'] ? $r['DEADLINE']->format('Y-m-d') : '—'), $rows)) : 'задачи нет';
+                    if ($ok && isset($t['deadline_workdays'])) {
+                        $day = new \DateTimeImmutable('today');
+                        for ($n = 0; $n < (int) $t['deadline_workdays'];) {
+                            $day = $day->modify('+1 day');
+                            $n += (int) $day->format('N') <= 5 ? 1 : 0;
+                        }
+                        $ok = (bool) array_filter($rows, function ($r) use ($day) {
+                            if (!$r['DEADLINE']) {
+                                return false;
+                            }
+                            $diff = abs((new \DateTimeImmutable($r['DEADLINE']->format('Y-m-d')))->diff($day)->days);
+                            return $diff <= 1;   // допуск: праздники производственного календаря
+                        });
+                    }
+                    $check("задача: {$t['responsible']}", $ok, $t, $actual);
+                }
+                break;
+            case 'observers':
+                $observers = array_map('intval', (array) $item->get('OBSERVERS'));
+                foreach ((array) $value as $role) {
+                    $check("наблюдатель: {$role}", (bool) array_intersect($observers, $roleUsers($role)), $role, $observers);
+                }
+                break;
             case 'no_task_for':
+                // проверка означает: роль вообще не получала заданий по этому элементу — ни открытых, ни отвеченных
                 foreach ((array) $value as $role) {
                     $users = implode(',', $roleUsers($role)) ?: '0';
                     $count = (int) $db->query("SELECT COUNT(*) AS C FROM b_bp_task t JOIN b_bp_task_user tu ON tu.TASK_ID = t.ID

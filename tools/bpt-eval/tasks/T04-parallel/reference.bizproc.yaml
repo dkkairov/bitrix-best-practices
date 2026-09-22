@@ -1,0 +1,45 @@
+# Эталон T04: параллельно юрист и бухгалтер проекта; роли — из карточки проекта.
+bizproc: 1
+name: EVAL T04 эталон
+variables:
+  lawyer_ok:     {Name: Юрист согласовал, Type: bool, Default: "N"}
+  accountant_ok: {Name: Бухгалтер согласовал, Type: bool, Default: "N"}
+  reason:        {Name: Причина отказа, Type: text}
+steps:
+  - get_smart_item:
+      id: project
+      title: Роли из карточки проекта
+      DynamicTypeId: "{{smart:Проекты}}"
+      ReturnFields: ["{{field:Проекты/Бухгалтер проекта}}"]
+      DynamicFilterFields:
+        items: [[{object: Document, field: ID, operator: "=", value: "{=Document:{{field:Проект}}}"}, AND]]
+  - parallel:
+      branches:
+        - - approve:
+              id: lawyer
+              Users: ["{{group:Юристы}}"]
+              ApproveType: any
+              Name: "Согласуйте заявку «{=Document:TITLE}» (юрист)"
+              on_yes: [{set_var: {VariableValue: {lawyer_ok: "Y"}}}]
+              on_no: [{set_var: {VariableValue: {reason: "{=@lawyer:Comments}"}}}]
+        - - approve:
+              id: accountant
+              Users: ["{=@project:{{field:Проекты/Бухгалтер проекта}}}"]
+              ApproveType: any
+              Name: "Согласуйте заявку «{=Document:TITLE}» (бухгалтер проекта)"
+              on_yes: [{set_var: {VariableValue: {accountant_ok: "Y"}}}]
+              on_no: [{set_var: {VariableValue: {reason: "{=@accountant:Comments}"}}}]
+  - if:
+      branches:
+        - title: Оба согласовали
+          when: {propertyvariablecondition: [[lawyer_ok, "=", "Y", "0"], [accountant_ok, "=", "Y", "0"]]}
+          steps: [{change_stage: {TargetStatus: "{{stage:Согласовано}}"}}]
+        - title: Отказ
+          else: true
+          steps:
+            - notify:
+                MessageSite: "Заявка «{=Document:TITLE}» возвращена на доработку: {=Variable:reason}"
+                MessageType: "4"
+                MessageUserFrom: ["{=Document:ASSIGNED_BY_ID}"]
+                MessageUserTo: ["{=Document:CREATED_BY}"]
+            - change_stage: {TargetStatus: "{{stage:Доработка}}"}

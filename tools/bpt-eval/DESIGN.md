@@ -164,7 +164,8 @@ checklist:                       # что агент должен поднять
 
 **Проверки `expect`:** `stage`; `fields: {поле: значение}`; `history_contains: [фрагмент]`;
 `notify: [{to: роль, contains: фрагмент}]`; `task_created: [{responsible: роль, title_contains,
-deadline_workdays}]`; `observers: [роль]`; `process`; `no_task_for: [роль]`.
+deadline_workdays}]`; `observers: [роль]`; `process`; `no_task_for: [роль]` (роль вообще не получала
+заданий по этому элементу — ни открытых, ни отвеченных).
 
 **Чек-лист:** пункты — строки; пункт с `required: false` в итог «пройдена» не входит, только в
 оценку качества вопросов.

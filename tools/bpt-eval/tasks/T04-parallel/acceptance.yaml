@@ -1,0 +1,34 @@
+task: T04
+document: Заявки
+start: create
+item:
+  Название: Заявка T04
+  Сумма к оплате: 250000
+  Проект: Проект Альфа
+scenarios:
+  - name: оба согласовали
+    steps:
+      - {task_for: Юристы, do: approve, comment: Юридически чисто}
+      - {task_for: Бухгалтер проекта, do: approve, comment: Сумма верна}
+    expect: {stage: Согласовано, process: completed}
+  - name: юрист отказал
+    steps:
+      - {task_for: Юристы, do: reject, comment: Нет доверенности}
+      - {task_for: Бухгалтер проекта, do: approve, comment: Сумма верна, optional: true}
+    expect:
+      stage: Доработка
+      notify: [{to: Инициатор, contains: Нет доверенности}]
+      process: completed
+  - name: бухгалтер отказал
+    steps:
+      - {task_for: Бухгалтер проекта, do: reject, comment: Сумма не совпадает со счётом}
+      - {task_for: Юристы, do: approve, comment: Юридически чисто, optional: true}
+    expect:
+      stage: Доработка
+      notify: [{to: Инициатор, contains: Сумма не совпадает со счётом}]
+      process: completed
+checklist:
+  - Ждать ли второго согласующего после первого отказа
+  - Юрист — группа «Юристы» или конкретный сотрудник
+  - Повторное согласование после доработки
+  - {text: Срок на согласование, required: false}

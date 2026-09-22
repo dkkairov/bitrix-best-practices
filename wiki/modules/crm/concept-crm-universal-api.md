@@ -5,12 +5,12 @@ module: crm
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль CRM — Универсальное API, Смарт-процессы, Счёт, Предложение; строка про REST облака — не сверялась"
+verified: "2026-09-22 / коробка в Docker, crm 26.800.0: фабрики включены у всех четырёх сущностей (прогон); 2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль CRM — Универсальное API, Смарт-процессы, Счёт, Предложение; строка про REST облака — не сверялась"
 tags: [crm, universal-api, d7, фабрика, операции, servicelocator]
 sources: ["[[source-devbook-crm]]"]
 related: ["[[pattern-crm-action-vs-event]]", "[[recipe-crm-history-all-fields]]", "[[recipe-smart-process-programmatic-creation]]", "[[concept-crm-dictionaries]]", "[[entity-smart-process]]", "[[recipe-smart-process-factory-customization]]", "[[recipe-crm-legacy-entity-crud]]", "[[recipe-crm-lead-conversion]]"]
 aliases: ["bitrix24-crm-ua"]
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Universal API CRM
@@ -79,8 +79,13 @@ $result  = $factory->getUpdateOperation($item)->launch();   // \Bitrix\Main\Resu
   ([Концепция](https://bx24devbook.website.yandexcloud.net/Modul_CRM/Universalnoe_api/Koncepcia.html#novoe-universal-noe-api)).
   Поэтому практики на старом API ([[recipe-crm-legacy-entity-crud]]) — с версией crm в `verified`.
 
-Перед тем как писать код под UA для сделки или лида, проверьте, включён ли он на этом портале:
-иначе часть логики уйдёт мимо.
+> **Стенд 2026-09-22 (коробка, `crm` 26.800.0):** фабрики **включены** у всех четырёх сущностей
+> (`isFactoryEnabled()` = `true`, `(new \CCrmDeal())->isUseOperation()` = `true`) — то есть настройка
+> уже не «по умолчанию выключена», как во времена книги. Старое API при этом продолжает работать:
+> `CCrm*`-методы на включённом UA отрабатывают штатно (прогон в [[recipe-crm-legacy-entity-crud]]).
+
+Перед тем как писать код под UA для сделки или лида, всё равно проверьте флаг на конкретном портале:
+переключить его может любой пользователь с доступом в CRM.
 
 **Единый интерфейс — не единое поведение.** Счёт — смарт-процесс с фиксированными настройками,
 своими стадиями и доп. полями (`ACCOUNT_NUMBER`, `COMMENTS`); коммерческое предложение — фабрика

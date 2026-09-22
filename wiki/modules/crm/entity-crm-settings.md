@@ -5,12 +5,12 @@ module: crm
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль CRM — Универсальное API / Как включить; Лид — методы (отложенное удаление)"
+verified: "2026-09-22 / коробка в Docker, crm 26.800.0: значения isFactoryEnabled() сняты прогоном; 2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль CRM — Универсальное API / Как включить; Лид — методы (отложенное удаление)"
 tags: [crm, настройки, universal-api, класс]
 sources: ["[[source-devbook-crm]]"]
 related: ["[[concept-crm-universal-api]]", "[[pattern-crm-action-vs-event]]", "[[entity-crm-factory]]"]
 aliases: ["bitrix24-crm-settings"]
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # `\Bitrix\Crm\Settings\<Type>Settings`
@@ -37,6 +37,10 @@ Settings-класса; книга этого не говорит — снято.
 Код, написанный под [[concept-crm-universal-api|Universal API]], для сделки или лида на конкретном
 портале может не работать вообще: если фабрика выключена, сущность живёт на старом API, и ваши
 действия операций просто не вызовутся. Это первое, что проверяют перед проектированием доработки.
+
+На свежей коробке флаг уже поднят: на стенде (`crm` 26.800.0, 2026-09-22) `isFactoryEnabled()` вернул
+`true` для всех четырёх сущностей. Но переключить его может любой пользователь с доступом в CRM,
+поэтому проверяем в рантайме, а не считаем включённым.
 
 ```php
 use Bitrix\Crm\Settings;

@@ -10,7 +10,7 @@ tags: [задачи, tasks, v2, cqrs, команды, провайдеры]
 sources: []
 related: ["[[concept-tasks-api-v2]]", "[[recipe-tasks-v2-commands]]", "[[pattern-tasks-effectiveness-from-db]]", "[[checklist-tasks-regulations]]", "[[concept-crm-universal-api]]", "[[entity-main-result]]"]
 aliases: []
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Конспект: модуль задач
@@ -93,6 +93,13 @@ updated: "2026-09-21"
   ловушек; `draft` до прогона примеров на стенде.
 
 ## Противоречия
+
+### С установленной версией (стенд, tasks 26.300.100, 2026-09-22)
+- **Структура пункта чек-листа устарела.** Книга: `text` и `isComplete` = `'Y'`/`'N'`. На стенде
+  пункт описывается полями `nodeId`, `title`, `isComplete` (булево) — вариант из книги сохраняется
+  «успешно», но в базу не попадает. Разбор — [[recipe-tasks-v2-commands]].
+- **Копия задачи** из `new Task(id: …)` не создаётся: нужен полный объект из провайдера.
+- **Приоритет `Low`** в модели есть, но не сохраняется — задача остаётся со средним.
 
 ### Внутри книги
 - `TaskParams` объявлен `readonly`, а короткий пример присваивает свойства после `mapFromArray()`

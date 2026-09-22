@@ -3,21 +3,22 @@ title: "Команды задач V2: типовые операции и лов�
 type: recipe
 module: tasks-projects
 edition: box
-status: draft
+status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Модуль Задачи — Основные команды, Участники задач, Чек-листы, Работа с файлами, Связи и зависимости, Гант, Канбан, Отображение и поведение, Другие, Чат (tasks 26.0.0); примеры не прогонялись, без проверки на стенде"
+verified: "2026-09-22 / коробка в Docker, tasks 26.300.100: сигнатуры команд и конфигов сверены рефлексией, создание/чтение/обновление/копирование/удаление задач, соисполнители и чек-лист прогнаны на тестовых задачах; Гант, канбан, чат, напоминания и вложения не проверяли. Текст — «Книга разработчика Bitrix24» (снимок 2026-09-21), описывающая tasks 26.0.0"
 tags: [задачи, tasks, v2, команды, участники, чек-лист, канбан, гант, файлы]
 sources: ["[[source-devbook-tasks]]"]
 related: ["[[concept-tasks-api-v2]]", "[[entity-main-result]]", "[[checklist-tasks-regulations]]", "[[pattern-module-based-development-standard]]", "[[entity-admin-php-console]]", "[[entity-loader]]"]
 aliases: []
-updated: "2026-09-21"
+updated: "2026-09-22"
 ---
 
 # Команды задач V2: типовые операции и ловушки
 
-> **Черновик.** Код собран по сигнатурам из книги (модуль `tasks` 26.0.0) и на стенде не
-> прогонялся; книга местами противоречит сама себе — такие места помечены «проверить на стенде».
-> `draft` снимаем после прогона примеров на тест-стенде.
+> **Проверено на стенде** (коробка в Docker, `tasks` **26.300.100**, 2026-09-22): сигнатуры сверены
+> рефлексией, ключевые команды прогнаны на тестовых задачах (созданы и удалены, корзина вычищена).
+> Книга описывает 26.0.0, и часть её примеров на этой версии **молча не работает** — прежде всего
+> чек-лист (шаг 4) и копирование (шаг 8). Итоги — в разделе «Что прогнали на стенде».
 
 **Результат:** типовые изменения задач в коробке — создание, правка, срок, участники, чек-лист,
 файлы, иерархия и Гант, канбан, копия, удаление, напоминание, чат — через команды
@@ -106,13 +107,18 @@ $taskId = (int)runTaskCommand(new AddTaskCommand(
 ```
 
 - Обязательны `title` и `creator`; сроки — Unix timestamp.
+- **Приоритет «низкий» не сохраняется.** В модели перечисление `Priority` знает `Low`, `Average`,
+  `High`, но задача с `Priority::Low` и при создании, и при обновлении оказывается со средним
+  приоритетом (стенд; в базе `PRIORITY = 1`). `High` записывается нормально. Отдельных команд для
+  низкого приоритета тоже нет — считаем, что градаций две.
 - Соисполнителей и наблюдателей удобнее назначить командами шага 3: как собрать `UserCollection`
   для полей `accomplices` и `auditors`, книга не показывает.
 - Флаги `AddConfig`, которые решаем осознанно: `skipBP` (не запускать бизнес-процессы), `fromAgent`
   (создание из агента), `checkFileRights` — по умолчанию `false`, то есть права на прикладываемые файлы
   не проверяются. Если ID файлов приходят от пользователя — включать (вывод команды).
 - Как `deadlineTs` сочетается с часовым поясом пользователя (в конфигах есть `skipTimeZoneFields`),
-  книга не объясняет — проверить на стенде.
+  книга не объясняет; на стенде срок сохранился и прочитался тем же временем.
+- Результат: `getId()` — ID задачи, `getObject()` — сущность `Entity\Task` (стенд).
 
 ### 2. Изменить задачу и срок
 
@@ -188,21 +194,28 @@ runTaskCommand(new WatchTaskCommand(taskId: $taskId, userId: 128, auditorId: 142
 | Наблюдатель по одному | `WatchTaskCommand`, `UnwatchTaskCommand` | без `UpdateConfig`; `userId` ≠ `auditorId` |
 | Постановщик | `UpdateCreatorCommand` | передать текущего ответственного |
 
-`$currentAccompliceIds` читаем заранее (V2 `TaskProvider::get` с `members: true`); как достать ID из
-`UserCollection`, книга не показывает — проверить на стенде.
+`$currentAccompliceIds` читаем заранее: `(new TaskProvider())->get(new TaskParams(taskId: …,
+userId: …))`, затем `foreach ($task->accomplices as $user) { $ids[] = $user->id; }` —
+`UserCollection` итерируется, у элемента публичное свойство `id` (стенд).
 
 ### 4. Чек-лист
+
+> **Структура пункта в книге не работает.** На 26.300.100 сущность пункта — `CheckListItem` с
+> полями `nodeId`, `title`, `isComplete` (**bool**), `sortIndex`, `parentNodeId`. Прогон:
+> пункт без `nodeId` **молча не сохраняется** (команда возвращает успех, в базе ноль строк);
+> ключ `text` вместо `title` — тоже мимо; `'Y'` в `isComplete` даёт «не выполнено», потому что
+> ядро приводит значение как `$v === true || (int)$v > 0`.
 
 ```php
 use Bitrix\Tasks\V2\Public\Command\CheckList\CompleteCheckListItemsCommand;
 use Bitrix\Tasks\V2\Public\Command\CheckList\SaveCheckListCommand;
 
-// Сохраняется ВСЯ структура: существующие пункты — с id, новые — без
+// Сохраняется ВСЯ структура: существующие пункты — с id, новые — с nodeId
 runTaskCommand(new SaveCheckListCommand(
     task: new Task(id: $taskId, checklist: [
-        ['id' => 501, 'text' => 'Собрать цены', 'isComplete' => 'Y', 'sortIndex' => 10],
-        ['id' => 502, 'text' => 'Согласовать скидку', 'isComplete' => 'N', 'sortIndex' => 20],
-        ['text' => 'Отправить КП', 'isComplete' => 'N', 'sortIndex' => 30],
+        ['id' => 501, 'title' => 'Собрать цены', 'isComplete' => true, 'sortIndex' => 10],
+        ['id' => 502, 'title' => 'Согласовать скидку', 'isComplete' => false, 'sortIndex' => 20],
+        ['nodeId' => '3', 'title' => 'Отправить КП', 'isComplete' => false, 'sortIndex' => 30],
     ]),
     updatedBy: 128,                            // автор изменений
 ));
@@ -210,9 +223,11 @@ runTaskCommand(new SaveCheckListCommand(
 runTaskCommand(new CompleteCheckListItemsCommand(ids: [502], userId: 128));
 ```
 
-- `isComplete` — строка `'Y'` или `'N'`, не `bool`; вложенность — через `parentId` пункта.
-- Команда за один вызов добавляет, обновляет и удаляет пункты. Вывод команды: пункт, которого нет в
-  массиве, вероятно, будет удалён — сначала прочитать текущий чек-лист; проверить на стенде.
+- Новый пункт — **`nodeId`** (строка, уникальная в пределах вызова); существующий — `id` из базы.
+  Вложенность — `parentNodeId` (для новых) или `parentId` (для существующих).
+- `isComplete` — `true`/`false` (или 1/0), а не `'Y'`/`'N'`.
+- Команда за один вызов добавляет, обновляет и удаляет пункты, поэтому текущий чек-лист сначала
+  читаем провайдером и передаём целиком.
 - `RenewCheckListItemsCommand` возобновляет выполненные пункты. `ExpandCheckListCommand` и
   `CollapseCheckListCommand` только разворачивают и сворачивают чек-лист в интерфейсе пользователя;
   что именно означает их `checkListId`, книга не уточняет.
@@ -232,9 +247,11 @@ runTaskCommand(new AttachFilesCommand(
 ));
 ```
 
-- **Противоречие книги:** `AttachFilesCommand` ждёт строки (`'n10'`), а пример `DetachFilesCommand`
-  передаёт числа (`[10, 20]`). Формат для открепления — проверить на стенде. Открепление не удаляет
-  файл из Диска.
+- **Противоречие книги разрешено (код 26.300.100):** у `AttachFilesCommand` параметр закрыт
+  правилом валидации `#[NewFiles]` — каждый элемент обязан быть **строкой** `'n<ID объекта Диска>'`,
+  иначе команда вернёт ошибку. У `DetachFilesCommand` такого правила нет, и сервис принимает оба
+  вида: `'n<objectId>'` он ищет среди вложений по ID объекта Диска, а **число понимает как ID уже
+  прикреплённого файла** — отсюда числа в примере книги. Открепление не удаляет файл из Диска.
 
 ### 6. Иерархия, связи, Гант
 
@@ -291,9 +308,9 @@ runTaskCommand(new MoveTaskCommand(relationId: $relationId, stageId: 22));
 
 - `DeleteTaskStageRelationCommand(relationIds: […])` отвязывает задачи от стадий, и они переходят в
   состояние «не назначено»; `ClearTaskCommand(taskId: …)` снимает все привязки одной задачи.
-- `ClearStageCommand(stageId: …)` книга описывает как удаление всех задач из стадии: удаляются ли сами
-  задачи или только их привязки — неясно. **Только тест-стенд**; на реальных данных не применять до
-  выяснения.
+- `ClearStageCommand(stageId: …)` удаляет **только привязки** задач к стадии, сами задачи остаются
+  (`ClearStageHandler` → `taskStageRepository->deleteByStageId()`, код 26.300.100). Задачи уходят
+  в «не назначено», как и при `DeleteTaskStageRelationCommand`.
 - Как найти `relationId` уже существующей привязки и от чьего имени проверяются права (у
   `ClearStageCommand` среди ошибок есть `ACCESS_DENIED`), книга не говорит.
 - Коды ошибок `MoveTaskCommand` по книге: `POSITIVE_NUMBER`, `STAGE_NOT_FOUND`, `TASK_NOT_FOUND`,
@@ -324,10 +341,12 @@ runTaskCommand(new DeleteTaskCommand(taskId: 1030, config: new DeleteConfig(user
 - Флаги `CopyConfig` — `withSubTasks`, `withCheckLists`, `withAttachments`, `withRelatedTasks`,
   `withReminders`, `withGanttLinks` — по умолчанию `false`, хотя по описанию книги команда копирует
   задачу со всеми параметрами. С `targetTaskId` данные копируются в уже существующую задачу.
-- Что передавать как `$sourceTask`, книга однозначно не говорит: в примере объект собран вручную, с
-  комментарием, что это задача из базы. Вывод команды: брать задачу V2-провайдером
-  ([[concept-tasks-api-v2]]); хватит ли `new Task(id: …)` — проверить на стенде.
-- Уходит ли удалённая задача в корзину, книга не говорит — на стенде считать удаление необратимым.
+- **`$sourceTask` — полный объект задачи из провайдера.** `new Task(id: …)` не годится: на стенде
+  команда вернула ошибку «Не указано название задачи». Читаем задачу
+  `TaskProvider::get(new TaskParams(taskId: …, userId: …))` и передаём её ([[concept-tasks-api-v2]]).
+- **Удалённая задача уходит в корзину** (`b_recyclebin`, модуль `tasks`) — проверено на стенде.
+  Значит «удаление» обратимо, но и следы тестов остаются: чистить корзину отдельно
+  (`\Bitrix\Recyclebin\Recyclebin::remove($id)`).
   `DeleteConfig` умеет `skipBP`, `skipExchangeSync` и `byPassParameters` (данные для своих
   обработчиков и интеграций).
 
@@ -353,6 +372,8 @@ runTaskCommand(new SendMessageCommand(
 ));
 ```
 
+- Перечисления сверены на стенде: `LinkType` — `StartStart`, `StartFinish`, `FinishStart`,
+  `FinishFinish`; `RemindBy` — `Deadline`, `Date`, `Recurring`.
 - `Reminder`: `remindBy` (`Deadline`, `Date`, `Recurring` с правилом `rrule`), `remindVia`
   (`Notification`, `Email`), `recipient` (`Responsible`, `Creator`, `Accomplice`, `Myself`), `before`
   в секундах, `nextRemindTs`. Команд создания и удаления напоминаний в книге нет; задаются ли
@@ -378,21 +399,47 @@ runTaskCommand(new SendMessageCommand(
 | `Set…Command` вместо добавления | `Set…` заменяет список; наблюдателей — `Add`/`DeleteAuditorsCommand` | [Соисполнители](https://bx24devbook.website.yandexcloud.net/Modul_Zadaci/Ucastniki_zadac.html#setaccomplicescommand) |
 | Смена постановщика без ответственного | `responsibleId` — текущий ответственный | [UpdateCreatorCommand](https://bx24devbook.website.yandexcloud.net/Modul_Zadaci/Ucastniki_zadac.html#updatecreatorcommand) |
 | `userId` в `Watch`/`Unwatch` понят как «кого» | `userId` — кто действует, `auditorId` — кого | [Наблюдатели](https://bx24devbook.website.yandexcloud.net/Modul_Zadaci/Ucastniki_zadac.html#nabludateli-audit) |
-| Кусок чек-листа, `true`/`false` | вся структура, `'Y'`/`'N'`, автор — `updatedBy` | [Чек-листы](https://bx24devbook.website.yandexcloud.net/Modul_Zadaci/Cek_listy.html#struktura-cek-lista) |
+| Пункт без `nodeId`, ключ `text`, `'Y'`/`'N'` | новый пункт — `nodeId` + `title` + `isComplete` булевым; иначе пункт молча теряется | [Чек-листы](https://bx24devbook.website.yandexcloud.net/Modul_Zadaci/Cek_listy.html#struktura-cek-lista) (устарело) |
+| `new Task(id: …)` как источник копии | полный объект из `TaskProvider` | [Копирование](https://bx24devbook.website.yandexcloud.net/Modul_Zadaci/Osnovnye_komandy.html#kopirovanie-zadaci) |
 | Числовые ID файлов | сначала Диск, затем `'n<ID>'` | [Файлы](https://bx24devbook.website.yandexcloud.net/Modul_Zadaci/Rabota_s_fajlami.html#attachfilescommand) |
 | `taskId` в канбане | `relationId` связи со стадией | [Канбан](https://bx24devbook.website.yandexcloud.net/Modul_Zadaci/Kanban.html#ponatie-svazi-relation) |
 | `dependentId` понят как зависимая | `dependentId` — предшествующая | [Гант](https://bx24devbook.website.yandexcloud.net/Modul_Zadaci/Gant.html#sozdat-svaz) |
 | Правка `TaskParams` после `mapFromArray()` | флаги — в конструктор | [Поиск](https://bx24devbook.website.yandexcloud.net/Modul_Zadaci/Poisk.html#taskprovider-get) |
 
 ## Проверка результата
-- `isSuccess()`, затем `getId()` или `getObject()`: у `AddTaskCommand` — созданная задача, у
-  `AddTaskStageRelationCommand` — ID связи.
-- Перечитать задачу V2-провайдером с нужными флагами (`members`, `checkLists`, `gantt`, `stage`) и
-  сверить поля ([[concept-tasks-api-v2]]).
+- `isSuccess()`, затем `getId()` или `getObject()`: у `AddTaskCommand` — ID и сущность `Entity\Task`,
+  у `AddTaskStageRelationCommand` — ID связи.
+- Перечитать задачу V2-провайдером и сверить поля:
+  `(new \Bitrix\Tasks\V2\Public\Provider\TaskProvider())->get(new
+  \Bitrix\Tasks\V2\Public\Provider\Params\TaskParams(taskId: $taskId, userId: $userId))` — флаги
+  вроде `members`, `checkLists`, `gantt` в `TaskParams` по умолчанию включены ([[concept-tasks-api-v2]]).
 - Открыть карточку под пользователем из `userId`: видна ли задача, какие уведомления пришли, что
   появилось в чате.
 - Где прогонять: тест-стенд — [[entity-admin-php-console|Командная PHP-строка]] (веб-запрос от
-  текущего пользователя) или CLI-скрипт ([[recipe-cli-script-bootstrap]]).
+  текущего пользователя) или CLI-скрипт ([[recipe-cli-script-bootstrap]]). **В консоли сначала
+  авторизуйтесь** (`$USER->Authorize(<id>)`): команды проверяют права текущего пользователя, а не
+  только `userId` из конфига.
+
+## Что прогнали на стенде
+
+Коробка в Docker, `tasks` 26.300.100, 2026-09-22. Тестовые задачи созданы, изменены и удалены,
+корзина вычищена.
+
+| Проверка | Результат |
+|---|---|
+| Создание, чтение, обновление, удаление | работают; `getId()` и `getObject()` заполнены |
+| Приоритет `Low` | не сохраняется — задача остаётся со средним; `High` записывается |
+| Соисполнители | `SetAccomplicesCommand` заменил список; читается из `UserCollection` по `$user->id` |
+| Чек-лист по книге (`text`, `'Y'`) | **не сохраняется**, команда при этом успешна |
+| Чек-лист с `nodeId` + `title` | сохраняется, пункт появляется в базе |
+| Копия из `new Task(id: …)` | ошибка «Не указано название задачи» |
+| Копия из объекта провайдера | создаётся |
+| Удаление задачи | уходит в корзину (`b_recyclebin`) |
+| Формат ID файлов | `Attach` — только `'n<ID>'` (правило `#[NewFiles]`), `Detach` — и число (ID вложения) |
+| `ClearStageCommand` | удаляет привязки, а не задачи |
+
+Не проверяли: Гант и канбан (нужны проект и стадии), чат задачи, напоминания, вложения (нужен
+загруженный файл Диска), `UpdateConfig::createFromArray` с ключами старого API.
 
 ## Откат и проблемы
 - Отмены у команд книга не описывает, а цепочка команд — не транзакция (вывод команды): сценарий

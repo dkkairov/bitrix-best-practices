@@ -7,6 +7,49 @@
 
 ## 2026-09
 
+- **2026-09-22 — прогон десяти черновиков «Книги разработчика» на стенде, все сняты с черновика** —
+  Коробка в Docker (`main` 26.750.0, `crm` 26.800.0, `tasks` 26.300.100). Классы разворачивались в
+  `/local`, тестовые элементы CRM и задачи создавались и удалялись, корзина вычищена, `/local` снят
+  после прогона.
+
+  Страницы: [[recipe-cli-script-bootstrap]], [[recipe-d7-custom-validation-rule]],
+  [[concept-deferred-functions-and-page-areas]], [[recipe-custom-list-page-filter-grid]],
+  [[recipe-crm-legacy-entity-crud]], [[recipe-crm-lead-conversion]], [[recipe-crm-todo-activity]],
+  [[recipe-smart-process-factory-customization]], [[recipe-tasks-v2-commands]],
+  [[recipe-intranet-absence-import]].
+
+  Ошибки примеров книги, найденные прогоном:
+  - `ToDo::load($owner, $id)` — на деле метод экземпляра `load(int $id)`, и читает он с проверкой
+    прав: в консоли и агенте возвращает `null` для существующего дела;
+  - `addInstanceLazy(..., ['constructor' => ['Класс', 'метод']])` роняет портал — нужно замыкание;
+  - пункт чек-листа задач требует `nodeId` и `title`, `isComplete` булево: вариант книги
+    (`text` + `'Y'`) «сохраняется» без ошибки, но в базу не попадает;
+  - копия задачи из `new Task(id: …)` не создаётся — нужен объект из провайдера;
+  - события отсутствий выбрасывает модуль `intranet` (в книге — `crm`), `ABSENCE_TYPE` в них —
+    `XML_ID`, даты — объекты `DateTime`;
+  - поля фильтра передаются в `FILTER` (`FIELDS` — ключ результата), `'partial' => true` обязателен,
+    иначе список уходит без вариантов, а диапазон дат без своего `prepareListFilterParam()` исчезает;
+  - `setPageSizes()` принимает плоский список чисел;
+  - в `ACTION_AFTER_SAVE` операции удаления у элемента уже нет ID.
+
+  Разошлось с книгой по версии продукта:
+  - зоны шаблона `bitrix24` в оформлении AIR другие (`im`, `topblock`, `pagetitle*` больше не
+    выводятся, появилась `page_menu`, тулбар подключается безусловно) — поправлены
+    [[entity-toolbar]], [[entity-site-template]], [[concept-ui-subsystem]];
+  - Universal API включён у всех четырёх сущностей CRM — поправлены [[concept-crm-universal-api]],
+    [[entity-crm-settings]];
+  - приоритет задачи «низкий» не сохраняется.
+
+  Закрыты открытые вопросы: `replaceWithCustomError()` и разница `Loc::getMessage()` против
+  `LocalizableMessage`, группы правил валидации, порядок фрагментов в зоне (`$pos`), поведение
+  отложенных функций при `die()`, `LEAD_ID` пишется вопреки пометке `RO`, `Immutable` соблюдают
+  операции (но не `$item->save()`), мастер конвертации в фоне требует `enablePermissionCheck(false)`,
+  `ClearStageCommand` удаляет привязки, формат ID файлов задач, состав типов отсутствий.
+
+  Попутно: [[entity-validation-service]], [[entity-validation-result]], [[concept-validation-d7]],
+  [[concept-service-locator]], [[entity-custom-filter]], [[entity-filter-component]],
+  [[entity-user-absence]], [[source-devbook-tasks]], `index.md`.
+
 - **2026-09-22 — прогон черновиков курса 57 на стенде, все сняты с черновика** — Отдельный тестовый
   смарт-процесс «Черновики курса 57 (тест)» (не «Заявки» пилота и не «Проекты» bpt-eval). Спецификации
   рецептов собраны `tools/bpt` в строгом режиме, импортированы и пройдены по всем веткам:

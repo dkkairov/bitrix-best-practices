@@ -98,9 +98,9 @@
 - [[recipe-migrations-as-code|Миграции как код]] · Разработка · box
 - [[recipe-composer-third-party-libraries|Сторонние Composer-пакеты (dompdf, PhpWord)]] · Разработка · box
 - [[recipe-d7-orm-event-subscription|Подписка модуля на событие D7 ORM]] · Разработка · box
-- [[recipe-cli-script-bootstrap|Консольный и cron-скрипт: подключение ядра]] · Разработка · box · черновик
-- [[recipe-d7-custom-validation-rule|Свой валидатор и правило валидации D7]] · Разработка · box · черновик
-- [[recipe-custom-list-page-filter-grid|Своя страница-список: фильтр, грид, тулбар]] · Разработка · box · черновик
+- [[recipe-cli-script-bootstrap|Консольный и cron-скрипт: подключение ядра]] · Разработка · box · проверено
+- [[recipe-d7-custom-validation-rule|Свой валидатор и правило валидации D7]] · Разработка · box · проверено
+- [[recipe-custom-list-page-filter-grid|Своя страница-список: фильтр, грид, тулбар]] · Разработка · box · проверено
 - [[recipe-safe-module-deploy|Безопасная заливка модуля: guard, линт, откат]] · Разработка · box
 - [[recipe-git-deploy-to-production|Доставка правки на прод через git]] · Разработка · box
 - [[recipe-mysql-connection-refused|MySQL (2002) Connection refused]] · Разработка · box
@@ -108,19 +108,19 @@
 - [[recipe-crm-history-all-fields|История смарт-процесса: все поля + источник]] · CRM · box
 - [[recipe-crm-card-editor-js-access|Карточка CRM из JS: редактор и модель]] · CRM · box
 - [[recipe-crm-hide-card-block-js|Скрыть блок в карточке смарт-процесса]] · CRM · box
-- [[recipe-crm-legacy-entity-crud|Лид, контакт, компания, сделка через CCrm*]] · CRM · box · черновик
-- [[recipe-crm-lead-conversion|Конвертация лида из кода]] · CRM · box · черновик
-- [[recipe-crm-todo-activity|Универсальное дело (ToDo) из кода]] · CRM · box · черновик
+- [[recipe-crm-legacy-entity-crud|Лид, контакт, компания, сделка через CCrm*]] · CRM · box · проверено
+- [[recipe-crm-lead-conversion|Конвертация лида из кода]] · CRM · box · проверено
+- [[recipe-crm-todo-activity|Универсальное дело (ToDo) из кода]] · CRM · box · проверено
 - [[recipe-smart-process-programmatic-creation|Создать смарт-процесс и поля из инсталлятора]] · СПА · box
-- [[recipe-smart-process-factory-customization|Своя фабрика смарт-процесса]] · СПА · box · черновик
+- [[recipe-smart-process-factory-customization|Своя фабрика смарт-процесса]] · СПА · box · проверено
 - [[recipe-bizproc-approval-route|Маршрут согласования: срок, доработка, итог]] · БП · both
 - [[recipe-bizproc-request-intake|Заявка: исполнитель, задача со сроком, контроль]] · БП · both
 - [[recipe-bizproc-debugging|Отладка БП: журнал, зависшие процессы]] · БП · both
 - [[recipe-bizproc-custom-activity-baseactivity|Своё действие БП на BaseActivity]] · БП · box
 - [[recipe-bizproc-custom-task-activity|Своё действие БП с заданием (CBPTaskService)]] · БП · box
-- [[recipe-tasks-v2-commands|Команды задач V2: операции и ловушки]] · Задачи · box · черновик
+- [[recipe-tasks-v2-commands|Команды задач V2: операции и ловушки]] · Задачи · box · проверено
 - [[recipe-custom-left-menu-section|Свой раздел в левом меню (CustomSection)]] · Администрирование · box
-- [[recipe-intranet-absence-import|Запись отсутствий из кода (импорт отпусков)]] · Администрирование · box · черновик
+- [[recipe-intranet-absence-import|Запись отсутствий из кода (импорт отпусков)]] · Администрирование · box · проверено
 - [[recipe-post-to-livefeed|Пост в живую ленту из PHP]] · Коммуникации · box
 
 ### Концепты
@@ -139,7 +139,7 @@
 - [[concept-crm-universal-api|Universal API CRM: Container → Factory → Item]] · CRM · box
 - [[concept-crm-dictionaries|Справочники CRM: новое читает, старое пишет]] · CRM · box
 - [[concept-request-lifecycle|Жизненный цикл HTTP-запроса]] · Разработка · box
-- [[concept-deferred-functions-and-page-areas|Отложенные функции и зоны страницы]] · Разработка · box · черновик
+- [[concept-deferred-functions-and-page-areas|Отложенные функции и зоны страницы]] · Разработка · box · проверено
 - [[concept-orm-datamanager-events|События ORM DataManager]] · Разработка · box
 - [[concept-service-locator|ServiceLocator: регистрация и подмена сервисов]] · Разработка · box
 - [[concept-validation-d7|Валидация D7: PHP-атрибуты]] · Разработка · box
@@ -215,23 +215,20 @@
 
 ## По статусу
 
-- **verified:** 135 страниц из 154 (`verified`: 2026-06-01 … 2026-09-22).
-- **draft:** 19 страниц, по четырём разным причинам —
+- **verified:** 145 страниц из 154 (`verified`: 2026-06-01 … 2026-09-22).
+- **draft:** 9 страниц, по трём причинам —
   **методические каркасы**, которые уточняются после первого применения на проекте
   ([[checklist-data-migration]], [[checklist-golive-deployment]], [[checklist-user-adoption]],
   [[checklist-support-handover]], [[checklist-permissions-audit]],
   [[checklist-tasks-regulations]], [[pattern-smart-process-vs-deal-fields]]);
   **пилот пройден только на коробке, облако и оценка на задачах — впереди** ([[pattern-bizproc-ai-assisted-generation]]);
   **не удалось сверить с первоисточником** ([[entity-module-manager]] — справочник D7 не отдал
-  содержимое страницы);
-  **написано по «Книге разработчика», на стенде не проверялось** — 10 страниц сверки 2026-09-21
-  ([[concept-deferred-functions-and-page-areas]], [[recipe-cli-script-bootstrap]],
-  [[recipe-d7-custom-validation-rule]], [[recipe-custom-list-page-filter-grid]],
-  [[recipe-crm-legacy-entity-crud]], [[recipe-crm-lead-conversion]], [[recipe-crm-todo-activity]],
-  [[recipe-smart-process-factory-customization]], [[recipe-tasks-v2-commands]],
-  [[recipe-intranet-absence-import]]); паспорт `.description.php` снят с черновика 2026-09-22 — спор
-  книги закрыт курсом 57 и кодом ядра. Семь страниц по курсу 57 сняты с черновика 2026-09-22 после
-  прогона на стенде.
+  содержимое страницы).
+- **Снято с черновика 2026-09-22:** семь страниц по курсу 57 и **все десять страниц «Книги
+  разработчика»** — каждая прогнана на коробке в Docker. Прогон нашёл и ошибки в примерах книги:
+  `ToDo::load()` оказался методом экземпляра, `addInstanceLazy` не принимает массив-колбэк, пункт
+  чек-листа задач требует `nodeId`, события отсутствий приходят от модуля `intranet`, а зоны шаблона
+  `bitrix24` в оформлении AIR другие.
 - **deprecated:** —
 
 > При устаревании практики ставь `status: deprecated` и ссылку на замену; `/wiki:lint` следит за

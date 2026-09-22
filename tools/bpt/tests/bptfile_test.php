@@ -78,3 +78,17 @@ test('Analyzer: висячая ссылка и запрещённое дейст
     assertTrue(str_contains($errors, 'A9_9_9_9'), "висячая ссылка: {$errors}");
     assertTrue(str_contains($errors, 'CodeActivity'), "запрещённое действие: {$errors}");
 });
+
+test('Analyzer: действие вне каталога не обрывает разбор, а даёт предупреждение', function () {
+    // Примеры курса 57 содержат LogActivity, SetPermissionsActivity, процессы со статусами и др.
+    $data = fixtureData();
+    $data['TEMPLATE'][0]['Children'][] = [
+        'Type' => 'LogActivity', 'Name' => 'A5_6_7_8', 'Activated' => 'Y', 'Node' => null,
+        'Properties' => ['Title' => 'Запись в отчет', 'Text' => 'проверка', 'SetVariable' => '0'], 'Children' => [],
+    ];
+    $report = (new Analyzer(Catalog::load()))->analyze('sample.bpt', ['data' => $data, 'serialized' => null, 'compressed' => null]);
+    assertSame([], $report['errors']);
+    $warnings = implode(' ', $report['warnings']);
+    assertTrue(str_contains($warnings, 'вне каталога') && str_contains($warnings, 'LogActivity'), "предупреждение: {$warnings}");
+    assertSame(['DT1000_10:CLIENT'], $report['portal_bindings']['stages'], 'остальной разбор на месте');
+});

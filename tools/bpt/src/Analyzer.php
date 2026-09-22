@@ -73,6 +73,13 @@ final class Analyzer
 
         $portal = $this->portalBindings($logicJson, $stats);
         [$errors, $warnings] = $this->checks($data, $logicJson, $docFields, $stats);
+        if ($this->catalog !== null) {
+            $outside = array_values(array_filter(array_keys($stats['types']), fn (string $t) => !$this->catalog->has($t)));
+            if ($outside) {
+                sort($outside);
+                $warnings[] = 'действия вне каталога tools/bpt — их свойства не сверялись: ' . implode(', ', $outside);
+            }
+        }
 
         arsort($stats['types']);
         arsort($stats['conditions']);
@@ -215,9 +222,10 @@ final class Analyzer
                 $s['conditions'][$key] = ($s['conditions'][$key] ?? 0) + 1;
                 $this->collectConditionFields($key, $value, $s);
             }
-            // Свойства-идентификаторы портала известны каталогу (например, TemplateId, DynamicTypeId)
+            // Свойства-идентификаторы портала известны каталогу (например, TemplateId, DynamicTypeId);
+            // действие вне каталога (чужой шаблон, пример курса) просто пропускаем
             if (is_string($key) && is_scalar($value) && (string) $value !== ''
-                && $this->catalog?->propType($type, $key) === 'portal-id') {
+                && $this->catalog?->has($type) && $this->catalog->propType($type, $key) === 'portal-id') {
                 $s['portal_props'][] = "{$type}.{$key}={$value}";
             }
         }

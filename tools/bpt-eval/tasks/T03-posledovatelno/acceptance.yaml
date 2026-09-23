@@ -1,0 +1,29 @@
+task: T03
+document: Заявки
+start: create
+item:
+  Сумма к оплате: 300000
+  Проект: Проект Альфа
+scenarios:
+  - name: все согласовали
+    steps:
+      - {task_for: Юристы, do: approve, comment: Юридически чисто}
+      - {task_for: Руководитель проекта, do: approve, comment: В бюджете проекта}
+      - {task_for: Генеральный директор, do: approve, comment: Согласовано}
+    expect:
+      stage: Согласовано
+      process: completed
+  - name: руководитель проекта отказал
+    steps:
+      - {task_for: Юристы, do: approve, comment: Юридически чисто}
+      - {task_for: Руководитель проекта, do: reject, comment: Смета не согласована с заказчиком}
+    expect:
+      stage: Доработка
+      notify: [{to: Инициатор, contains: Смета не согласована с заказчиком}]
+      no_task_for: [Генеральный директор]
+      process: completed
+checklist:
+  - Кому писать причину — создателю заявки или ответственному
+  - Сообщать ли об отказе тем, кто уже согласовал
+  - Повторное согласование после доработки
+  - {text: Юрист — группа «Юристы» или конкретный сотрудник, required: false}

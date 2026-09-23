@@ -1,0 +1,50 @@
+# Эталон T03: вложенные утверждения; отказ на любом шаге — причина инициатору и «Доработка».
+bizproc: 1
+name: EVAL T03 эталон
+steps:
+  - get_smart_item:
+      id: project
+      title: Руководитель из карточки проекта
+      DynamicTypeId: "{{smart:Проекты}}"
+      ReturnFields: ["{{field:Проекты/Руководитель проекта}}"]
+      DynamicFilterFields:
+        items: [[{object: Document, field: ID, operator: "=", value: "{=Document:{{field:Проект}}}"}, AND]]
+  - approve:
+      id: lawyer
+      Users: ["{{group:Юристы}}"]
+      ApproveType: any
+      Name: "Согласуйте заявку «{=Document:TITLE}» (юрист)"
+      on_yes:
+        - approve:
+            id: pm
+            Users: ["{=@project:{{field:Проекты/Руководитель проекта}}}"]
+            ApproveType: any
+            Name: "Согласуйте заявку «{=Document:TITLE}» (руководитель проекта)"
+            on_yes:
+              - approve:
+                  id: ceo
+                  Users: ["{{user:Генеральный директор Тест}}"]
+                  ApproveType: any
+                  Name: "Согласуйте заявку «{=Document:TITLE}» (генеральный директор)"
+                  on_yes: [{change_stage: {TargetStatus: "{{stage:Согласовано}}"}}]
+                  on_no:
+                    - notify:
+                        MessageSite: "Заявка «{=Document:TITLE}» на доработке. Генеральный директор: {=@ceo:Comments}"
+                        MessageType: "4"
+                        MessageUserFrom: ["{=Document:ASSIGNED_BY_ID}"]
+                        MessageUserTo: ["{=Document:CREATED_BY}"]
+                    - change_stage: {TargetStatus: "{{stage:Доработка}}"}
+            on_no:
+              - notify:
+                  MessageSite: "Заявка «{=Document:TITLE}» на доработке. Руководитель проекта: {=@pm:Comments}"
+                  MessageType: "4"
+                  MessageUserFrom: ["{=Document:ASSIGNED_BY_ID}"]
+                  MessageUserTo: ["{=Document:CREATED_BY}"]
+              - change_stage: {TargetStatus: "{{stage:Доработка}}"}
+      on_no:
+        - notify:
+            MessageSite: "Заявка «{=Document:TITLE}» на доработке. Юрист: {=@lawyer:Comments}"
+            MessageType: "4"
+            MessageUserFrom: ["{=Document:ASSIGNED_BY_ID}"]
+            MessageUserTo: ["{=Document:CREATED_BY}"]
+        - change_stage: {TargetStatus: "{{stage:Доработка}}"}

@@ -1,0 +1,34 @@
+# Эталон T02: условие по сумме; руководитель — из карточки проекта, выше порога — группа.
+bizproc: 1
+name: EVAL T02 эталон
+steps:
+  - if:
+      title: Сумма до 100 000?
+      branches:
+        - title: До 100 000 включительно
+          when: {fieldcondition: [["{{field:Сумма к оплате}}", "<=", "100000", "0"]]}
+          steps:
+            - get_smart_item:
+                id: project
+                title: Руководитель из карточки проекта
+                DynamicTypeId: "{{smart:Проекты}}"
+                ReturnFields: ["{{field:Проекты/Руководитель проекта}}"]
+                DynamicFilterFields:
+                  items: [[{object: Document, field: ID, operator: "=", value: "{=Document:{{field:Проект}}}"}, AND]]
+            - approve:
+                id: pm
+                Users: ["{=@project:{{field:Проекты/Руководитель проекта}}}"]
+                ApproveType: any
+                Name: "Согласуйте заявку «{=Document:TITLE}» на {=Document:{{field:Сумма к оплате}}}"
+                on_yes: [{change_stage: {TargetStatus: "{{stage:Согласовано}}"}}]
+                on_no: [{change_stage: {TargetStatus: "{{stage:Доработка}}"}}]
+        - title: Больше 100 000
+          else: true
+          steps:
+            - approve:
+                id: finance
+                Users: ["{{group:Финансовый отдел}}"]
+                ApproveType: any
+                Name: "Согласуйте заявку «{=Document:TITLE}» на {=Document:{{field:Сумма к оплате}}}"
+                on_yes: [{change_stage: {TargetStatus: "{{stage:Согласовано}}"}}]
+                on_no: [{change_stage: {TargetStatus: "{{stage:Доработка}}"}}]

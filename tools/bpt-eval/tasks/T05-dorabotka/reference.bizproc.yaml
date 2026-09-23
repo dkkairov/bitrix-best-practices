@@ -1,0 +1,52 @@
+# Эталон T05: цикл «согласование → доработка» со счётчиком отказов.
+bizproc: 1
+name: EVAL T05 эталон
+variables:
+  rejections: {Name: Отказов, Type: int, Default: "0"}
+  approved:   {Name: Согласовано, Type: bool, Default: "N"}
+  fixes:      {Name: Что исправлено, Type: text}
+steps:
+  - get_smart_item:
+      id: project
+      title: Руководитель из карточки проекта
+      DynamicTypeId: "{{smart:Проекты}}"
+      ReturnFields: ["{{field:Проекты/Руководитель проекта}}"]
+      DynamicFilterFields:
+        items: [[{object: Document, field: ID, operator: "=", value: "{=Document:{{field:Проект}}}"}, AND]]
+  - while:
+      title: Пока не согласовано и отказов меньше трёх
+      when: {propertyvariablecondition: [[approved, "=", "N", "0"], [rejections, "<", "3", "0"]]}
+      steps:
+        - approve:
+            id: pm
+            Users: ["{=@project:{{field:Проекты/Руководитель проекта}}}"]
+            ApproveType: any
+            Name: "Согласуйте заявку «{=Document:TITLE}»"
+            Description: "Исправления инициатора: {=Variable:fixes}"
+            on_yes: [{set_var: {VariableValue: {approved: "Y"}}}]
+            on_no:
+              - set_var: {VariableValue: {rejections: "={=Variable:rejections} + 1"}}
+              - if:
+                  title: Ещё есть попытки?
+                  branches:
+                    - title: Да — на доработку
+                      when: {propertyvariablecondition: [[rejections, "<", "3", "0"]]}
+                      steps:
+                        - request_info:
+                            id: fix
+                            Users: ["{=Document:CREATED_BY}"]
+                            Name: "Доработайте заявку «{=Document:TITLE}»: {=@pm:Comments}"
+                            RequestedInformation:
+                              - {Name: fixes, Title: Что исправлено, Type: text, Required: true}
+                    - title: Нет — третий отказ
+                      else: true
+                      steps: []
+  - if:
+      title: Итог
+      branches:
+        - title: Согласовано
+          when: {propertyvariablecondition: [[approved, "=", "Y", "0"]]}
+          steps: [{change_stage: {TargetStatus: "{{stage:Согласовано}}"}}]
+        - title: Три отказа
+          else: true
+          steps: [{change_stage: {TargetStatus: "{{stage:Провал}}"}}]

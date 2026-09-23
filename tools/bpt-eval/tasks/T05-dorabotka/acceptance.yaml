@@ -1,0 +1,30 @@
+task: T05
+document: Заявки
+start: create
+item:
+  Сумма к оплате: 120000
+  Проект: Проект Альфа
+scenarios:
+  - name: согласовано со второго раза
+    steps:
+      - {task_for: Руководитель проекта, do: reject, comment: Нет сметы}
+      - {task_for: Инициатор, do: provide, comment: Исправил, values: {Что исправлено: Приложил смету}}
+      - {task_for: Руководитель проекта, do: approve, comment: Теперь всё есть}
+    expect:
+      stage: Согласовано
+      process: completed
+  - name: три отказа
+    steps:
+      - {task_for: Руководитель проекта, do: reject, comment: Нет сметы}
+      - {task_for: Инициатор, do: provide, comment: Исправил, values: {Что исправлено: Приложил смету}}
+      - {task_for: Руководитель проекта, do: reject, comment: Смета неполная}
+      - {task_for: Инициатор, do: provide, comment: Исправил, values: {Что исправлено: Дополнил смету}}
+      - {task_for: Руководитель проекта, do: reject, comment: Всё ещё неполная}
+    expect:
+      stage: Провал
+      process: completed
+checklist:
+  - Кто описывает исправления — создатель заявки или ответственный
+  - Как считать попытки — три отказа подряд или всего
+  - Что делать, если инициатор не ответил на запрос
+  - {text: Где хранить описание исправлений — в поле заявки или только в задании, required: false}

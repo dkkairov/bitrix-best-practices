@@ -66,6 +66,7 @@
 ### Паттерны
 - [[pattern-crm-sales-funnel-design|Проектирование воронки и стадий]] · CRM · both
 - [[pattern-robots-vs-bizproc-decision|Роботы/триггеры vs бизнес-процессы]] · Бизнес-процессы · both
+- [[pattern-bizproc-roles-from-project-card|Роли процесса — из карточки проекта, а не из шаблона]] · Бизнес-процессы · both · проверено на коробке
 - [[pattern-bizproc-ai-assisted-generation|AI-генерация БП: агент проектирует, код собирает]] · Бизнес-процессы · both · черновик
 - [[pattern-rest-webhooks-and-events|Вебхуки и события для интеграций]] · REST · both
 - [[pattern-events-over-core-modification|Расширение через события]] · Разработка · box

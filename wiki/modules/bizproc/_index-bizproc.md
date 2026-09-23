@@ -22,6 +22,7 @@ updated: "2026-09-23"
 
 ## Страницы
 - [[pattern-robots-vs-bizproc-decision|Паттерн выбора: роботы/триггеры vs бизнес-процессы]]
+- [[pattern-bizproc-roles-from-project-card|Роли процесса — из карточки проекта, а не из шаблона]]
 - [[concept-bizproc-engine|Устройство движка БП: шаблон, инстанс, активити]] · коробка
 - [[concept-bizproc-state-machine|БП со статусами: устройство и когда выбирать]]
 - [[concept-bizproc-bpt-format|Формат шаблона БП (.bpt): устройство и чтение]]

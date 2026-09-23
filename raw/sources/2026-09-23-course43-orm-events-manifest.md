@@ -5,7 +5,7 @@
 | Источник | <https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&INDEX=Y> — официальный учебный курс 1С-Битрикс на dev.1c-bitrix.ru |
 | Издатель | 1С-Битрикс |
 | Статус | эталонный источник: официальная документация (`CLAUDE.md` §9) |
-| Снято | 2026-09-23, два раздела уровня Middle: **ORM** (17 уроков) и **События** (2 урока) |
+| Снято | 2026-09-23, два раздела уровня Middle: **ORM** (26 уроков, в два захода) и **События** (2 урока) |
 | Что внутри | только метаданные: адрес, место в оглавлении, дата изменения, объём и хэш текста |
 | Чего нет | текста уроков — в репозиторий его не копируем. Содержание — в конспекте `wiki/sources/source-course43-orm-events.md` |
 | Прежние снимки курса | `2026-06-19-bxfw-course43-namespaces.md`, `2026-06-20-bxfw-course43-modules.md` |
@@ -38,6 +38,23 @@
 | Фильтр ORM | [`3030`](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=3030) | ORM | 2025-11-20 | 8485 | `2256ed588353df0c` |
 | События в D7 | [`3113`](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=3113) | События | 2025-11-20 | 1240 | `a035179242b90cf4` |
 | Как написать обработчик события | [`3395`](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=3395) | События / Использование событий | 2023-11-13 | 2744 | `d56b4b947f30a28d` |
+
+## Уроки: второй заход (отношения, аннотации, пропущенное)
+
+Первый список уроков, полученный с оглавления, оказался неполным — глава «Отношения» и
+часть уроков об объектах в него не попали. Добраны 2026-09-23 тем же способом.
+
+| Название | ID | Где | Изменён | Знаков | sha256[:16] |
+|---|---|---|---|---:|---|
+| 1:N | [`11737`](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=11737) | ORM / Отношения | 2022-05-11 | 8169 | `a79b17931dc70829` |
+| 1:1 | [`11739`](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=11739) | ORM / Отношения | 2020-10-27 | 162 | `d3110893605e385e` |
+| N:M | [`11741`](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=11741) | ORM / Отношения | 2020-10-27 | 11500 | `e9d5f8390011f406` |
+| Отношения (у объекта) | [`11707`](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=11707) | ORM / Объекты | 2023-08-08 | 2141 | `51aeac6c107906d0` |
+| Заполнение | [`11705`](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=11705) | ORM / Объекты | 2020-10-27 | 2356 | `d26e460a7093b015` |
+| Восстановление | [`11703`](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=11703) | ORM / Объекты | 2020-10-27 | 1211 | `a523a19d487685c0` |
+| ArrayAccess | [`11755`](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=11755) | ORM / Объекты | 2020-10-27 | 884 | `be4a0cacfdf93d8e` |
+| Аннотации классов | [`11733`](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=11733) | ORM | 2025-09-19 | 2415 | `b9bed04480b334e7` |
+| Обратная совместимость | [`11715`](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=11715) | ORM | 2022-07-27 | 1036 | `f171d6756b75258f` |
 
 ## Что бросилось в глаза при снятии
 

@@ -144,6 +144,7 @@
 - [[concept-d7-orm-entity|Сущность ORM: Table-класс и описание полей]] · Разработка · box
 - [[concept-d7-orm-query|Выборка ORM: getList, Query и два формата фильтра]] · Разработка · box
 - [[concept-d7-orm-objects|Объекты и коллекции ORM: EO_-классы вместо массивов]] · Разработка · box
+- [[concept-d7-orm-relations|Связи ORM: Reference, OneToMany, ManyToMany]] · Разработка · box · черновик
 - [[concept-orm-datamanager-events|События ORM DataManager]] · Разработка · box
 - [[concept-service-locator|ServiceLocator: регистрация и подмена сервисов]] · Разработка · box
 - [[concept-validation-d7|Валидация D7: PHP-атрибуты]] · Разработка · box
@@ -221,14 +222,15 @@
 
 ## По статусу
 
-- **verified:** 152 страницы из 160 (`verified`: 2026-06-01 … 2026-09-23).
-- **draft:** 8 страниц, по двум причинам —
+- **verified:** 152 страницы из 161 (`verified`: 2026-06-01 … 2026-09-23).
+- **draft:** 9 страниц, по трём причинам —
   **методические каркасы**, которые уточняются после первого применения на проекте
   ([[checklist-data-migration]], [[checklist-golive-deployment]], [[checklist-user-adoption]],
   [[checklist-support-handover]], [[checklist-permissions-audit]],
   [[checklist-tasks-regulations]], [[pattern-smart-process-vs-deal-fields]]);
-  **пилот пройден только на коробке, облако и оценка на задачах — впереди** ([[pattern-bizproc-ai-assisted-generation]]).
-  Все черновики, которые зависели только от нас, закрыты.
+  **пилот пройден только на коробке, облако и оценка на задачах — впереди** ([[pattern-bizproc-ai-assisted-generation]]);
+  **написано по курсу, но не прогнано на стенде** ([[concept-d7-orm-relations]] — в момент работы
+  был недоступен Docker).
 - **Снято с черновика 2026-09-22:** семь страниц по курсу 57 и **все десять страниц «Книги
   разработчика»** — каждая прогнана на коробке в Docker. Прогон нашёл и ошибки в примерах книги:
   `ToDo::load()` оказался методом экземпляра, `addInstanceLazy` не принимает массив-колбэк, пункт

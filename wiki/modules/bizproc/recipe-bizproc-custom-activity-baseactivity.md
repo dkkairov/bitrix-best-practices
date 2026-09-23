@@ -5,12 +5,12 @@ module: bizproc
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-22 / коробка, bizproc 26.1075.0: код рецепта прогнан в процессе на элементе смарт-процесса; импорт, результат, ошибка формата, списки дизайнера и роботов, форма настроек (HTML ядра)"
+verified: "2026-09-22 / коробка, bizproc 26.1075.0: код рецепта прогнан в процессе на элементе смарт-процесса; импорт, результат, ошибка формата, списки дизайнера и роботов, форма настроек (HTML ядра); REST-методы сверены через MCP (apidocs.bitrix24.ru) 2026-09-23"
 tags: [bizproc, активити, BaseActivity, свои-действия, робот, результат, ошибки]
 sources: ["[[source-devbook-bizproc]]", "[[source-course57-developer]]"]
 related: ["[[entity-cbp-activity]]", "[[entity-bizproc-activity-description]]", "[[recipe-bizproc-custom-task-activity]]", "[[antipattern-bizproc-php-code-activity]]", "[[entity-bizproc-field-type]]", "[[recipe-module-structure-and-install]]", "[[recipe-bizproc-debugging]]", "[[pattern-robots-vs-bizproc-decision]]"]
 aliases: []
-updated: "2026-09-22"
+updated: "2026-09-23"
 ---
 
 # Своё действие БП на `BaseActivity`
@@ -39,7 +39,8 @@ updated: "2026-09-22"
 - **Действие выполняется сразу и людей не ждёт** — этот рецепт. Ждёт ответа человека — задание
   ([[recipe-bizproc-custom-task-activity]]).
 - **Вместо «PHP кода» в шаблоне** — [[antipattern-bizproc-php-code-activity]].
-- **Облако:** своих PHP-действий нет, только действия приложений по REST (`bizproc.activity.add`,
+- **Облако:** своих PHP-действий нет, только действия приложений по REST
+  ([`bizproc.activity.add`](https://apidocs.bitrix24.ru/api-reference/bizproc/bizproc-activity/bizproc-activity-add.html),
   [[entity-bizproc-template-rest-methods]]).
 
 ## Предусловия

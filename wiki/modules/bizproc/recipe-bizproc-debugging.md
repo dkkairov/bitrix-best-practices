@@ -5,12 +5,12 @@ module: bizproc
 edition: both
 status: verified
 provenance: mixed
-verified: "2026-09-22 / коробка, bizproc 26.1075.0: сообщения таблицы воспроизведены прогоном на тестовом смарт-процессе; лимит одновременных процессов, рекурсивная смена стадий, письмо и пауза на хитах — по курсу и коду"
+verified: "2026-09-22 / коробка, bizproc 26.1075.0: сообщения таблицы воспроизведены прогоном на тестовом смарт-процессе; лимит одновременных процессов, рекурсивная смена стадий, письмо и пауза на хитах — по курсу и коду; REST-методы сверены через MCP (apidocs.bitrix24.ru) 2026-09-23"
 tags: [бизнес-процессы, отладка, журнал, зависшие-процессы, запись-в-отчёт]
 sources: ["[[source-course57-basics]]", "[[source-course57-actions-core]]", "[[source-course57-actions-notify-other]]", "[[source-course57-developer]]"]
 related: ["[[checklist-bizproc-template-review]]", "[[concept-bizproc-activity-catalog]]", "[[concept-bizproc-engine]]", "[[entity-cbp-activity]]", "[[entity-bizproc-template-rest-methods]]", "[[concept-bizproc-bpt-format]]", "[[recipe-bizproc-custom-activity-baseactivity]]"]
 aliases: []
-updated: "2026-09-22"
+updated: "2026-09-23"
 ---
 
 # Отладка БП: журнал, запись в отчёт, зависшие процессы
@@ -50,8 +50,9 @@ updated: "2026-09-22"
 7. **Зависшие процессы.** «Бизнес-процессы → Все активные», пресет «Зависшие»: администратор видит
    все процессы и может удалить зависшие
    ([урок 2363](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=2363)). Через REST —
-   `bizproc.workflow.instances`, остановка с сохранением данных — `bizproc.workflow.terminate`,
-   удаление вместе с данными — `bizproc.workflow.kill`
+   [`bizproc.workflow.instances`](https://apidocs.bitrix24.ru/api-reference/bizproc/bizproc-workflow-instances.html), остановка с сохранением
+   данных — [`bizproc.workflow.terminate`](https://apidocs.bitrix24.ru/api-reference/bizproc/bizproc-workflow-terminate.html), удаление вместе
+   с данными — [`bizproc.workflow.kill`](https://apidocs.bitrix24.ru/api-reference/bizproc/bizproc-workflow-kill.html)
    ([[entity-bizproc-template-rest-methods|REST-методы]]). Прерванный процесс не продолжить — только
    запустить заново ([урок 3813](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=3813));
    задания в работе при остановке удаляются (код ядра).

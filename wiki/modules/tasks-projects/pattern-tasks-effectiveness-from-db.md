@@ -5,12 +5,12 @@ module: tasks-projects
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-06-10 / коробка: сверка с виджетом эффективности на боевом портале, версия модуля tasks не зафиксирована; `tasks.task.list` сверен через MCP 2026-09-18"
+verified: "2026-06-10 / коробка: сверка с виджетом эффективности на боевом портале, версия модуля tasks не зафиксирована; `tasks.task.list` сверен через MCP 2026-09-18; REST-методы сверены через MCP (apidocs.bitrix24.ru) 2026-09-23"
 tags: [tasks, эффективность, отчётность, sql, дашборд, kpi]
 sources: []
 related: ["[[concept-platform-reverse-engineering]]", "[[concept-change-invasiveness-hierarchy]]", "[[checklist-box-performance]]", "[[concept-tasks-api-v2]]"]
 aliases: ["bitrix24-tasks-effective-direct-sql"]
-updated: "2026-09-21"
+updated: "2026-09-23"
 ---
 
 # Эффективность задач 1:1 с виджетом
@@ -21,7 +21,8 @@ updated: "2026-09-21"
 (`/company/personal/user/<id>/tasks/effective/`), за произвольный период. Два тупика, оба пройдены
 на живом портале:
 
-- **Пересчёт через REST** (`tasks.task.list` плюс выборка истории задачи и своя бизнес-логика)
+- **Пересчёт через REST** ([`tasks.task.list`](https://apidocs.bitrix24.ru/api-reference/rest-v3/tasks/tasks-task-list.html) — метод описан в разделе
+  REST v3 — плюс выборка истории задачи и своя бизнес-логика)
   упёрся в 93 % совпадения (91 из 98 пользователей). Дальше не идёт без исходника: правила
   «было отложено», «перенесённая просрочка», исторический self-assign приходится угадывать.
 - **Парсинг HTML виджета** через headless-браузер с cookies из `.env` — работает, но хрупко:

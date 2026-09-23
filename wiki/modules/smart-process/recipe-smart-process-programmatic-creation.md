@@ -5,12 +5,12 @@ module: smart-process
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-06-08 / коробка; тип создан вживую, элементы заводятся сразу после установки; сверено с «Книгой разработчика Bitrix24» 2026-09-21 (Смарт-процессы — Процессы, Описание; Счёт)"
+verified: "2026-06-08 / коробка; тип создан вживую, элементы заводятся сразу после установки; сверено с «Книгой разработчика Bitrix24» 2026-09-21 (Смарт-процессы — Процессы, Описание; Счёт); REST-методы сверены через MCP (apidocs.bitrix24.ru) 2026-09-23"
 tags: [smart-process, crm, инсталлятор, userfield, идемпотентность, typetable]
 sources: ["[[source-devbook-crm]]"]
 related: ["[[concept-crm-universal-api]]", "[[recipe-module-structure-and-install]]", "[[entity-smart-process]]", "[[recipe-crm-history-all-fields]]", "[[recipe-smart-process-factory-customization]]", "[[recipe-migrations-as-code]]"]
 aliases: ["bitrix24-create-smart-process-programmatically"]
-updated: "2026-09-21"
+updated: "2026-09-23"
 ---
 
 # Создать смарт-процесс и поля из инсталлятора
@@ -113,7 +113,8 @@ ID типа, а `entityTypeId` и ID типа на каждом портале �
   стенде. Осознанное решение: по умолчанию тип оставляем, чистим только опции модуля.
 
 ## Альтернативы
-- **REST `crm.type.add` + `userfieldconfig.add`** — для облака и для приложений маркетплейса;
+- **REST [`crm.type.add`](https://apidocs.bitrix24.ru/api-reference/crm/universal/user-defined-object-types/crm-type-add.html) + `userfieldconfig.add`** — для облака и для
+  приложений маркетплейса;
   для коробочного модуля это лишний HTTP-слой и нужен `scope`.
 - **Ручное создание мастером** — то, от чего уходим: коды полей приходится переносить руками.
 

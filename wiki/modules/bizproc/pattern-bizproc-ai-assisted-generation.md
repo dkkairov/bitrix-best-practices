@@ -5,12 +5,12 @@ module: bizproc
 edition: both
 status: draft
 provenance: mixed
-verified: ""
+verified: "; REST-методы сверены через MCP (apidocs.bitrix24.ru) 2026-09-23"
 tags: [бизнес-процессы, ai, claude-code, агент, bpt, генерация, mcp, тестирование]
 sources: ["[[source-course57-actions-core]]"]
 related: ["[[concept-bizproc-bpt-format]]", "[[entity-bizproc-template-rest-methods]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[pattern-robots-vs-bizproc-decision]]", "[[recipe-rest-oauth-app-setup]]", "[[concept-bizproc-activity-catalog]]", "[[checklist-bizproc-template-review]]", "[[recipe-bizproc-approval-route]]"]
 aliases: []
-updated: "2026-09-22"
+updated: "2026-09-23"
 ---
 
 # AI-генерация бизнес-процессов: агент проектирует, код собирает
@@ -92,11 +92,13 @@ updated: "2026-09-22"
 3. **Инструменты — это код, не модель:** разбор и сборка `.bpt`
    ([`tools/bpt`](../../../tools/bpt/README.md)), компилятор спецификации, проверки (ссылки,
    объявления, запрещённые действия, «сырые» ID), схема процесса в Mermaid для ревью.
-4. **Снимок портала через REST:** смарт-процессы (`crm.type.list`), стадии, поля, пользователи и
+4. **Снимок портала через REST:** смарт-процессы ([`crm.type.list`](https://apidocs.bitrix24.ru/api-reference/crm/universal/user-defined-object-types/crm-type-list.html)), стадии, поля, пользователи и
    структура — чтобы подставлять ID по названиям.
 5. **Тестовый портал и своё приложение** со scope `bizproc` и `crm`: загрузка
-   (`bizproc.workflow.template.add`), запуск (`bizproc.workflow.start`), задания
-   (`bizproc.task.list` / `bizproc.task.complete`) — см.
+   ([`bizproc.workflow.template.add`](https://apidocs.bitrix24.ru/api-reference/bizproc/template/bizproc-workflow-template-add.html)), запуск
+   ([`bizproc.workflow.start`](https://apidocs.bitrix24.ru/api-reference/bizproc/bizproc-workflow-start.html)), задания
+   ([`bizproc.task.list`](https://apidocs.bitrix24.ru/api-reference/bizproc/bizproc-task/bizproc-task-list.html) /
+   [`bizproc.task.complete`](https://apidocs.bitrix24.ru/api-reference/bizproc/bizproc-task/bizproc-task-complete.html)) — см.
    [[entity-bizproc-template-rest-methods|REST-методы шаблонов]].
 6. **Навык Claude Code** — сделано:
    [`building-bizproc-templates`](../../../.claude/skills/building-bizproc-templates/SKILL.md).

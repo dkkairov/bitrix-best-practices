@@ -5,12 +5,12 @@ module: bizproc
 edition: both
 status: verified
 provenance: mixed
-verified: "2026-06-19 / Bitrix24 cloud + box; автозапуск и запуск из кода — 2026-09-22 / курс 57 dev.1c-bitrix.ru (уроки 20686, 3122, 7399, 8445) и код стенда (коробка, bizproc 26.1075.0, crm 26.800.0)"
+verified: "2026-06-19 / Bitrix24 cloud + box; автозапуск и запуск из кода — 2026-09-22 / курс 57 dev.1c-bitrix.ru (уроки 20686, 3122, 7399, 8445) и код стенда (коробка, bizproc 26.1075.0, crm 26.800.0); REST-методы сверены через MCP (apidocs.bitrix24.ru) 2026-09-23"
 tags: [роботы, триггеры, автоматизация, crm, автозапуск]
 sources: ["[[source-course57-developer]]", "[[source-course57-templates-designer]]", "[[source-course57-actions-crm-disk]]"]
 related: ["[[pattern-robots-vs-bizproc-decision]]", "[[pattern-rest-webhooks-and-events]]", "[[entity-bizproc-template-rest-methods]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[entity-bizproc-activity-description]]", "[[concept-bizproc-engine]]"]
 aliases: ["robots-triggers"]
-updated: "2026-09-22"
+updated: "2026-09-23"
 ---
 
 # Роботы и триггеры
@@ -67,8 +67,9 @@ updated: "2026-09-22"
   ([урок 7399](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=7399),
   [урок 8445](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=57&LESSON_ID=8445)).
 - **Шаблоны роботов недоступны в REST:** их нельзя получить, изменить или удалить, а
-  `bizproc.workflow.template.add` не привязывает шаблон к стадии. `bizproc.robot.add` лишь
-  регистрирует робота приложения. Перенос роботов между порталами — вручную
+  [`bizproc.workflow.template.add`](https://apidocs.bitrix24.ru/api-reference/bizproc/template/bizproc-workflow-template-add.html) привязывает шаблон к
+  типу документа, но не к стадии. [`bizproc.robot.add`](https://apidocs.bitrix24.ru/api-reference/bizproc/bizproc-robot/bizproc-robot-add.html) лишь
+  регистрирует робота приложения (нужны права администратора и контекст приложения). Перенос роботов между порталами — вручную
   ([[entity-bizproc-template-rest-methods|REST-методы шаблонов БП]], сверено 2026-09-16).
 - В роботах выбирают конкретных людей и поля — при переносе это
   [[antipattern-bizproc-hardcoded-portal-ids|зашитые ID портала]].

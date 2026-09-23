@@ -31,7 +31,8 @@ Claude Code автозагружает этот файл, поэтому пра�
 3. **`CLAUDE.md`** — эта схема.
 
 Служебные: **`index.md`** (каталог-навигатор), **`log.md`** (журнал операций), `README.md` (для людей),
-git (история версий), `tools/` (утилиты для артефактов Bitrix24 — не вики, у каждой свой README).
+git (история версий), `tools/` (утилиты: для артефактов Bitrix24 и для самой вики; у каждой свой
+README).
 
 ---
 
@@ -51,7 +52,9 @@ wiki/development/<a>/   КОРОБКА (разработка): core-d7, componen
 wiki/cross-cutting/     playbooks (жизненный цикл), patterns, antipatterns
 wiki/glossary/          сущности и термины (entity-страницы)
 wiki/sources/           конспекты источников (source-summary)
-tools/<name>/           утилиты (напр. tools/bpt — разбор/сборка/проверка шаблонов БП .bpt)
+tools/<name>/           утилиты: tools/bpt — разбор/сборка/проверка шаблонов БП .bpt;
+                        tools/bpt-eval — прогон задач на стенде и оценка;
+                        tools/wiki-lint — механические проверки вики (запускает /wiki:lint)
 work/                   рабочие файлы по клиентам (спецификации, снимки, сборки) — в .gitignore
 ```
 

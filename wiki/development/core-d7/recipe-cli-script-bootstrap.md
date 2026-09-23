@@ -10,7 +10,7 @@ tags: [cli, cron, консоль, prolog-before, finalactions, фоновые-з
 sources: ["[[source-devbook-core-d7]]"]
 related: ["[[pattern-agents-vs-cron]]", "[[concept-request-lifecycle]]", "[[antipattern-cli-php-as-root]]", "[[pattern-local-solution-structure]]", "[[entity-php-interface]]", "[[entity-admin-php-console]]"]
 aliases: []
-updated: "2026-09-22"
+updated: "2026-09-23"
 ---
 
 # Консольный и cron-скрипт: подключение ядра и завершение
@@ -89,7 +89,8 @@ updated: "2026-09-22"
    обрабатываются фоновые задания, уходят push-уведомления; без этого, по книге, консольный скрипт
    работает некорректно. **Обе формы завершают процесс:** код после них не выполняется, а код
    возврата — 0 (стенд). Нужен свой код для мониторинга — вместо них
-   `\Bitrix\Main\Application::getInstance()->end(<код>)`: те же завершающие действия и выход с этим
+   [[entity-main-application|`\Bitrix\Main\Application`]]`::getInstance()->end(<код>)`: те же
+   завершающие действия и выход с этим
    кодом (`CMain::FinalActions()` — это `end(0)`).
 
 ```php

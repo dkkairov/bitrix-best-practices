@@ -170,7 +170,8 @@
 
 **Интранет** — [[entity-cintranet-utils|CIntranetUtils]] · [[entity-user-absence|UserAbsence]]
 
-**Ядро** — [[entity-loader|Loader]] · [[entity-module-manager|ModuleManager]] ·
+**Ядро** — [[entity-main-application|Application]] · [[entity-loader|Loader]] ·
+[[entity-module-manager|ModuleManager]] ·
 [[entity-config-option|Config\Option]] · [[entity-event-manager|EventManager]] ·
 [[entity-main-event|Event / EventResult]] · [[entity-main-result|Result / Error]] ·
 [[entity-cagent|CAgent]] · [[entity-validation-service|ValidationService]] ·
@@ -215,7 +216,7 @@
 
 ## По статусу
 
-- **verified:** 145 страниц из 154 (`verified`: 2026-06-01 … 2026-09-22).
+- **verified:** 146 страниц из 155 (`verified`: 2026-06-01 … 2026-09-22).
 - **draft:** 9 страниц, по трём причинам —
   **методические каркасы**, которые уточняются после первого применения на проекте
   ([[checklist-data-migration]], [[checklist-golive-deployment]], [[checklist-user-adoption]],

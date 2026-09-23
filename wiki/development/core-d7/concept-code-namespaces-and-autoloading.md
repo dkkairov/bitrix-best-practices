@@ -10,7 +10,7 @@ tags: [d7, namespaces, автозагрузка, local, разработка]
 sources: ["[[source-bxfw-course43-namespaces]]", "[[source-devbook-dev-rules]]"]
 related: ["[[antipattern-box-core-modification]]", "[[recipe-module-structure-and-install]]", "[[pattern-local-solution-structure]]", "[[entity-local-directory]]"]
 aliases: ["code-namespaces-and-autoloading"]
-updated: "2026-09-21"
+updated: "2026-09-23"
 ---
 
 # Организация кода: пространства имён и автозагрузка
@@ -46,7 +46,8 @@ use Bitrix\Main\Localization\Loc;
 
 Loc::getMessage('CODE'); // вместо \Bitrix\Main\Localization\Loc::getMessage(...)
 ```
-Допустимы: полный путь `\Bitrix\Main\Application::getInstance()`, сокращённый
+Допустимы: полный путь `\Bitrix\Main\Application::getInstance()`
+([[entity-main-application|о самом классе]]), сокращённый
 `Main\Application::...` (если код уже в пространстве `Bitrix`), либо алиас через `use`.
 
 ## Где размещать свой код

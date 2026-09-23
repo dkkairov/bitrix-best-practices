@@ -44,6 +44,7 @@ updated: "2026-09-23"
 - [[antipattern-box-core-modification|Антипаттерн: правка ядра вместо событий]]
 
 ### Классы и объекты ядра (справочник)
+- [[entity-main-application|Application]] — соединение, контекст, кэши и завершение хита
 - [[entity-loader|Loader]] — подключение модулей
 - [[entity-module-manager|ModuleManager]] — регистрация модуля · черновик
 - [[entity-config-option|Config\Option]] — настройки модулей

@@ -83,6 +83,9 @@ final class CheckRunner
             $constants = ConstantMatcher::match($import['constants'], $roles);
             $result['constants_matched'] = $constants['matched'];
             $result['constants_unmatched'] = $constants['unmatched'];
+            // unmatched — только константы без роли И без уже заполненного Default (см.
+            // ConstantMatcher::match()): агент мог сам подставить рабочего сотрудника в Default,
+            // тогда сопоставление не нужно и провала здесь быть не должно — шаблон и так рабочий.
             if ($constants['unmatched']) {
                 $result['reason'] = 'константы без сопоставления: ' . implode(', ', $constants['unmatched']);
             } elseif ($acceptance->scenarios()) {

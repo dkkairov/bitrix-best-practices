@@ -41,3 +41,22 @@ test('Константы: сопоставление по названию', fun
         'head' => 'Руководитель отдела продаж', 'who' => 'Руководитель проекта'], $result['matched']);
     assertSame(['boss'], $result['unmatched']);
 });
+
+test('Константы: заполненный Default не требует сопоставления', function () {
+    $roles = Roles::fromArray(rolesData(), 'roles.yaml');
+    $result = ConstantMatcher::match([
+        // роли нет, но Default уже заполнен агентом (например, из снимка портала) — шаблон и так
+        // рабочий, сопоставление не нужно: константа не попадает ни в matched, ни в unmatched
+        'fin_director' => ['Name' => 'Финансовый директор', 'Type' => 'user', 'Default' => 'user_42'],
+        // роли нет, Default — пустая строка: запускать процесс не с чем, нужно сопоставление
+        'boss' => ['Name' => 'Директор филиала', 'Type' => 'user', 'Default' => ''],
+        // роли нет, Default вовсе не задан — тоже нужно сопоставление
+        'boss2' => ['Name' => 'Директор филиала', 'Type' => 'user'],
+        // Multiple-константа, все элементы Default пустые — тоже пусто
+        'multi' => ['Name' => 'Директор филиала', 'Type' => 'user', 'Multiple' => '1', 'Default' => ['']],
+        // роль нашлась и Default уже заполнен — всё равно matched: прогонщик подставит роль поверх
+        'pm' => ['Name' => 'Руководитель проекта', 'Type' => 'user', 'Default' => 'user_7'],
+    ], $roles);
+    assertSame(['pm' => 'Руководитель проекта'], $result['matched']);
+    assertSame(['boss', 'boss2', 'multi'], $result['unmatched']);
+});

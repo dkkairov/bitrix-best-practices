@@ -4,7 +4,8 @@ type: index
 module: smart-process
 edition: both
 status: verified
-updated: "2026-09-21"
+verified: "2026-09-23 / состав папки сверен со списком файлов"
+updated: "2026-09-23"
 ---
 
 # Смарт-процессы — практики внедрения

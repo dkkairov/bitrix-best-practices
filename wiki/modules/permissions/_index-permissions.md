@@ -4,7 +4,8 @@ type: index
 module: permissions
 edition: both
 status: verified
-updated: "2026-09-18"
+verified: "2026-09-23 / состав папки сверен со списком файлов"
+updated: "2026-09-23"
 ---
 
 # Права доступа — практики внедрения

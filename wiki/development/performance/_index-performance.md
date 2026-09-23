@@ -4,7 +4,8 @@ type: index
 module: performance
 edition: box
 status: verified
-updated: "2026-06-19"
+verified: "2026-09-23 / состав папки сверен со списком файлов"
+updated: "2026-09-23"
 ---
 
 # Производительность — практики разработки (коробка)

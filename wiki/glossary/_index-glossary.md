@@ -4,7 +4,8 @@ type: index
 module: glossary
 edition: both
 status: verified
-updated: "2026-09-16"
+verified: "2026-09-23 / состав папки сверен со списком файлов"
+updated: "2026-09-23"
 ---
 
 # Глоссарий — сущности и термины

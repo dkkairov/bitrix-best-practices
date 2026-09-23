@@ -4,7 +4,8 @@ type: index
 module: server-admin
 edition: box
 status: verified
-updated: "2026-09-21"
+verified: "2026-09-23 / состав папки сверен со списком файлов"
+updated: "2026-09-23"
 ---
 
 # Администрирование сервера — практики (коробка)

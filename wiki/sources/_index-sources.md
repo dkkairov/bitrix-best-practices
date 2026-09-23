@@ -4,7 +4,8 @@ type: index
 module: sources
 edition: both
 status: verified
-updated: "2026-09-22"
+verified: "2026-09-23 / состав папки сверен со списком файлов"
+updated: "2026-09-23"
 ---
 
 # Конспекты источников

@@ -98,6 +98,7 @@
 - [[recipe-migrations-as-code|Миграции как код]] · Разработка · box
 - [[recipe-composer-third-party-libraries|Сторонние Composer-пакеты (dompdf, PhpWord)]] · Разработка · box
 - [[recipe-d7-orm-event-subscription|Подписка модуля на событие D7 ORM]] · Разработка · box
+- [[recipe-d7-orm-crud|Запись через ORM: add, update, delete и проверки]] · Разработка · box
 - [[recipe-cli-script-bootstrap|Консольный и cron-скрипт: подключение ядра]] · Разработка · box · проверено
 - [[recipe-d7-custom-validation-rule|Свой валидатор и правило валидации D7]] · Разработка · box · проверено
 - [[recipe-custom-list-page-filter-grid|Своя страница-список: фильтр, грид, тулбар]] · Разработка · box · проверено
@@ -140,6 +141,9 @@
 - [[concept-crm-dictionaries|Справочники CRM: новое читает, старое пишет]] · CRM · box
 - [[concept-request-lifecycle|Жизненный цикл HTTP-запроса]] · Разработка · box
 - [[concept-deferred-functions-and-page-areas|Отложенные функции и зоны страницы]] · Разработка · box · проверено
+- [[concept-d7-orm-entity|Сущность ORM: Table-класс и описание полей]] · Разработка · box
+- [[concept-d7-orm-query|Выборка ORM: getList, Query и два формата фильтра]] · Разработка · box
+- [[concept-d7-orm-objects|Объекты и коллекции ORM: EO_-классы вместо массивов]] · Разработка · box
 - [[concept-orm-datamanager-events|События ORM DataManager]] · Разработка · box
 - [[concept-service-locator|ServiceLocator: регистрация и подмена сервисов]] · Разработка · box
 - [[concept-validation-d7|Валидация D7: PHP-атрибуты]] · Разработка · box
@@ -191,6 +195,7 @@
 - [[source-b24-crm-deal-add|Офф. метод crm.deal.add]] · apidocs.bitrix24.ru
 - [[source-bxfw-course43-namespaces|Курс 43: пространства имён]] · dev.1c-bitrix.ru · box
 - [[source-bxfw-course43-modules|Курс 43: раздел о модулях]] · dev.1c-bitrix.ru · box
+- [[source-course43-orm-events|Курс 43: ORM и события]] · dev.1c-bitrix.ru · box
 - [[source-devbook-dev-rules|Книга разработчика: правила разработки]] · box
 - [[source-devbook-core-d7|Книга разработчика: ядро D7]] · box
 - [[source-devbook-crm|Книга разработчика: модуль CRM]] · box
@@ -216,7 +221,7 @@
 
 ## По статусу
 
-- **verified:** 147 страниц из 155 (`verified`: 2026-06-01 … 2026-09-23).
+- **verified:** 152 страницы из 160 (`verified`: 2026-06-01 … 2026-09-23).
 - **draft:** 8 страниц, по двум причинам —
   **методические каркасы**, которые уточняются после первого применения на проекте
   ([[checklist-data-migration]], [[checklist-golive-deployment]], [[checklist-user-adoption]],

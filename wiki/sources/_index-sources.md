@@ -18,6 +18,7 @@ updated: "2026-09-23"
 - [[source-b24-crm-deal-add|Офф. документация метода crm.deal.add]] (apidocs.bitrix24.ru)
 - [[source-bxfw-course43-namespaces|Конспект: курс 43, урок «Пространства имён»]]
 - [[source-bxfw-course43-modules|Конспект: курс 43, раздел о модулях]]
+- [[source-course43-orm-events|Конспект: курс 43, ORM и события]] · новый, 2026-09-23
 
 ### Кластерные конспекты «Книги разработчика» (сверены с сайтом книги 2026-09-21)
 - [[source-devbook-dev-rules|Правила разработки и устройство проекта]]

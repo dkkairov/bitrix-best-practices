@@ -5,11 +5,11 @@ module: sources
 edition: both
 status: verified
 provenance: documented
-verified: "2026-09-22"
+verified: "2026-09-23"
 tags: [источники, бэклог, ингест, очередь]
 sources: []
 related: ["[[source-b24-crm-deal-add]]", "[[source-devbook-dev-rules]]", "[[source-devbook-bizproc]]", "[[source-course57-basics]]"]
-updated: "2026-09-22"
+updated: "2026-09-23"
 ---
 
 # Бэклог источников
@@ -27,7 +27,7 @@ updated: "2026-09-22"
 
 | # | Источник | Тип | Куда мапится | Приоритет | План ингеста |
 |---|----------|-----|--------------|-----------|--------------|
-| 1 | [Курс 43 «Разработчик Bitrix Framework»](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43) (урок [Пространства имён](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=3524)) | содержание (серия уроков) | [development/](../development/core-d7/_index-core-d7.md) | **P1** | поурочно; ингещены: пространства имён (S-SS02), модули (S-SS03); далее ORM/события |
+| 1 | [Курс 43 «Разработчик Bitrix Framework»](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43) (урок [Пространства имён](https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=3524)) | содержание (серия уроков) | [development/](../development/core-d7/_index-core-d7.md) | **P1** | поурочно; взяты: пространства имён (S-SS02), модули (S-SS03), **ORM и события (19 уроков, 2026-09-23 → [[source-course43-orm-events]])**; далее — связи сущностей (`ReferenceField`, N:M) и аннотации ORM для IDE |
 | 2 | [bx24devbook — Книга разработчика](https://bx24devbook.website.yandexcloud.net/) | содержание (многоглавный), **эталон** (`CLAUDE.md` §9) | [development/](../development/core-d7/_index-core-d7.md) + [modules/](../modules/crm/_index-crm.md) | **сделано** | **пройдена целиком 2026-09-21** — 97 страниц, все разделы навигации: семь конспектов `source-devbook-*`, снимок-манифест `raw/sources/2026-09-21-bx24devbook-manifest.md`. Дальше — пересверка только страниц, у которых изменился хэш в манифесте |
 | 3 | [awesome-bitrix](https://github.com/awesomebitrix/awesome-bitrix) | каталог-указатель | мета (порождает под-источники) | **P2** | разобрать по категориям → завести под-источники |
 | 4 | [api_help (старое ядро)](https://dev.1c-bitrix.ru/api_help/) | каталог-указатель (legacy) | [development/](../development/core-d7/_index-core-d7.md) | **P3** | по требованию: только когда нужен конкретный метод старого ядра; сначала смотреть D7/devbook/MCP |

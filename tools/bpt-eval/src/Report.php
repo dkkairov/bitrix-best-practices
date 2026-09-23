@@ -24,7 +24,14 @@ final class Report
             $results[$task] = $result;
             $checklistFile = dirname($file) . '/checklist.json';
             if (is_file($checklistFile)) {
-                $checklists[$task] = self::readJson($checklistFile);
+                try {
+                    $checklists[$task] = self::readJson($checklistFile);
+                } catch (EvalException $e) {
+                    // CHECKLIST_PROMPT.md требует валидный JSON, но проверяющий — дешёвая модель и
+                    // иногда ошибается (см. пилот). Битый файл не должен ронять report для всего
+                    // прогона: пункты задачи считаются неподнятыми, note — явная пометка причины.
+                    $checklists[$task] = ['items' => [], 'broken' => true];
+                }
             }
             $taskDirs = glob(rtrim($tasksDir, '/\\') . "/{$task}-*", GLOB_ONLYDIR) ?: [];
             if ($taskDirs) {
@@ -66,6 +73,10 @@ final class Report
             $requiredRaised = count(array_filter($required, fn ($i) => isset($raised[mb_strtolower($i['text'])])));
             $compileOk = in_array($r['compile'] ?? 'fail', ['ok', 'skip'], true);
             $importOk = in_array($r['import'] ?? 'fail', ['ok', 'skip'], true);
+            $note = (string) ($r['note'] ?? '');
+            if ($checklists[$task]['broken'] ?? false) {
+                $note = $note !== '' ? "{$note}; чек-лист не разобран" : 'чек-лист не разобран';
+            }
             $rows[$task] = [
                 'task' => $task,
                 'compile' => $r['compile'] ?? 'fail',
@@ -75,7 +86,7 @@ final class Report
                 'passed' => $compileOk && $importOk && $ok === $expected && $requiredRaised === count($required),
                 'category' => (string) ($r['category'] ?? ''),
                 'reason' => (string) ($r['reason'] ?? ''),
-                'note' => (string) ($r['note'] ?? ''),
+                'note' => $note,
                 'tokens' => $agents[$task]['tokens'] ?? null,
                 'minutes' => isset($agents[$task]['duration_ms']) ? round($agents[$task]['duration_ms'] / 60000, 1) : null,
             ];

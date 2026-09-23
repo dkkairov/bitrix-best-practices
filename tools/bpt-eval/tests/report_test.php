@@ -53,6 +53,36 @@ test('Отчёт: битый result.json — EvalException с путём к фа
     }
 });
 
+test('Отчёт: битый checklist.json — не роняет отчёт, задача не пройдена, note называет причину', function () {
+    $runDir = tmpPath('');
+    $tasksDir = tmpPath('');
+    mkdir("{$runDir}/T99", 0777, true);
+    mkdir("{$tasksDir}/T99-fake", 0777, true);
+    file_put_contents("{$tasksDir}/T99-fake/acceptance.yaml", SpecReader::dump([
+        'task' => 'T99', 'document' => 'Заявки',
+        'scenarios' => [['name' => 's', 'steps' => [], 'expect' => ['stage' => 'Клиент']]],
+        'checklist' => ['Обязательный пункт'],
+    ]));
+    file_put_contents("{$runDir}/T99/result.json", json_encode(['task' => 'T99', 'compile' => 'ok',
+        'import' => 'ok', 'scenarios' => [['ok' => true]], 'reason' => '', 'category' => '', 'note' => '']));
+    file_put_contents("{$runDir}/T99/checklist.json", '{испорченный json');
+    try {
+        $row = Report::fromRunDir($runDir, $tasksDir)->rows()['T99'];
+        assertTrue(!$row['passed'], 'обязательный пункт чек-листа не мог быть поднят — задача не пройдена');
+        assertSame('1/1', $row['scenarios'], 'сценарии сами по себе не пострадали');
+        assertSame('0/1', $row['checklist'], 'битый чек-лист — 0 поднятых, а не сбой');
+        assertTrue(str_contains($row['note'], 'чек-лист не разобран'), 'note называет причину');
+    } finally {
+        unlink("{$runDir}/T99/result.json");
+        unlink("{$runDir}/T99/checklist.json");
+        rmdir("{$runDir}/T99");
+        rmdir($runDir);
+        unlink("{$tasksDir}/T99-fake/acceptance.yaml");
+        rmdir("{$tasksDir}/T99-fake");
+        rmdir($tasksDir);
+    }
+});
+
 test('Отчёт: markdown', function () {
     $md = reportFixture()->toMarkdown();
     assertTrue(str_contains($md, '| Задача | Сборка | Импорт | Сценарии | Чек-лист |'), 'таблица');

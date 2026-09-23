@@ -3,36 +3,35 @@ title: "\\Bitrix\\Main\\ModuleManager"
 type: entity
 module: core-d7
 edition: box
-status: draft
+status: verified
 provenance: mixed
-verified: ""
-tags: [модули, установка, d7, класс]
+verified: "2026-09-23 / коробка в Docker, main 26.750.0: состав методов, механика registerModule/unRegisterModule, кэш списка модулей и поведение getVersion — по коду main/lib/ModuleManager.php и прогону"
+tags: [модули, установка, агенты, права, d7, класс]
 sources: []
-related: ["[[recipe-module-structure-and-install]]", "[[entity-loader]]", "[[recipe-module-versioning-and-private-distribution]]"]
+related: ["[[recipe-module-structure-and-install]]", "[[entity-loader]]", "[[recipe-module-versioning-and-private-distribution]]", "[[entity-main-application]]"]
 aliases: []
-updated: "2026-09-21"
+updated: "2026-09-23"
 ---
 
 # `\Bitrix\Main\ModuleManager`
 
-> **Черновик.** Состав методов собран по употреблению в проверенных страницах вики. Сверка
-> 2026-09-18 не удалась: страница справочника D7 по `ModuleManager` на `dev.1c-bitrix.ru` не отдала
-> содержимое, а поиск выводит на функции **старого** ядра (`RegisterModule`, `IsModuleInstalled`).
-> Соседние классы того же модуля сверить удалось — см. [[entity-loader]] и
-> [[entity-config-option]]. Снять `draft` после сверки по исходникам `main` или по справочнику.
-> 2026-09-21: в «Книге разработчика» `ModuleManager` не встречается — ссылка на её конспект снята.
+**Что это:** регистрация и снятие регистрации модуля, проверка установленности, версия модуля.
+D7-замена старому `CModule::RegisterModule()`.
 
-**Что это:** регистрация и снятие регистрации модуля, проверка установленности. D7-замена старому
-`CModule::RegisterModule()`.
+> **Сверено по исходникам 2026-09-23.** Прежде страница была черновиком: справочник D7 на
+> `dev.1c-bitrix.ru` не отдавал страницу класса, а поиск выводил на функции старого ядра. Факты ниже
+> сняты с кода `main/lib/ModuleManager.php` и прогона на стенде — тем же способом, что и
+> [[entity-main-application]].
 
 ## Ключевые факты
 | Поле | Значение |
 |------|----------|
 | Тип | класс со статическими методами |
 | Модуль | `main` |
+| Хранилище | таблица `b_module` (`\Bitrix\Main\ModuleTable`) |
 | Edition | box |
 
-## Что используем
+## Методы
 
 ```php
 use Bitrix\Main\ModuleManager;
@@ -40,7 +39,34 @@ use Bitrix\Main\ModuleManager;
 ModuleManager::registerModule($moduleId);      // в DoInstall
 ModuleManager::unRegisterModule($moduleId);    // в DoUninstall
 ModuleManager::isModuleInstalled($moduleId);   // проверка
+ModuleManager::getVersion('crm');              // '26.800.0'
 ```
+
+| Метод | Что делает |
+|---|---|
+| `registerModule($name)` | зарегистрировать модуль |
+| `unRegisterModule($name)` | снять регистрацию |
+| `isModuleInstalled($name)` | зарегистрирован ли модуль |
+| `getInstalledModules()` | список установленных (на стенде — 92) |
+| `getVersion($name)` | версия модуля или `false` |
+| `getModificationDateTime($name)` | время изменения файлов модуля |
+| `getModulesFromDisk($withLocal, $withPartners, $withKernel)` | что лежит на диске, а не в базе |
+| `isValidModule($name)` | имя из допустимых символов (`a-z`, `A-Z`, `0-9`, `_`, `.`) |
+| `add($name)`, `delete($name)` | низкоуровневая запись в `b_module` без событий |
+
+## Что происходит при регистрации и снятии
+
+Важно для установщика: ядро делает больше, чем строку в таблице.
+
+| `registerModule()` | `unRegisterModule()` |
+|---|---|
+| `add()`: строка в `b_module` (повторная регистрация не падает — `DuplicateEntryException` гасится) | `CAgent::RemoveModuleAgents()` — снимает агенты модуля |
+| включает агенты модуля (`b_agent`: `ACTIVE = 'Y'`) | `CMain::DelGroupRight()` — снимает групповые права модуля |
+| чистит кэш модулей и загруженных обработчиков | `delete()`: удаляет строку из `b_module`, деактивирует агенты |
+| событие `main` → **`OnAfterRegisterModule`** | событие `main` → **`OnAfterUnRegisterModule`** |
+
+Оба события получают имя модуля — на них можно повесить свою донастройку портала при установке
+другого модуля ([[entity-event-manager]]).
 
 ## Регистрация ≠ загрузка
 
@@ -55,17 +81,34 @@ ModuleManager::isModuleInstalled($moduleId);   // проверка
 `includeModule`. Чтобы модуль работал на каждом хите, установщик вписывает вызов в `init.php`:
 [[recipe-d7-orm-event-subscription]].
 
+## Версия модуля
+
+`getVersion()` читает версию **с диска**, а не из базы: для `main` — константа `SM_VERSION`, для
+остальных — `$arModuleVersion['VERSION']` из `install/version.php` модуля. Возвращает `false`, если
+модуль не зарегистрирован или имя невалидно (стенд: `main` → `26.750.0`, `crm` → `26.800.0`,
+несуществующий → `false`).
+
+Следствие: версия в вики и в `verified` берётся именно отсюда — она показывает, какие файлы лежат на
+портале ([[recipe-module-versioning-and-private-distribution]]).
+
 ## Подводные камни
 
-- **`CModule::RegisterModule()` — старый API.** Работает, но в новом коде используем
-  `ModuleManager`.
-- **`isModuleInstalled()` отвечает на вопрос «зарегистрирован ли», а не «загружен ли сейчас»** —
-  для второго нужен результат `Loader::includeModule()`.
-- Снятие регистрации в `DoUninstall` — не вся уборка: события, опции, агенты и записи в `init.php`
-  снимаются отдельно ([[recipe-module-structure-and-install]]).
+- **`CModule::RegisterModule()` — старый API.** Работает, но в новом коде используем `ModuleManager`.
+- **`isModuleInstalled()` отвечает «зарегистрирован ли», а не «загружен ли сейчас»** — для второго
+  нужен результат `Loader::includeModule()`.
+- **Список модулей кэшируется**: `getInstalledModules()` читает `b_module` с кэшем на сутки плюс
+  статический кэш на хит. Свои правки таблицы в обход `add()`/`delete()` портал увидит не сразу —
+  кэш чистят только штатные методы.
+- **Агенты и групповые права ядро снимает само** (`unRegisterModule`), а вот события, опции,
+  таблицы модуля и строку подключения в `init.php` убирает уже ваш `DoUninstall`
+  ([[recipe-module-structure-and-install]]).
+- `add()` и `delete()` работают тихо — **без событий** `OnAfter(Un)RegisterModule`. Если на них
+  кто-то подписан, вызывайте `registerModule()` / `unRegisterModule()`.
 
 ## Связанное
 - [[entity-loader]] — загрузка модуля
 - [[recipe-module-structure-and-install]] — где эти вызовы стоят в установщике
+- [[entity-main-application]] — соединение с БД, которым ходит сам `ModuleManager`
+- [[recipe-module-versioning-and-private-distribution]] — откуда берётся `install/version.php`
 
 [← Ядро D7](_index-core-d7.md)

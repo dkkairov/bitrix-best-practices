@@ -46,7 +46,7 @@ updated: "2026-09-23"
 ### Классы и объекты ядра (справочник)
 - [[entity-main-application|Application]] — соединение, контекст, кэши и завершение хита
 - [[entity-loader|Loader]] — подключение модулей
-- [[entity-module-manager|ModuleManager]] — регистрация модуля · черновик
+- [[entity-module-manager|ModuleManager]] — регистрация модуля, версии, события установки
 - [[entity-config-option|Config\Option]] — настройки модулей
 - [[entity-event-manager|EventManager]] — подписка на события
 - [[entity-main-event|Event и EventResult]] — объект события и результат

@@ -1,0 +1,11 @@
+# Эталон T11 (служебный, см. tz.md): пишет параметр ручного запуска в поле документа, чтобы сценарий
+# мог проверить, что значение параметра действительно дошло при CBPDocument::startWorkflow.
+bizproc: 1
+name: EVAL T11 эталон
+parameters:
+  comment: {Name: Комментарий запуска, Type: string}
+steps:
+  - set_field:
+      title: Записать параметр запуска в поле
+      FieldValue:
+        "{{field:Номер счёта}}": "{=Parameter:comment}"

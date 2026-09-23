@@ -1,8 +1,9 @@
 <?php
 /**
  * Сводка прогона: по задаче — сборка, импорт, сценарии, чек-лист, итог, расход агента, причина и
- * категория провала; по прогону — доля пройденных против порога. Сбои прогонщика (harness) в долю
- * не входят: их чинят и задачу перегоняют.
+ * категория провала; по прогону — доля пройденных против порога. В долю не входят (но видны в
+ * таблице): сбои прогонщика (harness) — их чинят и задачу перегоняют; и задачи, у которых нет вовсе
+ * данных чек-листа при обязательных пунктах — шаг «чек-лист» не выполнен, это не провал навыка.
  */
 
 declare(strict_types=1);
@@ -45,7 +46,7 @@ final class Report
     }
 
     /** Разбор JSON-файла прогона (result.json/checklist.json/agents.json): битый файл — EvalException с путём, а не голый JsonException. */
-    private static function readJson(string $file): array
+    public static function readJson(string $file): array
     {
         try {
             return json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
@@ -74,8 +75,16 @@ final class Report
             $compileOk = in_array($r['compile'] ?? 'fail', ['ok', 'skip'], true);
             $importOk = in_array($r['import'] ?? 'fail', ['ok', 'skip'], true);
             $note = (string) ($r['note'] ?? '');
+            $isHarness = ($r['category'] ?? '') === 'harness';
+            // Данных чек-листа нет вовсе (файл не появился — шаг 5 порядка прогона забыли выполнить или
+            // проверяющий не записал файл), при этом задача требует обязательные пункты: без этого
+            // «нет» на выходе было бы без причины и заметки, как будто навык действительно не поднял
+            // вопросы. Отличаем от битого JSON (тот уже даёт note ниже) — там данные есть, но не разобрались.
+            $checklistMissing = !$isHarness && $required && !isset($checklists[$task]);
             if ($checklists[$task]['broken'] ?? false) {
                 $note = $note !== '' ? "{$note}; чек-лист не разобран" : 'чек-лист не разобран';
+            } elseif ($checklistMissing) {
+                $note = $note !== '' ? "{$note}; чек-лист не проверен" : 'чек-лист не проверен';
             }
             $rows[$task] = [
                 'task' => $task,
@@ -87,6 +96,9 @@ final class Report
                 'category' => (string) ($r['category'] ?? ''),
                 'reason' => (string) ($r['reason'] ?? ''),
                 'note' => $note,
+                // как harness: сбой вне контроля навыка (тут — забытый шаг чек-листа) не входит в
+                // знаменатель доли пройденных, но задача остаётся видна в таблице отчёта
+                'counted' => !$isHarness && !$checklistMissing,
                 'tokens' => $agents[$task]['tokens'] ?? null,
                 'minutes' => isset($agents[$task]['duration_ms']) ? round($agents[$task]['duration_ms'] / 60000, 1) : null,
             ];
@@ -98,7 +110,7 @@ final class Report
 
     public function passRate(): float
     {
-        $counted = array_filter($this->rows, fn ($r) => $r['category'] !== 'harness');
+        $counted = array_filter($this->rows, fn ($r) => $r['counted']);
         return $counted ? count(array_filter($counted, fn ($r) => $r['passed'])) / count($counted) : 0.0;
     }
 
@@ -116,8 +128,9 @@ final class Report
                 $r['passed'] ? '**пройдена**' : 'нет', $r['tokens'] ?? '—', $r['minutes'] ?? '—',
                 $r['reason'] ?: '—', $r['category'] ?: '—', $r['note'] ?: '—');
         }
-        $counted = array_filter($this->rows, fn ($r) => $r['category'] !== 'harness');
-        $harness = count($this->rows) - count($counted);
+        $counted = array_filter($this->rows, fn ($r) => $r['counted']);
+        $harness = count(array_filter($this->rows, fn ($r) => $r['category'] === 'harness'));
+        $checklistMissing = count($this->rows) - count($counted) - $harness;
         $passed = count(array_filter($counted, fn ($r) => $r['passed']));
         $lines[] = '';
         $lines[] = sprintf('**Пройдено: %d из %d (%d%%) — порог %d%% %s.**', $passed, count($counted),
@@ -125,6 +138,9 @@ final class Report
             $this->thresholdReached() ? 'достигнут' : 'не достигнут');
         if ($harness) {
             $lines[] = "Не учтено задач со сбоем прогонщика: {$harness} — их перегоняют после исправления.";
+        }
+        if ($checklistMissing) {
+            $lines[] = "Не учтено задач без данных чек-листа: {$checklistMissing} — довыполнить шаг «чек-лист» (CHECKLIST_PROMPT.md) и перегнать report.";
         }
         $lines[] = 'Один прогон на задачу: порог оценён грубо.';
 

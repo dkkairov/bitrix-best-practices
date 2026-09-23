@@ -18,7 +18,7 @@ scenarios:
       - {task_for: Бухгалтерия, do: reject, comment: Нет подтверждающих документов}
     expect:
       stage: Доработка
-      notify: [{to: Руководитель отдела продаж}]
+      notify: [{to: Руководитель отдела продаж, contains: Нет подтверждающих документов}]
       process: completed
 checklist:
   - Бухгалтерия — группа пользователей или отдел

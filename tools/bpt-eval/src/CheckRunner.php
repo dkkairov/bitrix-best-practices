@@ -29,7 +29,9 @@ final class CheckRunner
         if ($missing = $roles->missing($acceptance->roleNames())) {
             throw new EvalException("{$task}: в roles.yaml нет ролей " . implode(', ', $missing));
         }
-        @mkdir($outDir, 0777, true);
+        if (!is_dir($outDir) && !@mkdir($outDir, 0777, true)) {
+            throw new EvalException("не удалось создать каталог задачи: {$outDir}");
+        }
         $result = ['task' => $task, 'run' => $this->run, 'spec' => $specFile, 'compile' => 'skip', 'compile_errors' => [],
             'import' => 'skip', 'import_error' => '', 'template_id' => null, 'constants_matched' => [],
             'constants_unmatched' => [], 'scenarios' => [], 'reason' => '', 'category' => '', 'note' => '', 'cleanup_error' => ''];
@@ -53,8 +55,17 @@ final class CheckRunner
         $bptFile = "{$outDir}/eval.bpt";
         BptFile::write($bptFile, $compiled['bpt'], null, true);
 
-        $import = $this->stand->run('import', ['bpt_b64' => base64_encode((string) file_get_contents($bptFile)),
-            'name' => "EVAL {$this->run} {$task}", 'auto_execute' => $acceptance->start() === 'create' ? 1 : 0]);
+        try {
+            $import = $this->stand->run('import', ['bpt_b64' => base64_encode((string) file_get_contents($bptFile)),
+                'name' => "EVAL {$this->run} {$task}", 'auto_execute' => $acceptance->start() === 'create' ? 1 : 0]);
+        } catch (EvalException $e) {   // упал сам стенд, не бизнес-отказ импорта — не против навыка: чиним и
+            // перегоняем, но result.json обязан остаться, иначе reference all оборвётся без разбора причины
+            $result['import'] = 'fail';
+            $result['import_error'] = $e->getMessage();
+            $result['reason'] = 'стенд: ' . $e->getMessage();
+            $result['category'] = 'harness';
+            return $this->save($outDir, $result);
+        }
         if (!$import['ok']) {
             $result['import'] = 'fail';
             $result['import_error'] = $import['message'];
@@ -103,7 +114,11 @@ final class CheckRunner
 
     private function save(string $outDir, array $result): array
     {
-        file_put_contents("{$outDir}/result.json", json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        $file = "{$outDir}/result.json";
+        $written = file_put_contents($file, json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        if ($written === false) {
+            throw new EvalException("не удалось записать {$file}");
+        }
         return $result;
     }
 }

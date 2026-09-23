@@ -83,6 +83,39 @@ test('Отчёт: битый checklist.json — не роняет отчёт, з
     }
 });
 
+test('Отчёт: checklist.json нет вовсе — «чек-лист не проверен», задача видна, но не в доле', function () {
+    $runDir = tmpPath('');
+    $tasksDir = tmpPath('');
+    mkdir("{$runDir}/T98", 0777, true);
+    mkdir("{$tasksDir}/T98-fake", 0777, true);
+    file_put_contents("{$tasksDir}/T98-fake/acceptance.yaml", SpecReader::dump([
+        'task' => 'T98', 'document' => 'Заявки',
+        'scenarios' => [['name' => 's', 'steps' => [], 'expect' => ['stage' => 'Клиент']]],
+        'checklist' => ['Обязательный пункт'],
+    ]));
+    file_put_contents("{$runDir}/T98/result.json", json_encode(['task' => 'T98', 'compile' => 'ok',
+        'import' => 'ok', 'scenarios' => [['ok' => true]], 'reason' => '', 'category' => '', 'note' => '']));
+    // checklist.json нарочно не создаём — шаг «чек-лист» из README.md как будто пропустили
+    try {
+        $report = Report::fromRunDir($runDir, $tasksDir);
+        $row = $report->rows()['T98'];
+        assertTrue(!$row['passed'], 'обязательный пункт чек-листа не подтверждён — задача не пройдена');
+        assertSame('1/1', $row['scenarios'], 'сценарии сами по себе не пострадали');
+        assertTrue(str_contains($row['note'], 'чек-лист не проверен'), 'note называет причину');
+        assertTrue(!$row['counted'], 'как harness: задача не учитывается в доле пройденных');
+        assertSame(0.0, $report->passRate(), 'единственная задача прогона — вне доли, знаменатель пуст');
+        assertTrue(str_contains($report->toMarkdown(), '| T98 |'), 'задача всё равно видна в таблице отчёта');
+        assertTrue(str_contains($report->toMarkdown(), 'Не учтено задач без данных чек-листа: 1'), 'причина исключения из доли названа');
+    } finally {
+        unlink("{$runDir}/T98/result.json");
+        rmdir("{$runDir}/T98");
+        rmdir($runDir);
+        unlink("{$tasksDir}/T98-fake/acceptance.yaml");
+        rmdir("{$tasksDir}/T98-fake");
+        rmdir($tasksDir);
+    }
+});
+
 test('Отчёт: markdown', function () {
     $md = reportFixture()->toMarkdown();
     assertTrue(str_contains($md, '| Задача | Сборка | Импорт | Сценарии | Чек-лист |'), 'таблица');

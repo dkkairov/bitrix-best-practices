@@ -1,0 +1,13 @@
+# Служебная задача прогонщика (не тестовый кейс навыка, см. tz.md): единственная проверка веток
+# формата start: manual и parameters — ни одна содержательная задача их не задействует.
+task: T11
+document: Заявки
+start: manual
+parameters:
+  comment: SERVICE-CHECK
+scenarios:
+  - name: параметр ручного запуска дошёл до поля
+    steps: []
+    expect:
+      fields: {Номер счёта: SERVICE-CHECK}
+      process: completed

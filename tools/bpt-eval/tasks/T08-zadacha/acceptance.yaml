@@ -6,7 +6,10 @@ item:
   Проект: Проект Альфа
 scenarios:
   - name: задача поставлена
-    steps: []
+    # do: complete нигде больше не проверяется (единственный интеграционный тест этой ветки формата
+    # runner.php) — замысел задачи не меняется: задача модуля «Задачи» ставится, сценарий её закрывает
+    steps:
+      - {task_for: Сметчик, do: complete, optional: true}
     expect:
       task_created: [{responsible: Сметчик, title_contains: смет, deadline_workdays: 3}]
 checklist:

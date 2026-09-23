@@ -24,6 +24,13 @@ foreach (['Юристы', 'Финансовый отдел', 'Бухгалтер
 $iblockId = (int) \COption::GetOptionInt('intranet', 'iblock_structure', 0);
 $rs = \CIBlockSection::GetList(['LEFT_MARGIN' => 'ASC'], ['IBLOCK_ID' => $iblockId], false, ['ID', 'NAME']);
 while ($s = $rs->Fetch()) {
+    // отдел с тем же названием, что уже занято группой (или другим отделом), молча затёр бы её в $groups —
+    // агент получит код чужой сущности и не узнает об этом; на стенде намеренно разводим названия
+    // (prepare создаёт группы, не совпадающие с названиями отделов) — совпадение здесь всегда ошибка
+    if (isset($groups[$s['NAME']])) {
+        eval_fail("название «{$s['NAME']}» занято и группой, и отделом — снимок не может отличить их"
+            . ' по имени; переименуйте один из них на стенде');
+    }
     $groups[$s['NAME']] = 'group_d' . $s['ID'];
 }
 eval_out(['document_fields' => $describe(EVAL_REQUESTS_CODE),

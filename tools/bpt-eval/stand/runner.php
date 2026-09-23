@@ -68,13 +68,19 @@ $stageName = function (string $stageId) use ($factory): string {
     return $stageId;
 };
 
-/** Открытые задания процессов элемента (задания, где пользователь ещё не ответил). */
-$openTasks = function (int $itemId) use ($entityTypeId, $db): array {
+/**
+ * Открытые задания процессов элемента (задания, где пользователь ещё не ответил) — строго от шаблона
+ * этой задачи: на «Заявках» намеренно оставлены активными чужие шаблоны роботов, без фильтра по
+ * WORKFLOW_TEMPLATE_ID их задания подмешались бы в результат (тот же сотрудник мог получить задание
+ * и от чужого шаблона) и давали бы ложный «ok» шага.
+ */
+$openTasks = function (int $itemId) use ($entityTypeId, $db, $templateId): array {
     $doc = "DYNAMIC_{$entityTypeId}_{$itemId}";
     return $db->query("SELECT t.ID, t.WORKFLOW_ID, t.ACTIVITY, t.ACTIVITY_NAME, t.NAME, tu.USER_ID
         FROM b_bp_task t JOIN b_bp_task_user tu ON tu.TASK_ID = t.ID
         JOIN b_bp_workflow_state s ON s.ID = t.WORKFLOW_ID
-        WHERE s.DOCUMENT_ID = '{$doc}' AND t.STATUS = 0 AND tu.STATUS = 0 ORDER BY t.ID")->fetchAll();
+        WHERE s.DOCUMENT_ID = '{$doc}' AND s.WORKFLOW_TEMPLATE_ID = {$templateId}
+            AND t.STATUS = 0 AND tu.STATUS = 0 ORDER BY t.ID")->fetchAll();
 };
 
 /**
@@ -350,10 +356,16 @@ foreach ($acceptance['scenarios'] as $scenario) {
             case 'no_task_for':
                 // проверка означает: роль вообще не получала заданий по этому элементу — ни открытых, ни отвеченных
                 foreach ((array) $value as $role) {
-                    $users = implode(',', $roleUsers($role)) ?: '0';
+                    $roleUserIds = $roleUsers($role);
+                    // пустая роль (пустая группа/отдел, незаполненное поле проекта) дала бы IN (0) и
+                    // проверка прошла бы вхолостую (заданий нет, потому что отвечать было некому) —
+                    // это сбой прогонщика, а не пройденная проверка
+                    $roleUserIds ?: eval_fail("роль «{$role}» (no_task_for) — ни одного пользователя, проверка бессмысленна");
+                    $users = implode(',', $roleUserIds);
                     $count = (int) $db->query("SELECT COUNT(*) AS C FROM b_bp_task t JOIN b_bp_task_user tu ON tu.TASK_ID = t.ID
                         JOIN b_bp_workflow_state s ON s.ID = t.WORKFLOW_ID
-                        WHERE s.DOCUMENT_ID = 'DYNAMIC_{$entityTypeId}_{$itemId}' AND tu.USER_ID IN ({$users})")->fetch()['C'];
+                        WHERE s.DOCUMENT_ID = 'DYNAMIC_{$entityTypeId}_{$itemId}' AND s.WORKFLOW_TEMPLATE_ID = {$templateId}
+                            AND tu.USER_ID IN ({$users})")->fetch()['C'];
                     $check("нет задания: {$role}", $count === 0, 0, $count);
                 }
                 break;

@@ -35,7 +35,7 @@
 - Тексты и сообщения — по-русски; стиль кода — как в `tools/bpt` (`declare(strict_types=1)` в файлах
   хоста, `final class`, ошибки — исключением с понятным текстом и путём).
 - После каждой задачи: `php tools/bpt-eval/tests/run.php` и
-  `php tools/bpt/tests/run.php --corpus=C:/Users/d.kairov/Downloads` — зелёные; коммит по-русски с
+  `php tools/bpt/tests/run.php --corpus=<папка с корпусом>` — зелёные; коммит по-русски с
   `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`; без push.
 
 ---
@@ -1022,7 +1022,7 @@ test('Сборщик: заполненный DynamicEntityFields не трога
 `bpt.php snapshot` из экспорта его не заполняет — в экспорте только поля своего документа.
 ```
 
-- [ ] **Шаг 6:** `php tools/bpt/tests/run.php --corpus=C:/Users/d.kairov/Downloads` — все зелёные (было 87, стало 90;
+- [ ] **Шаг 6:** `php tools/bpt/tests/run.php --corpus=<папка с корпусом>` — все зелёные (было 87, стало 90;
   корпусные тесты «туда-обратно» не должны измениться: у корпуса `DynamicEntityFields` заполнен).
 - [ ] **Шаг 7: коммит** — «bpt: поля связанных смарт-процессов в снимке и DynamicEntityFields по снимку».
 

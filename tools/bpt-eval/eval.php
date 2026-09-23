@@ -106,14 +106,23 @@ try {
         case 'usage':
             $task = (string) ($positional[0] ?? '');
             $file = "{$runDir}/agents.json";
-            $agents = is_file($file) ? json_decode((string) file_get_contents($file), true) : [];
+            // Report::readJson: битый файл — понятная ошибка с путём, а не молча пустой массив (иначе
+            // расход всех прошлых задач прогона обнулился бы вместе с одной поломанной записью)
+            $agents = is_file($file) ? Report::readJson($file) : [];
             $agents[$task] = ['tokens' => (int) ($opts['tokens'] ?? 0), 'tool_uses' => (int) ($opts['tools'] ?? 0),
                 'duration_ms' => (int) ($opts['ms'] ?? 0)];
-            file_put_contents($file, json_encode($agents, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+            $agentsWritten = file_put_contents($file, json_encode($agents, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+            if ($agentsWritten === false) {
+                throw new EvalException("не удалось записать {$file}");
+            }
             exit(0);
         case 'report':
             $report = Report::fromRunDir($runDir, __DIR__ . '/tasks');
-            file_put_contents("{$runDir}/report.md", $report->toMarkdown());
+            $reportFile = "{$runDir}/report.md";
+            $reportWritten = file_put_contents($reportFile, $report->toMarkdown());
+            if ($reportWritten === false) {
+                throw new EvalException("не удалось записать {$reportFile}");
+            }
             echo $report->toMarkdown();
             exit(0);
         default:

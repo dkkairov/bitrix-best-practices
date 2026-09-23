@@ -1,0 +1,24 @@
+# Эталон T09: после утверждения — поле «Согласовано кем» и руководитель проекта в наблюдателях.
+bizproc: 1
+name: EVAL T09 эталон
+steps:
+  - get_smart_item:
+      id: project
+      title: Руководитель из карточки проекта
+      DynamicTypeId: "{{smart:Проекты}}"
+      ReturnFields: ["{{field:Проекты/Руководитель проекта}}"]
+      DynamicFilterFields:
+        items: [[{object: Document, field: ID, operator: "=", value: "{=Document:{{field:Проект}}}"}, AND]]
+  - approve:
+      id: pm
+      Users: ["{=@project:{{field:Проекты/Руководитель проекта}}}"]
+      ApproveType: any
+      Name: "Утвердите заявку «{=Document:TITLE}»"
+      on_yes:
+        - set_field:
+            FieldValue: {"{{field:Согласовано кем}}": "{=@pm:LastApprover}"}
+        - observers:
+            ActionOnObservers: add
+            Observers: ["{=@project:{{field:Проекты/Руководитель проекта}}}"]
+      on_no:
+        - change_stage: {TargetStatus: "{{stage:Доработка}}"}

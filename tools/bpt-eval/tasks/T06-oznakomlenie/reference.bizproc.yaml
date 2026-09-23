@@ -1,0 +1,12 @@
+# Эталон T06: ознакомление отдела; кто ознакомился — комментарием в карточке (второй путь «истории»).
+bizproc: 1
+name: EVAL T06 эталон
+steps:
+  - review:
+      id: review
+      Users: ["{{group:Юридический отдел}}"]
+      ApproveType: any
+      Name: "Ознакомьтесь с заявкой «{=Document:TITLE}»"
+  - timeline_comment:
+      CommentText: "С заявкой ознакомился: {=@review:LastReviewer > printable}"
+      CommentUser: ["{=@review:LastReviewer}"]

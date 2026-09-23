@@ -93,7 +93,9 @@ try {
                     echo "{$task}: эталона нет — пропуск\n";
                     continue;
                 }
-                $result = $checker->check($task, $reference, "{$runDir}/_reference/{$task}");
+                // Эталоны — вне папки прогона: агент-исполнитель пишет решение в work/eval/<прогон>/<задача>/
+                // и не должен видеть готовый эталон рядом со своей рабочей папкой.
+                $result = $checker->check($task, $reference, "{$root}/work/eval/_reference/{$run}/{$task}");
                 // Грязный после уборки стенд — тоже не «эталон прошёл», даже если сам процесс отработал
                 $reasons = array_filter([$result['reason'], $result['cleanup_error']]);
                 $ok = $result['compile'] === 'ok' && $result['import'] === 'ok' && !$reasons;

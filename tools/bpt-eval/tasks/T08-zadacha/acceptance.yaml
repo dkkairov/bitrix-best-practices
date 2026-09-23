@@ -1,0 +1,15 @@
+task: T08
+document: Заявки
+start: create
+item:
+  Сумма к оплате: 70000
+  Проект: Проект Альфа
+scenarios:
+  - name: задача поставлена
+    steps: []
+    expect:
+      task_created: [{responsible: Сметчик, title_contains: смет, deadline_workdays: 3}]
+checklist:
+  - Кто постановщик задачи
+  - Ждать ли выполнения задачи и что потом делать с заявкой
+  - {text: Три рабочих дня от момента создания или до конца третьего рабочего дня, required: false}

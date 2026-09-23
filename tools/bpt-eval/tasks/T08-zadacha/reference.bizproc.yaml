@@ -1,0 +1,19 @@
+# Эталон T08: задача сметчику из карточки проекта, срок — через три рабочих дня.
+bizproc: 1
+name: EVAL T08 эталон
+steps:
+  - get_smart_item:
+      id: project
+      title: Сметчик из карточки проекта
+      DynamicTypeId: "{{smart:Проекты}}"
+      ReturnFields: ["{{field:Проекты/Сметчик}}"]
+      DynamicFilterFields:
+        items: [[{object: Document, field: ID, operator: "=", value: "{=Document:{{field:Проект}}}"}, AND]]
+  - task:
+      id: estimate
+      Fields:
+        TITLE: "Подготовить смету по заявке «{=Document:TITLE}»"
+        DESCRIPTION: "Сумма заявки: {=Document:{{field:Сумма к оплате}}}"
+        CREATED_BY: "{=Document:CREATED_BY}"
+        RESPONSIBLE_ID: "{=@project:{{field:Проекты/Сметчик}}}"
+        DEADLINE: "=addworkdays({=System:Now}, 3)"

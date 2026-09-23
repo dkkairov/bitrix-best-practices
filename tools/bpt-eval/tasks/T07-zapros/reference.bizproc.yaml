@@ -1,0 +1,26 @@
+# Эталон T07: запрос информации у бухгалтера проекта → поля заявки → «Оплачено».
+bizproc: 1
+name: EVAL T07 эталон
+variables:
+  invoice_no: {Name: Номер счёта, Type: string}
+  paid_on:    {Name: Дата оплаты, Type: date}
+steps:
+  - get_smart_item:
+      id: project
+      title: Бухгалтер из карточки проекта
+      DynamicTypeId: "{{smart:Проекты}}"
+      ReturnFields: ["{{field:Проекты/Бухгалтер проекта}}"]
+      DynamicFilterFields:
+        items: [[{object: Document, field: ID, operator: "=", value: "{=Document:{{field:Проект}}}"}, AND]]
+  - request_info:
+      id: payment
+      Users: ["{=@project:{{field:Проекты/Бухгалтер проекта}}}"]
+      Name: "Внесите номер счёта и дату оплаты по заявке «{=Document:TITLE}»"
+      RequestedInformation:
+        - {Name: invoice_no, Title: Номер счёта, Type: string, Required: true}
+        - {Name: paid_on, Title: Дата оплаты, Type: date, Required: true}
+  - set_field:
+      FieldValue:
+        "{{field:Номер счёта}}": "{=Variable:invoice_no}"
+        "{{field:Дата оплаты}}": "{=Variable:paid_on}"
+  - change_stage: {TargetStatus: "{{stage:Оплачено}}"}

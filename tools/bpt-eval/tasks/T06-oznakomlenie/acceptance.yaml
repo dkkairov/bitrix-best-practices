@@ -1,0 +1,17 @@
+task: T06
+document: Заявки
+start: create
+item:
+  Сумма к оплате: 80000
+  Проект: Проект Альфа
+scenarios:
+  - name: юрист ознакомился
+    steps:
+      - {task_for: Юридический отдел, do: review, comment: Ознакомлен}
+    expect:
+      history_contains: [Юрист Тест]
+      process: completed
+checklist:
+  - Ознакомиться должны все сотрудники отдела или достаточно одного
+  - «История» — запись в историю CRM или комментарий в карточке
+  - {text: Срок на ознакомление, required: false}

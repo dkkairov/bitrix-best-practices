@@ -5,12 +5,12 @@ module: bizproc
 edition: both
 status: verified
 provenance: mixed
-verified: "2026-09-22 / коробка клиента: корпус 16 экспортов из дизайнера БП (VERSION 2); курс 57 dev.1c-bitrix.ru (снимок 2026-09-22): смысл полей и поведение; стенд Docker, bizproc 26.1075.0: ValidateProperties, validateTemplate без записи в базу, прогон процессов"
+verified: "2026-09-22 / коробка клиента: корпус 16 экспортов из дизайнера БП (VERSION 2); курс 57 dev.1c-bitrix.ru (снимок 2026-09-22): смысл полей и поведение; стенд Docker, bizproc 26.1075.0: ValidateProperties, validateTemplate без записи в базу, прогон процессов; операторы условий — 2026-09-24, тот же стенд: список сверен с JS Operator и PHP Enum\Operator, импорт шаблона с <= и contain"
 tags: [бизнес-процессы, действия, активити, каталог, bpt, генерация, роботы]
 sources: ["[[source-course57-actions-core]]", "[[source-course57-actions-notify-other]]", "[[source-course57-actions-crm-disk]]"]
 related: ["[[concept-bizproc-bpt-format]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[concept-bizproc-engine]]", "[[entity-cbp-activity]]", "[[antipattern-bizproc-hardcoded-portal-ids]]", "[[entity-cbp-task-service]]", "[[concept-bizproc-expressions]]", "[[recipe-bizproc-approval-route]]", "[[recipe-bizproc-request-intake]]", "[[checklist-bizproc-template-review]]", "[[source-course57-examples]]"]
 aliases: []
-updated: "2026-09-22"
+updated: "2026-09-24"
 ---
 
 # Каталог действий БП: свойства, вложенность, результаты
@@ -169,6 +169,20 @@ updated: "2026-09-22"
 | `RequestInformationOptionalActivity` | `CommentRequired` | `N` — нет; `Y` — да; `YA` — только при утверждении (вводе); `YR` — только при отклонении |
 | `RequestInformationOptionalActivity` | `CancelType` | `any` — отклоняет любой сотрудник; `all` — отклонено, когда отказали все |
 | `RequestInformationOptionalActivity` | `SaveVariables` | «Сохранять значения в случае отказа» (с bizproc 20.200.0, урок 7839) |
+
+
+### Операторы условий
+
+У всех трёх видов условия список один и тот же — общий диалог дизайнера и общий обработчик ядра
+(`Bitrix\Bizproc\Activity\Condition::checkValue`, `Enum\Operator`):
+
+`=` равно · `!=` не равно · `>` больше · `>=` не меньше · `<` меньше · `<=` не больше ·
+`in` / `!in` в списке · `contain` / `!contain` содержит · `!empty` заполнено · `empty` не заполнено ·
+`between` между (только числа, даты, время) · `modified` было изменено (только у `fieldcondition`).
+
+**Ошибка в коде оператора не всплывёт ни при сборке, ни при импорте** — неизвестный код тихо становится
+строгим «равно» при выполнении, то есть ветка молча пойдёт не туда. Сводка и оговорки по типам полей —
+раздел «Операторы» в [SPEC.md](../../../tools/bpt/SPEC.md).
 
 ## Проверено на стенде (коробка, bizproc 26.1075.0, crm 26.800.0, 2026-09-22)
 - **Обязательность — по проверке ядра.** Импорт вызывает `ValidateProperties` каждого действия.

@@ -45,6 +45,19 @@ final class Report
         return self::fromData($results, $checklists, $acceptances, $agents, basename(rtrim($runDir, '/\\')));
     }
 
+    /**
+     * Ключ пункта чек-листа. Проверяющий — модель: текст пункта он возвращает то дословно, то
+     * обёрнутым в кавычки, то с заменой «ёлочек» на другие. Побуквенная сверка из-за этого
+     * отмечала «не пройдена» задачи с полным чек-листом (прогон main-7), поэтому кавычки и
+     * лишние пробелы при сопоставлении не учитываем.
+     */
+    private static function itemKey(string $text): string
+    {
+        $text = (string) preg_replace('/[«»„“”"\'‚‘’]/u', '', $text);
+        $text = (string) preg_replace('/\s+/u', ' ', $text);
+        return mb_strtolower(trim($text));
+    }
+
     /** Разбор JSON-файла прогона (result.json/checklist.json/agents.json): битый файл — EvalException с путём, а не голый JsonException. */
     public static function readJson(string $file): array
     {
@@ -66,12 +79,12 @@ final class Report
             $raised = [];
             foreach ($checklists[$task]['items'] ?? [] as $item) {
                 if (($item['raised'] ?? false) && trim((string) ($item['quote'] ?? '')) !== '') {
-                    $raised[mb_strtolower(trim((string) $item['text']))] = true;
+                    $raised[self::itemKey((string) $item['text'])] = true;
                 }
             }
             $items = isset($acceptances[$task]) ? $acceptances[$task]->checklist() : [];
             $required = array_filter($items, fn ($i) => $i['required']);
-            $requiredRaised = count(array_filter($required, fn ($i) => isset($raised[mb_strtolower($i['text'])])));
+            $requiredRaised = count(array_filter($required, fn ($i) => isset($raised[self::itemKey($i['text'])])));
             $compileOk = in_array($r['compile'] ?? 'fail', ['ok', 'skip'], true);
             $importOk = in_array($r['import'] ?? 'fail', ['ok', 'skip'], true);
             $note = (string) ($r['note'] ?? '');

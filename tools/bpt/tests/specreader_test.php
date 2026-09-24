@@ -46,3 +46,70 @@ test('SpecReader: запись читается обратно', function () {
 test('SpecReader: спецификация должна быть объектом с шагами', function () {
     assertThrows(fn () => SpecReader::parse('[1,2,3]', 'json'), 'спецификация', 'список вместо объекта');
 });
+
+test('SpecReader: n/off/yes как коды — понятная ошибка, а не тихая потеря', function () {
+    if (!SpecReader::hasYaml()) {
+        return;
+    }
+    // YAML 1.1: n, y, on, off, yes, no, true, false — булевы. PHP кладёт их в ключи 0 и 1,
+    // поэтому «n» и «off» сливаются в один ключ: одна переменная молча затирает другую.
+    $yaml = "bizproc: 1
+name: Тест
+variables:
+  n:
+    Type: string
+  off:
+    Type: string
+steps: []
+";
+    assertThrows(fn () => SpecReader::parse($yaml, 'yaml'), 'кавычк', 'код-булево — ошибка с подсказкой');
+    assertThrows(fn () => SpecReader::parse($yaml, 'yaml'), 'строка 4', 'ошибка называет строку');
+});
+
+test('SpecReader: законные числовые ключи снимка не считаются ошибкой', function () {
+    if (!SpecReader::hasYaml()) {
+        return;
+    }
+    // В снимке портала воронки нумерованные: «8: Общая воронка». Ключ 0 или 1 у воронки
+    // тоже возможен — придираться к числам нельзя, только к булевым словам в тексте.
+    $yaml = "bizproc: 1
+name: Тест
+funnels:
+  0: Общая воронка
+  1: Вторая
+steps: []
+";
+    $spec = SpecReader::parse($yaml, 'yaml');
+    assertSame(['Общая воронка', 'Вторая'], array_values($spec['funnels']));
+});
+
+test('SpecReader: слово-ключ внутри блочного текста — не ошибка', function () {
+    if (!SpecReader::hasYaml()) {
+        return;
+    }
+    // Внутри «EventText: |» лежит текст заказчика: строка «no: ...» там не ключ спецификации.
+    $yaml = "bizproc: 1
+name: Тест
+steps:
+  - crm_event:
+      EventText: |
+        on: включено
+        no: выключено
+";
+    $spec = SpecReader::parse($yaml, 'yaml');
+    assertTrue(str_contains($spec['steps'][0]['crm_event']['EventText'], 'включено'), 'блочный текст прочитан');
+});
+
+test('SpecReader: код в кавычках работает — это и есть способ записать n', function () {
+    if (!SpecReader::hasYaml()) {
+        return;
+    }
+    $yaml = "bizproc: 1
+name: Тест
+variables:
+  \"n\":
+    Type: string
+steps: []
+";
+    assertSame(['n'], array_keys(SpecReader::parse($yaml, 'yaml')['variables']));
+});

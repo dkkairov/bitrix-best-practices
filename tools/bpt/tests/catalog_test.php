@@ -66,6 +66,25 @@ test('Каталог: варианты значений с расшифровк�
     assertSame(null, $c->note('SequenceActivity'));
 });
 
+test('Каталог: операторы условий — список у всех трёх свойств', function () {
+    $c = Catalog::load();
+    // fieldcondition/propertyvariablecondition/mixedcondition — общий $conditions, проверяем через
+    // оба узла, где он используется (branch, loop), чтобы регенерация каталога не расцепила список
+    foreach (['IfElseBranchActivity', 'WhileActivity'] as $type) {
+        foreach (['fieldcondition', 'propertyvariablecondition', 'mixedcondition'] as $prop) {
+            $note = (string) $c->note($type, $prop);
+            assertTrue(str_contains($note, '`<=`'), "$type.$prop: есть оператор <=");
+            assertTrue(str_contains($note, '`contain`'), "$type.$prop: есть оператор contain");
+            assertTrue(str_contains($note, '`between`'), "$type.$prop: есть оператор between");
+            assertTrue(str_contains($note, '`modified`'), "$type.$prop: есть оператор modified");
+        }
+    }
+    // Оговорки по типу поля — не потерять при переформулировке
+    $note = (string) $c->note('IfElseBranchActivity', 'fieldcondition');
+    assertTrue(str_contains($note, 'int/double/date/datetime/time'), 'between ограничен типами поля');
+    assertTrue(str_contains($note, 'только у fieldcondition'), 'modified — только у fieldcondition');
+});
+
 test('Каталог: заголовки по умолчанию — как ставит дизайнер', function () {
     $c = Catalog::load();
     assertSame('Ознакомление с документом', $c->title('ReviewActivity'));

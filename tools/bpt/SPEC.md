@@ -135,7 +135,8 @@ bizproc 26.1075.0):
 вне этого списка не использовать. Проверено на стенде (bizproc 26.1075.0, 2026-09-24): шаблон с
 `fieldcondition` на `<=` (числовое поле) и `contain` (строковое) импортирован и сохранён без
 изменений; подробности — заметка к `fieldcondition` в `tools/bpt/catalog/activities.php`
-(`bpt.php catalog while`) и `.superpowers/sdd/PLAN/operators-report.md`.
+(`bpt.php catalog while`). Источники в ядре (модуль `bizproc`): `install/js/bizproc/condition/src/operator/operator.js`,
+`lib/activity/enum/operator.php`, русские подписи — `lang/ru/config.php`.
 
 ## Выражения, ссылки, плейсхолдеры
 

@@ -58,7 +58,8 @@ $joiner = 'связка: 0 — «и», 1 — «или»; «и» сильнее �
 // Стенд, bizproc 26.1075.0, 2026-09-24: шаблон с fieldcondition [OPPORTUNITY,"<=","1000","0"] и
 // [TITLE,"contain","OPTEST","0"] на DYNAMIC_2 (Сделка) принят и сохранён без изменений
 // (CBPWorkflowTemplateLoader::ImportTemplate, шаблон #111, деактивирован после проверки).
-// Источники и файл:строка — .superpowers/sdd/PLAN/operators-report.md
+// Источники в ядре (модуль bizproc): install/js/bizproc/condition/src/operator/operator.js,
+// lib/activity/enum/operator.php, русские подписи — lang/ru/config.php
 $operators = 'операторы (общие для fieldcondition/propertyvariablecondition/mixedcondition): `=` равно,'
     . ' `!=` не равно, `>` больше, `>=` не меньше, `<` меньше, `<=` не больше, `in` содержится в'
     . ' списке, `!in` не содержится в списке, `contain` содержит, `!contain` не содержит, `!empty`'

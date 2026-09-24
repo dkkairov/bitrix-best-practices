@@ -38,6 +38,7 @@ updated: "2026-09-24"
 - [[concept-routing|Маршрутизация: свои адреса вместо urlrewrite]]
 - [[recipe-engine-controller-action|Контроллер и действие: Engine\Controller]]
 - [[concept-messenger-queues|Очереди сообщений ядра (альфа)]]
+- [[concept-d7-session-storage|Сессия D7, LocalSession и временное хранилище]]
 - [[recipe-http-client|HTTP-запрос из коробки: HttpClient]]
 - [[concept-d7-logging|Логирование D7: логгеры, уровни, настройка]]
 - [[recipe-box-debugging|Отладка коробки: дампы, замеры, панель]]
@@ -76,6 +77,8 @@ updated: "2026-09-24"
 - [[entity-php-interface|Каталог php_interface]] — init.php, dbconn.php и соседи
 - [[entity-urlrewrite|urlrewrite.php]] — правила обработки адресов
 - [[entity-admin-php-console|Командная PHP-строка]] — диагностика из админки
+- [[entity-settings-php|.settings.php и Config\Configuration]] — конфигурация ядра
+- [[entity-web-cookie|Web\Cookie]] — чтение и установка cookie
 - [[entity-numerator|Numerator]] — нумерация документов
 - [[entity-user-consent|UserConsent]] — согласия пользователей в формах
 

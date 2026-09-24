@@ -5,12 +5,12 @@ module: core-d7
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Валидация — Основное, Контроллеры; Задачи — Основные команды; стиль «Result вместо исключения» — практика команды"
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Валидация — Основное, Контроллеры; Задачи — Основные команды; стиль «Result вместо исключения» — практика команды; 2026-09-24 — состав методов Result и ErrorCollection сверен по ядру стенда (main 26.750.0) и документации фреймворка"
 tags: [d7, result, error, класс, обработка-ошибок, контроллеры]
 sources: ["[[source-devbook-core-d7]]"]
 related: ["[[concept-validation-d7]]", "[[entity-crm-operation]]", "[[concept-coding-standards]]", "[[entity-validation-result]]", "[[concept-tasks-api-v2]]"]
 aliases: ["bitrix24-result-error"]
-updated: "2026-09-21"
+updated: "2026-09-24"
 ---
 
 # `\Bitrix\Main\Result` и `\Bitrix\Main\Error`
@@ -29,11 +29,21 @@ updated: "2026-09-21"
 
 ```php
 $result = new \Bitrix\Main\Result();
-$result->addError(new \Bitrix\Main\Error('Текст ошибки'));
+$result->addError(new \Bitrix\Main\Error('Текст ошибки', 'ERROR_CODE'));
 
-$result->isSuccess();   // bool
-$result->getErrors();   // \Bitrix\Main\Error[]
+$result->isSuccess();            // bool
+$result->getErrors();            // \Bitrix\Main\Error[]
+$result->getErrorMessages();     // string[]
+$result->addErrors([$e1, $e2]);  // несколько сразу
+$result->setData(['id' => 42]);
+$result->getData();
+$result->getErrorCollection()->getErrorByCode('ERROR_CODE');   // найти ошибку по коду
 ```
+
+Все перечисленные методы есть в ядре 26.750.0 (сверено перебором 2026-09-24), включая
+`ErrorCollection::getErrorByCode()`. Документация фреймворка объясняет и смысл конструкции:
+`Result` нужен там, где ошибок может быть **несколько сразу** — например, невалидны три поля формы;
+исключение сообщает ровно об одной проблеме и разворачивает стек.
 
 ## Канонический стиль
 

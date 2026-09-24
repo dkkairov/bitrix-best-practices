@@ -4,8 +4,8 @@ type: index
 module: templates-design
 edition: box
 status: verified
-verified: "2026-09-23 / состав папки сверен со списком файлов"
-updated: "2026-09-23"
+verified: "2026-09-24 / состав папки сверен со списком файлов"
+updated: "2026-09-24"
 ---
 
 # Шаблоны и вёрстка — практики разработки (коробка)
@@ -23,6 +23,7 @@ updated: "2026-09-23"
 
 ### Обзор
 - [[concept-ui-subsystem|UI-подсистема: тулбар, фильтр, грид, кнопки]]
+- [[concept-js-extensions|Расширения JS и CSS: свой bundle вместо тегов script]]
 - [[recipe-custom-list-page-filter-grid|Своя страница-список: фильтр, грид, тулбар]] · черновик
 - Зоны страницы и отложенный вывод — [[concept-deferred-functions-and-page-areas]] (в разделе «Ядро D7»)
 

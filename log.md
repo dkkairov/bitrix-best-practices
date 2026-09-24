@@ -7,6 +7,28 @@
 
 ## 2026-09
 
+- **2026-09-24 — ingest: документация фреймворка, «Основы фреймворка» (часть 2)** — ещё четыре
+  страницы и сверка трёх существующих.
+
+  Новое: [[entity-settings-php]] (секции `.settings.php`, `readonly`, API `Configuration`,
+  `.settings_extra.php` и `/local/` с 24.100.0), [[concept-d7-session-storage]] (сессия D7,
+  `LocalSession` без блокировок, временное хранилище `Data\Storage` с 25.1100.0),
+  [[entity-web-cookie]] (cookie, префикс `BITRIX_SM`, `CryptoCookie`),
+  [[concept-js-extensions]] (расширения JS/CSS, `config.php`, `Extension::load`).
+
+  Сверены с документацией и стендом:
+  - [[entity-event-manager]] — добавлен раздел про **своё событие**: `new Event(...)->send()` и
+    `getResults()` прогнаны на стенде; константы `EventResult`: `UNDEFINED = 0`, `SUCCESS = 1`,
+    `ERROR = 2`; в составе методов нашёлся `findEventHandlers()` — способ увидеть D7-подписки,
+    которого не описывает книга. Расхождение помечено: документация зовёт постоянную регистрацию
+    основной, но для событий ORM наш вывод (через `ORM\EventManager` в `include.php`) остаётся;
+    генератор `make:event` без composer не работает;
+  - [[concept-service-locator]] — локатор с `main` 20.5.400, PSR-11 подтверждён, добавлен третий
+    вариант описания сервиса `constructorParams` (проверен прогоном), ключом может быть имя
+    интерфейса, на стенде есть `registerByGlobalSettings()` и `registerByModuleSettings()`;
+  - [[entity-main-result]] — состав методов `Result` и `ErrorCollection` сверен перебором,
+    добавлен `getErrorByCode()` и объяснение, зачем `Result` вместо исключения.
+
 - **2026-09-24 — ingest: документация фреймворка, «Основы фреймворка» (часть 1)** — взяты три темы,
   которых в вики не было совсем: [[concept-routing]] (файл маршрутов, параметры пути, именованные
   маршруты и генерация URL, `PublicPageController` как мост со старого `urlrewrite.php`),

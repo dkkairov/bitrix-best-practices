@@ -5,12 +5,12 @@ module: core-d7
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Технологии — События, Свой код; строка про события D7 ORM — эмпирика, main 26.700"
+verified: "2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Технологии — События, Свой код; строка про события D7 ORM — эмпирика, main 26.700; 2026-09-24 — сверено с документацией фреймворка и прогнано на стенде (main 26.750.0): своё событие send/getResults, константы EventResult, состав методов EventManager"
 tags: [события, d7, eventmanager, класс, подписка, compatible]
 sources: ["[[source-devbook-core-d7]]"]
 related: ["[[pattern-events-over-core-modification]]", "[[recipe-d7-orm-event-subscription]]", "[[concept-orm-datamanager-events]]", "[[entity-main-event]]", "[[entity-crm-legacy-events]]"]
 aliases: ["bitrix24-event-manager"]
-updated: "2026-09-21"
+updated: "2026-09-24"
 ---
 
 # `\Bitrix\Main\EventManager`
@@ -94,6 +94,42 @@ $em->registerEventHandler(          // или registerEventHandlerCompatible д�
   обработчики идут в порядке добавления.
 - Для диагностики подписок старого ядра есть `\GetModuleEvents($module, $event)`; отдельного
   публичного способа перечислить D7-подписки книга не описывает.
+
+## Своё событие (сверка с документацией фреймворка, 2026-09-24)
+
+Событие объявляется не в реестре, а фактом отправки:
+
+```php
+$event = new \Bitrix\Main\Event('vendor.helpdesk', 'TicketClosed', ['ticketId' => 123]);
+$event->send();
+
+foreach ($event->getResults() as $result)
+{
+    $result->getType();        // 1 — успех
+    $result->getParameters();  // что вернул обработчик
+}
+```
+
+Проверено на стенде (26.750.0): подписка через `addEventHandler`, отправка, чтение результатов —
+работает; обработчик вернул `EventResult` с параметрами, и они пришли в `getResults()`.
+
+**Значения `EventResult`:** `UNDEFINED = 0`, `SUCCESS = 1`, `ERROR = 2` — константы, а не строки;
+обработчик может не возвращать ничего.
+
+Полный состав публичных методов `EventManager` на стенде: `addEventHandler`,
+`addEventHandlerCompatible`, `registerEventHandler`, `registerEventHandlerCompatible`,
+`removeEventHandler`, `unRegisterEventHandler`, `findEventHandlers`, `send`, `clearLoadedHandlers`.
+`findEventHandlers()` — как раз тот способ увидеть D7-подписки, которого не описывает книга.
+
+> **Расхождение.** Документация фреймворка называет постоянную регистрацию
+> (`registerEventHandler`) основным способом, а динамическую — нерекомендуемой. Для **событий
+> модулей** это верно и совпадает с нашей таблицей выше. Для **событий ORM** наш вывод остаётся
+> прежним ([[concept-orm-datamanager-events]]): там подписка идёт через
+> `\Bitrix\Main\ORM\EventManager` в `include.php` модуля, потому что имя события собирает ядро.
+>
+> Ещё документация показывает генератор `php bitrix.php make:event <Имя> -m <модуль>`. На стандартной
+> коробке он не запустится: консольные команды ядра требуют composer с `symfony/console`
+> ([[concept-messenger-queues]]), да и путь к скрипту — `bitrix/bitrix.php`.
 
 ## Связанное
 - [[pattern-events-over-core-modification]] — когда вообще идти в события

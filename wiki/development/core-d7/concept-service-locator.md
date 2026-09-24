@@ -5,12 +5,12 @@ module: core-d7
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-22 / коробка в Docker, main 26.750.0: форма constructor (только замыкание) проверена прогоном; 2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Технологии — Локатор служб; Свой код — kernel.php; CRM — Подмена фабрики"
+verified: "2026-09-22 / коробка в Docker, main 26.750.0: форма constructor (только замыкание) проверена прогоном; 2026-09-21 / «Книга разработчика Bitrix24» (bx24devbook, снимок 2026-09-21): Технологии — Локатор служб, Свой код — kernel.php, CRM — Подмена фабрики; 2026-09-24 — сверка с документацией фреймворка и стендом: PSR-11, constructorParams, ключ-интерфейс, registerByGlobalSettings/registerByModuleSettings"
 tags: [d7, di, servicelocator, сервисы, kernel-php, подмена]
 sources: ["[[source-devbook-core-d7]]", "[[source-devbook-dev-rules]]"]
 related: ["[[concept-crm-universal-api]]", "[[recipe-crm-history-all-fields]]", "[[concept-bitrix-naming-conventions]]", "[[concept-change-invasiveness-hierarchy]]", "[[pattern-local-solution-structure]]", "[[recipe-smart-process-factory-customization]]"]
 aliases: ["bitrix24-service-locator"]
-updated: "2026-09-22"
+updated: "2026-09-24"
 ---
 
 # ServiceLocator
@@ -47,6 +47,30 @@ updated: "2026-09-22"
 > и создаёт объект через `new $class(...)`; замыкание он вызывает, а массив `['Класс', 'метод']`
 > ломается на первом `get()`: `Error: Class name must be a valid object or a string`
 > (`main` 26.750.0, стенд 2026-09-22). Само ядро регистрирует сервисы замыканиями.
+
+## Сверка с документацией фреймворка (2026-09-24)
+
+Документация [docs.1c-bitrix.ru](https://docs.1c-bitrix.ru/pages/framework/service-locator.html)
+добавляет к сказанному книгой:
+
+- локатор доступен **с `main` 20.5.400** и реализует PSR-11 (`Psr\Container\ContainerInterface` —
+  подтверждено на стенде);
+- у описания сервиса есть третий вариант — **`constructorParams`**: класс плюс аргументы
+  конструктора. Проверено прогоном (26.750.0):
+
+  ```php
+  $locator->addInstanceLazy('vendor.date', [
+      'className' => \Bitrix\Main\Type\DateTime::class,
+      'constructorParams' => ['2026-01-01 00:00:00', 'Y-m-d H:i:s'],
+  ]);
+  ```
+
+- **ключом может быть имя интерфейса**, не только строка с точками: так ядро отдаёт временное
+  хранилище (`Data\Storage\PersistentStorageInterface`, [[concept-d7-session-storage]]);
+- автоматическое разрешение зависимостей (autowire) включено по умолчанию;
+- кроме известных методов, на стенде есть `registerByGlobalSettings()` и
+  `registerByModuleSettings()` — ими ядро само подхватывает секцию `services` из
+  `.settings.php` площадки и модулей ([[entity-settings-php]]).
 
 ## Соглашение именования
 

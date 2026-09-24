@@ -160,6 +160,8 @@
 - [[concept-postgresql-compatibility|Код, совместимый с PostgreSQL]] · Разработка · box
 - [[concept-routing|Маршрутизация: свои адреса вместо urlrewrite]] · Разработка · box · проверено
 - [[concept-messenger-queues|Очереди сообщений ядра (альфа)]] · Разработка · box · проверено
+- [[concept-d7-session-storage|Сессия D7, LocalSession и временное хранилище]] · Разработка · box · проверено
+- [[concept-js-extensions|Расширения JS и CSS: свой bundle]] · Разработка · box · проверено
 - [[concept-d7-logging|Логирование D7: логгеры, уровни, настройка]] · Разработка · box · проверено
 - [[concept-datetime-and-timezones|Дата и время: Date, DateTime, часовые пояса]] · Разработка · box · проверено
 - [[concept-localization-lang-files|Локализация: Loc и языковые файлы]] · Разработка · box · проверено
@@ -206,7 +208,8 @@
 [[entity-validation-result|ValidationResult / ValidationError]] ·
 [[entity-local-directory|/local/]] · [[entity-php-interface|php_interface]] ·
 [[entity-urlrewrite|urlrewrite.php]] · [[entity-admin-php-console|Командная PHP-строка]] ·
-[[entity-numerator|Numerator]] · [[entity-user-consent|UserConsent]]
+[[entity-numerator|Numerator]] · [[entity-user-consent|UserConsent]] ·
+[[entity-settings-php|.settings.php]] · [[entity-web-cookie|Web\Cookie]]
 
 **UI и шаблоны** — [[entity-toolbar|UI\Toolbar]] · [[entity-ui-button|Button]] ·
 [[entity-filter-component|main.ui.filter]] · [[entity-filter-field-adapter|FieldAdapter]] ·

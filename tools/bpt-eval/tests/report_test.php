@@ -31,6 +31,18 @@ test('Отчёт: итог по задаче и доля без сбоев пр�
     assertTrue(!reportFixture()->thresholdReached(), 'порог 80% не достигнут');
 });
 
+test('Отчёт: проверяющий обернул пункт в кавычки — пункт всё равно засчитан', function () {
+    // Проверяющий — модель: кавычки вокруг текста и внутри него у него «плавают».
+    // Сверка побуквенно давала «не пройдена» у задачи с полным чек-листом (прогон main-7).
+    $acc = Acceptance::fromArray(['task' => 'T06', 'document' => 'Заявки',
+        'scenarios' => [['name' => 's', 'steps' => [], 'expect' => ['stage' => 'Клиент']]],
+        'checklist' => ['«История» — запись в историю CRM']], 'T06');
+    $checklists = ['T06' => ['items' => [['text' => '«„История" — запись в историю CRM»', 'raised' => true, 'quote' => '…']]]];
+    $report = Report::fromData(['T06' => ['task' => 'T06', 'compile' => 'ok', 'import' => 'ok',
+        'scenarios' => [['ok' => true]], 'reason' => '', 'category' => '', 'note' => '']], $checklists, ['T06' => $acc], [], 'r');
+    assertTrue($report->rows()['T06']['passed'], 'кавычки не мешают сопоставлению');
+});
+
 test('Отчёт: сценарии не прогнаны — задача не пройдена', function () {
     $acc = Acceptance::fromArray(['task' => 'T05', 'document' => 'Заявки',
         'scenarios' => [['name' => 's', 'steps' => [], 'expect' => ['stage' => 'Клиент']]]], 'T05');

@@ -23,6 +23,8 @@ updated: "2026-09-24"
 
 ### Обзор
 - [[concept-ui-subsystem|UI-подсистема: тулбар, фильтр, грид, кнопки]]
+- [[concept-entity-selector|Селектор сущностей ui.entity-selector]]
+- [[concept-ui-system-components|Системные компоненты UI: ui.system.*, иконки, доступность]]
 - [[concept-js-extensions|Расширения JS и CSS: свой bundle вместо тегов script]]
 - [[recipe-custom-list-page-filter-grid|Своя страница-список: фильтр, грид, тулбар]] · черновик
 - Зоны страницы и отложенный вывод — [[concept-deferred-functions-and-page-areas]] (в разделе «Ядро D7»)
@@ -30,6 +32,8 @@ updated: "2026-09-24"
 ### Классы и компоненты (справочник API)
 - [[entity-toolbar|UI\Toolbar]] — шапка страницы: Manager, Toolbar, Facade
 - [[entity-ui-button|UI\Buttons\Button]] — кнопки
+- [[entity-main-sidepanel|main.sidepanel]] — боковая панель (слайдер)
+- [[entity-main-popup|main.popup]] — всплывающие окна и меню
 - [[entity-filter-component|bitrix:main.ui.filter]] — компонент фильтра
 - [[entity-filter-field-adapter|FieldAdapter]] — типы полей фильтра
 - [[entity-filter-options|UI\Filter\Options]] — настройки фильтра пользователя

@@ -7,6 +7,22 @@
 
 ## 2026-09
 
+- **2026-09-24 — ingest: документация фреймворка, раздел «Пользовательский интерфейс»** — четыре
+  страницы в `templates-design`: [[concept-entity-selector]] (виджет выбора людей, отделов,
+  проектов и чатов, стандартные провайдеры и их опции), [[entity-main-sidepanel]] (слайдер:
+  параметры, события, `postMessage` между панелями), [[entity-main-popup]] (окна и меню,
+  псевдонимы `BX.PopupWindow` / `BX.PopupMenuWindow`), [[concept-ui-system-components]]
+  (семейство `ui.system.*`, наборы иконок, расширение доступности `ui.a11y`).
+
+  Сверено по стенду (main 26.750.0): в `/bitrix/js/ui/system/` — alert, checkbox, chip, dialog,
+  highlighter, input, label, menu, popover, radiobutton, skeleton, typography; в
+  `/bitrix/js/ui/icon-set/` — двенадцать наборов иконок; расширения `ui.entity-selector`,
+  `ui.a11y`, `main.sidepanel`, `main.popup` на месте. Провайдеры селектора живут в интеграциях
+  модулей (`socialnetwork`, `intranet`, `im`), поэтому их доступность зависит от состава портала —
+  отмечено на странице.
+
+  Фильтр и грид из этого раздела у нас уже описаны; `vue` и `lottie` отложены.
+
 - **2026-09-24 — ingest: документация фреймворка, раздел «Безопасность»** — четыре страницы:
   [[concept-web-vulnerabilities-bitrix]] (XSS, CSRF, SSRF, инъекции и санитайзер),
   [[recipe-encrypt-sensitive-data]] (Cipher, ключи, `CryptoField`),

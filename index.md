@@ -168,6 +168,8 @@
 - [[concept-component-structure|Компонент 2.0: структура, кэш, AJAX]] · Разработка · box · проверено
 - [[concept-web-vulnerabilities-bitrix|XSS, CSRF, SSRF, инъекции: чем закрывает ядро]] · Разработка · box · проверено
 - [[concept-proactive-security|Проактивная защита: уровни, 2FA, побочные эффекты]] · Администрирование · box
+- [[concept-entity-selector|Селектор сущностей ui.entity-selector]] · Разработка · box · проверено
+- [[concept-ui-system-components|Системные компоненты UI: ui.system.*, иконки, доступность]] · Разработка · box · проверено
 - [[concept-d7-logging|Логирование D7: логгеры, уровни, настройка]] · Разработка · box · проверено
 - [[concept-datetime-and-timezones|Дата и время: Date, DateTime, часовые пояса]] · Разработка · box · проверено
 - [[concept-localization-lang-files|Локализация: Loc и языковые файлы]] · Разработка · box · проверено
@@ -223,7 +225,8 @@
 [[entity-filter-options|Filter\Options]] · [[entity-custom-filter|Main\Filter]] ·
 [[entity-bx-main-filter|BX.Main.Filter]] · [[entity-grid-component|main.ui.grid]] ·
 [[entity-grid-options|Grid\Options]] · [[entity-bx-main-grid|BX.Main.gridManager]] ·
-[[entity-site-template|Шаблон дизайна]] · [[entity-theme-picker|ThemePicker]]
+[[entity-site-template|Шаблон дизайна]] · [[entity-theme-picker|ThemePicker]] ·
+[[entity-main-sidepanel|main.sidepanel]] · [[entity-main-popup|main.popup]]
 
 ### Конспекты источников
 - [[sources-backlog]] — бэклог источников (очередь на ингест) · служебный

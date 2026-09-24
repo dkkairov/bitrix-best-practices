@@ -100,6 +100,7 @@
 - [[recipe-composer-third-party-libraries|Сторонние Composer-пакеты (dompdf, PhpWord)]] · Разработка · box
 - [[recipe-d7-orm-event-subscription|Подписка модуля на событие D7 ORM]] · Разработка · box
 - [[recipe-d7-orm-crud|Запись через ORM: add, update, delete и проверки]] · Разработка · box
+- [[recipe-d7-transactions|Транзакции D7: начать, зафиксировать, откатить]] · Разработка · box · проверено
 - [[recipe-cli-script-bootstrap|Консольный и cron-скрипт: подключение ядра]] · Разработка · box · проверено
 - [[recipe-d7-custom-validation-rule|Свой валидатор и правило валидации D7]] · Разработка · box · проверено
 - [[recipe-custom-list-page-filter-grid|Своя страница-список: фильтр, грид, тулбар]] · Разработка · box · проверено
@@ -149,6 +150,8 @@
 - [[concept-d7-orm-objects|Объекты и коллекции ORM: EO_-классы вместо массивов]] · Разработка · box
 - [[concept-d7-orm-relations|Связи ORM: Reference, OneToMany, ManyToMany]] · Разработка · box · проверено
 - [[concept-orm-datamanager-events|События ORM DataManager]] · Разработка · box
+- [[concept-d7-sql-layer|Прямой SQL: соединение, SqlHelper, SqlExpression]] · Разработка · box · проверено
+- [[concept-postgresql-compatibility|Код, совместимый с PostgreSQL]] · Разработка · box
 - [[concept-service-locator|ServiceLocator: регистрация и подмена сервисов]] · Разработка · box
 - [[concept-validation-d7|Валидация D7: PHP-атрибуты]] · Разработка · box
 - [[concept-ui-subsystem|UI-подсистема: тулбар, фильтр, грид, кнопки]] · Разработка · box

@@ -4,8 +4,8 @@ type: index
 module: core-d7
 edition: box
 status: verified
-verified: "2026-09-23 / состав папки сверен со списком файлов"
-updated: "2026-09-23"
+verified: "2026-09-24 / состав папки сверен со списком файлов"
+updated: "2026-09-24"
 ---
 
 # Ядро D7 — практики разработки (коробка)
@@ -32,6 +32,9 @@ updated: "2026-09-23"
 - [[concept-d7-orm-relations|Связи ORM: Reference, OneToMany, ManyToMany]]
 - [[recipe-d7-orm-crud|Запись через ORM: add, update, delete и проверки данных]]
 - [[concept-orm-datamanager-events|События ORM DataManager: девять хуков и формат имени]]
+- [[concept-d7-sql-layer|Прямой SQL: соединение, SqlHelper, SqlExpression]]
+- [[recipe-d7-transactions|Транзакции D7: начать, зафиксировать, откатить]]
+- [[concept-postgresql-compatibility|Код, совместимый с PostgreSQL]]
 - [[concept-service-locator|ServiceLocator: регистрация и подмена сервисов]]
 - [[concept-validation-d7|Валидация D7: PHP-атрибуты вместо простыней if]]
 - [[recipe-d7-custom-validation-rule|Свой валидатор и правило валидации D7]] · черновик
@@ -71,6 +74,8 @@ updated: "2026-09-23"
 тесты и ключевой антипаттерн. Страницы по «Книге разработчика» сверены с сайтом книги 2026-09-21.
 ORM разобрана по курсу 43 (2026-09-23) и прогнана на стенде: сущность, запись, выборка,
 объекты и коллекции, связи.
+Слой БД добавлен по документации фреймворка (2026-09-24): прямой SQL и `SqlHelper`, транзакции,
+переносимость на PostgreSQL.
 `Loader` и `Config\Option` сверены по справочнику D7 на `dev.1c-bitrix.ru` (2026-09-18).
 `ModuleManager` сверен по исходникам ядра 2026-09-23 — черновиков в разделе не осталось.
 

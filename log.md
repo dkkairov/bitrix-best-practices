@@ -7,6 +7,26 @@
 
 ## 2026-09
 
+- **2026-09-24 — ingest: документация фреймворка, раздел «База данных»** — второй кластер.
+  Созданы три страницы в `wiki/development/core-d7/`: [[concept-d7-sql-layer]] (соединение, методы
+  выполнения запросов, `DB\Result`, полный состав `SqlHelper`, плейсхолдеры `SqlExpression`),
+  [[recipe-d7-transactions]] (транзакции и вложенность), [[concept-postgresql-compatibility]]
+  (таблица замен MySQL-конструкций, схема данных, имена индексов, поддержка модулей).
+
+  Проверено на коробке (main 26.750.0, MySQL 8.0):
+  - вложенный `startTransaction()` даёт `SAVEPOINT`, а вложенный `rollbackTransaction()` бросает
+    `Bitrix\Main\DB\TransactionException` «Nested rollbacks are unsupported» — вложенный код не
+    откатывает, а сообщает наверх;
+  - все 27 методов `SqlHelper`, названных документацией, в ядре есть; `quote('ID')` → `` `ID` ``,
+    `getIsNullFunction` → `IFNULL`, `getRandomFunction` → `rand()`, `getInsertIgnore` →
+    `INSERT IGNORE INTO`;
+  - `SqlExpression` экранирует значения при компиляции (`?s` с кавычкой в строке);
+  - `Connection::getType()` возвращает `mysql`, `getVersion()` — версию сервера: это и есть штатный
+    способ узнать СУБД, в документации он не назван.
+
+  Отмечено: документация прямо предупреждает, что параметр `binds` в методах соединения защиты от
+  инъекции не даёт — безопасны только плейсхолдеры и `SqlHelper`.
+
 - **2026-09-24 — ingest: документация фреймворка, раздел «Производительность»** — первый кластер
   нового эталона. Снимок-манифест всего сайта:
   `raw/sources/2026-09-24-docs-1c-bitrix-manifest.md` — 221 страница из `sitemap.xml`, адреса,

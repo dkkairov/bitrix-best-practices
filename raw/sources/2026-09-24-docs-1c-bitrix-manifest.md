@@ -46,7 +46,7 @@ curl -s https://docs.1c-bitrix.ru/sitemap.xml \
 | `advanced` | 16 | нет |
 | `orm` | 15 | сверено 2026-09-24 ([[concept-d7-orm-entity]], бэклог источников) |
 | `security` | 14 | нет |
-| `database` | 12 | нет |
+| `database` | 12 | **да, 2026-09-24** — см. `wiki/development/core-d7/` |
 | `performance` | 6 | **да, 2026-09-24** — см. `wiki/development/performance/` |
 | `about` | 3 | нет |
 

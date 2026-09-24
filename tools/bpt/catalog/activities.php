@@ -47,10 +47,28 @@ declare(strict_types=1);
 // Связка условий подтверждена ядром: пусто/0 — «и», иначе «или» (CBPActivityCondition::getJoiner);
 // «и» сильнее «или» (Bizproc\Activity\ConditionGroup::evaluate, урок 3789)
 $joiner = 'связка: 0 — «и», 1 — «или»; «и» сильнее «или». «Или» в первой строке делает всё условие истинным';
+// Операторы — общий список для всех трёх условий: один UI-диалог (расширение bizproc.condition,
+// JS-класс Operator) и один обработчик ядра (Bitrix\Bizproc\Activity\Condition::checkValue +
+// backed enum Enum\Operator, 14 кодов). В диалоге дизайнера почти не зависят от типа поля —
+// ограничены только `between` (int/double/date/datetime/time) и полем с BaseType `document` (там
+// из списка — только empty/!empty); `modified` — только у fieldcondition, и только если документ
+// поддерживает отметку изменённых полей (у propertyvariablecondition/mixedcondition эта возможность
+// выключена жёстко). Импорт сам оператор не проверяет (ValidateProperties условий всегда пуст) —
+// ошибка в неверном коде проявится не на импорте, а при выполнении (тихо станет строгим «=»).
+// Стенд, bizproc 26.1075.0, 2026-09-24: шаблон с fieldcondition [OPPORTUNITY,"<=","1000","0"] и
+// [TITLE,"contain","OPTEST","0"] на DYNAMIC_2 (Сделка) принят и сохранён без изменений
+// (CBPWorkflowTemplateLoader::ImportTemplate, шаблон #111, деактивирован после проверки).
+// Источники и файл:строка — .superpowers/sdd/PLAN/operators-report.md
+$operators = 'операторы (общие для fieldcondition/propertyvariablecondition/mixedcondition): `=` равно,'
+    . ' `!=` не равно, `>` больше, `>=` не меньше, `<` меньше, `<=` не больше, `in` содержится в'
+    . ' списке, `!in` не содержится в списке, `contain` содержит, `!contain` не содержит, `!empty`'
+    . ' заполнено, `empty` не заполнено, `between` между (только int/double/date/datetime/time),'
+    . ' `modified` было изменено (только у fieldcondition, если документ поддерживает отметку'
+    . ' изменённых полей)';
 $conditions = [
-    'fieldcondition'            => ['type' => 'list', 'note' => 'по полям документа: `[[поле, оператор, значение, связка]]`; ' . $joiner],
-    'propertyvariablecondition' => ['type' => 'list', 'note' => 'по параметрам и переменным: `[[код, оператор, значение, связка]]`; ' . $joiner],
-    'mixedcondition'            => ['type' => 'list', 'note' => 'смешанное: `[{object, field, operator, value, joiner}]`; ' . $joiner],
+    'fieldcondition'            => ['type' => 'list', 'note' => 'по полям документа: `[[поле, оператор, значение, связка]]`; ' . $joiner . '; ' . $operators],
+    'propertyvariablecondition' => ['type' => 'list', 'note' => 'по параметрам и переменным: `[[код, оператор, значение, связка]]`; ' . $joiner . '; ' . $operators],
+    'mixedcondition'            => ['type' => 'list', 'note' => 'смешанное: `[{object, field, operator, value, joiner}]`; ' . $joiner . '; ' . $operators],
     'truecondition'             => ['type' => 'str', 'note' => "'1' — условие «Истина»: так делают ветку «иначе» (урок 3789)"],
 ];
 

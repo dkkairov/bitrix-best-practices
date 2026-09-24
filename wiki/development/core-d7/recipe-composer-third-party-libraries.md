@@ -9,7 +9,7 @@ verified: "2026-09-21 / Книга разработчика Bitrix24 (струк
 tags: [composer, vendor, автозагрузка, библиотеки, local, php_interface, dompdf, phpword]
 related: ["[[concept-code-namespaces-and-autoloading]]", "[[antipattern-box-core-modification]]", "[[recipe-module-structure-and-install]]", "[[concept-bitrix-framework-vs-bitrix24]]", "[[entity-local-directory]]"]
 aliases: ["composer-third-party-libraries"]
-updated: "2026-09-21"
+updated: "2026-09-24"
 ---
 
 # Сторонние Composer-пакеты (dompdf, PhpWord) в коробке
@@ -90,6 +90,27 @@ require_once __DIR__ . '/vendor/autoload.php';
 - ⚠️ **Composer-autoload ≠ Bitrix-autoload.** PSR-4 пакеты грузятся composer-автозагрузчиком (его
   подключаем явно); классы модулей — Bitrix-автозагрузкой
   ([[concept-code-namespaces-and-autoloading|стандарт D7]]). Это два параллельных механизма.
+
+## Вариант вендора: composer для самого ядра
+
+Документация фреймворка
+([«Composer»](https://docs.1c-bitrix.ru/pages/get-started/composer.html), сверено 2026-09-24)
+описывает другой сценарий — composer **для ядра**, а не для наших библиотек:
+
+- по умолчанию ядро ищет `composer.json` в каталоге `bitrix/`; рекомендуется вынести его **за
+  `DOCUMENT_ROOT`** (например, в домашний каталог) или в закрытый `/local/composer/`;
+- путь указывается в `.settings.php` ключом `config_path` ([[entity-settings-php]]);
+- зависимости самого продукта подключаются Composer Merge Plugin через `composer-bx.json`;
+- `vendor/autoload.php` рядом с `composer.json` подключается ядром автоматически.
+
+**Зачем это нужно:** без настроенного composer не работают **консольные команды ядра** (`make:*`,
+`orm:annotate`, `messenger:consume`) — на чистой коробке они отвечают «Symfony Console is not
+installed» ([[recipe-console-commands]]). То есть composer у вендора — это не «подключить
+стороннюю библиотеку», а «включить инструментарий разработчика».
+
+Наш вариант (`local/php_interface/`) и вендорский не противоречат друг другу: первый — про
+библиотеки проекта, второй — про инструменты ядра. Обе конфигурации могут сосуществовать, но
+`/bitrix/composer.json` мы всё равно не правим — путь задаём через `config_path`.
 
 ## Деплой
 - Коммить `composer.json` + `composer.lock`; `vendor/` — в `.gitignore`; на сервере `composer install`

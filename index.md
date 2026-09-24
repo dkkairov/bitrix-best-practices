@@ -166,6 +166,8 @@
 - [[concept-d7-session-storage|Сессия D7, LocalSession и временное хранилище]] · Разработка · box · проверено
 - [[concept-js-extensions|Расширения JS и CSS: свой bundle]] · Разработка · box · проверено
 - [[concept-component-structure|Компонент 2.0: структура, кэш, AJAX]] · Разработка · box · проверено
+- [[concept-highload-blocks|Highload-блоки: своя таблица без своего модуля]] · Разработка · box · проверено
+- [[concept-iblocks-and-lists|Инфоблоки и «Списки» портала]] · Разработка · box · проверено
 - [[concept-web-vulnerabilities-bitrix|XSS, CSRF, SSRF, инъекции: чем закрывает ядро]] · Разработка · box · проверено
 - [[concept-proactive-security|Проактивная защита: уровни, 2FA, побочные эффекты]] · Администрирование · box
 - [[concept-entity-selector|Селектор сущностей ui.entity-selector]] · Разработка · box · проверено

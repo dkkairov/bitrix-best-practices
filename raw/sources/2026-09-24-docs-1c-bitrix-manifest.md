@@ -43,7 +43,7 @@ curl -s https://docs.1c-bitrix.ru/sitemap.xml \
 | `ui` | 34 | нет |
 | `get-started` | 20 | нет |
 | `cms-basics` | 16 | нет |
-| `advanced` | 16 | нет |
+| `advanced` | 16 | **12 из 16, 2026-09-24** — взяты: HTTP-клиент, логгеры, отладка, Stepper, дата-время, локализация, изображения, нумератор, соглашения, многосайтовость, бэкап, монитор качества; отложены `uuid`, `encoding`, `geolocation` (по требованию) и `vue` (пойдёт с разделом `ui`) |
 | `orm` | 15 | сверено 2026-09-24 ([[concept-d7-orm-entity]], бэклог источников) |
 | `security` | 14 | нет |
 | `database` | 12 | **да, 2026-09-24** — см. `wiki/development/core-d7/` |

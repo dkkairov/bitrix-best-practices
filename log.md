@@ -7,6 +7,34 @@
 
 ## 2026-09
 
+- **2026-09-24 — ingest: документация фреймворка, раздел «Расширенные знания»** — третий кластер,
+  12 страниц документации из 16. Двенадцать новых страниц вики:
+  - ядро: [[recipe-http-client]], [[concept-d7-logging]], [[recipe-box-debugging]],
+    [[pattern-stepper-long-operations]], [[concept-datetime-and-timezones]],
+    [[concept-localization-lang-files]], [[recipe-image-processing]], [[entity-numerator]],
+    [[entity-user-consent]];
+  - сервер: [[recipe-box-backup]], [[concept-multisite]];
+  - администрирование: [[entity-quality-monitor]].
+
+  Отложены осознанно: `uuid`, `encoding`, `geolocation` — по требованию, отдельной страницы не
+  заслуживают; `vue` — пойдёт вместе с разделом `ui`. Отмечено в манифесте и бэклоге.
+
+  Что дал стенд (main 26.750.0), чего нет в документации:
+  - **`DateTime::isCorrect()` проверяет форму строки, а не дату**: `31.02.2026`, `32.13.2026` и
+    `99.99.9999` проходят как корректные, `tryParse()` переливает их вперёд (`31.02.2026` →
+    `2026-03-03`). Честная проверка — сравнить разобранное значение с исходной строкой;
+  - **`toUserTime()` меняет сам объект и возвращает его же** (`$d->toUserTime() === $d`), а
+    `isUserTimeEnabled()` — не статический метод, статический вызов падает с `Error`;
+  - **`Debug::writeToFile()` по умолчанию пишет в `DOCUMENT_ROOT/__bx_log.log`** — файл открыт по
+    прямой ссылке; в рецепте отладки это вынесено отдельным предупреждением;
+  - константы `Stepper`: `CONTINUE_EXECUTION = true`, `FINISH_EXECUTION = false`,
+    `THRESHOLD_TIME = 20.0` — бюджет шага;
+  - у `Loc` есть `getMessagePlural`, `loadLazy`, `setCurrentLang`, которых документация не называет;
+  - `HttpClient` реализует PSR-18, умеет асинхронные запросы, по умолчанию **разрешает запросы на
+    приватные адреса** (`privateIp = true`) — отмечено как риск SSRF, таймауты 30/60 с;
+  - изображения: `Main\File\Image` со всеми методами из документации, `FORMAT_WEBP = 18`, на стенде
+    доступны оба движка (GD и Imagick).
+
 - **2026-09-24 — ingest: документация фреймворка, раздел «База данных»** — второй кластер.
   Созданы три страницы в `wiki/development/core-d7/`: [[concept-d7-sql-layer]] (соединение, методы
   выполнения запросов, `DB\Result`, полный состав `SqlHelper`, плейсхолдеры `SqlExpression`),

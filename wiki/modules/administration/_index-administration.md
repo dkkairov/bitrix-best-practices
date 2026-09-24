@@ -4,8 +4,8 @@ type: index
 module: administration
 edition: both
 status: verified
-verified: "2026-09-23 / состав папки сверен со списком файлов"
-updated: "2026-09-23"
+verified: "2026-09-24 / состав папки сверен со списком файлов"
+updated: "2026-09-24"
 ---
 
 # Администрирование портала — практики внедрения
@@ -24,6 +24,7 @@ updated: "2026-09-23"
 - [[concept-org-structure|Оргструктура портала: подразделения, руководители, сотрудники]]
 - [[recipe-custom-left-menu-section|Свой раздел в левом меню через Intranet\CustomSection]] · коробка
 - [[recipe-intranet-absence-import|Запись отсутствий из кода (импорт отпусков)]] · коробка · черновик
+- [[entity-quality-monitor|Монитор качества: проверка проекта перед сдачей]] · коробка
 
 ### Классы (справочник API, коробка)
 - [[entity-cintranet-utils|CIntranetUtils]] — оргструктура и отсутствия (C-API интранета)

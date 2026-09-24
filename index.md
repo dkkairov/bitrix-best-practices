@@ -75,6 +75,7 @@
 - [[pattern-module-library-monorepo|Библиотека модулей агентства (монорепо)]] · Разработка · box
 - [[pattern-module-self-disabling-guard|Сторож модуля: портал важнее модуля]] · Разработка · box
 - [[pattern-agents-vs-cron|Агенты или cron: выбор фонового запуска]] · Разработка · box
+- [[pattern-stepper-long-operations|Длинная операция шагами: Stepper]] · Разработка · box · проверено
 - [[pattern-crm-action-vs-event|Operation\Action или обработчик события]] · CRM · box
 - [[pattern-crm-timeline-client-side|Таймлайн CRM на клиенте: догрузка и фильтрация]] · CRM · box
 - [[pattern-tasks-effectiveness-from-db|Эффективность задач 1:1 с виджетом]] · Задачи · box
@@ -101,6 +102,10 @@
 - [[recipe-d7-orm-event-subscription|Подписка модуля на событие D7 ORM]] · Разработка · box
 - [[recipe-d7-orm-crud|Запись через ORM: add, update, delete и проверки]] · Разработка · box
 - [[recipe-d7-transactions|Транзакции D7: начать, зафиксировать, откатить]] · Разработка · box · проверено
+- [[recipe-http-client|HTTP-запрос из коробки: HttpClient]] · Разработка · box · проверено
+- [[recipe-box-debugging|Отладка коробки: дампы, замеры, панель]] · Разработка · box · проверено
+- [[recipe-image-processing|Обработка изображений: Main\File\Image]] · Разработка · box · проверено
+- [[recipe-box-backup|Резервная копия коробки: снять и восстановить]] · Разработка · box
 - [[recipe-cli-script-bootstrap|Консольный и cron-скрипт: подключение ядра]] · Разработка · box · проверено
 - [[recipe-d7-custom-validation-rule|Свой валидатор и правило валидации D7]] · Разработка · box · проверено
 - [[recipe-custom-list-page-filter-grid|Своя страница-список: фильтр, грид, тулбар]] · Разработка · box · проверено
@@ -152,6 +157,10 @@
 - [[concept-orm-datamanager-events|События ORM DataManager]] · Разработка · box
 - [[concept-d7-sql-layer|Прямой SQL: соединение, SqlHelper, SqlExpression]] · Разработка · box · проверено
 - [[concept-postgresql-compatibility|Код, совместимый с PostgreSQL]] · Разработка · box
+- [[concept-d7-logging|Логирование D7: логгеры, уровни, настройка]] · Разработка · box · проверено
+- [[concept-datetime-and-timezones|Дата и время: Date, DateTime, часовые пояса]] · Разработка · box · проверено
+- [[concept-localization-lang-files|Локализация: Loc и языковые файлы]] · Разработка · box · проверено
+- [[concept-multisite|Многосайтовость: один домен и разные домены]] · Разработка · box
 - [[concept-service-locator|ServiceLocator: регистрация и подмена сервисов]] · Разработка · box
 - [[concept-validation-d7|Валидация D7: PHP-атрибуты]] · Разработка · box
 - [[concept-ui-subsystem|UI-подсистема: тулбар, фильтр, грид, кнопки]] · Разработка · box
@@ -183,7 +192,8 @@
 [[entity-cbp-activity-condition|CBPActivityCondition]] · [[entity-cbp-task-service|CBPTaskService]] ·
 [[entity-bizproc-field-type|FieldType]] · [[entity-bizproc-globals-manager|GlobalsManager]]
 
-**Интранет** — [[entity-cintranet-utils|CIntranetUtils]] · [[entity-user-absence|UserAbsence]]
+**Интранет** — [[entity-cintranet-utils|CIntranetUtils]] · [[entity-user-absence|UserAbsence]] ·
+[[entity-quality-monitor|Монитор качества]]
 
 **Ядро** — [[entity-main-application|Application]] · [[entity-loader|Loader]] ·
 [[entity-module-manager|ModuleManager]] ·
@@ -192,7 +202,8 @@
 [[entity-cagent|CAgent]] · [[entity-validation-service|ValidationService]] ·
 [[entity-validation-result|ValidationResult / ValidationError]] ·
 [[entity-local-directory|/local/]] · [[entity-php-interface|php_interface]] ·
-[[entity-urlrewrite|urlrewrite.php]] · [[entity-admin-php-console|Командная PHP-строка]]
+[[entity-urlrewrite|urlrewrite.php]] · [[entity-admin-php-console|Командная PHP-строка]] ·
+[[entity-numerator|Numerator]] · [[entity-user-consent|UserConsent]]
 
 **UI и шаблоны** — [[entity-toolbar|UI\Toolbar]] · [[entity-ui-button|Button]] ·
 [[entity-filter-component|main.ui.filter]] · [[entity-filter-field-adapter|FieldAdapter]] ·

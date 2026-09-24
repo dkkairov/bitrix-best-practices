@@ -35,6 +35,13 @@ updated: "2026-09-24"
 - [[concept-d7-sql-layer|Прямой SQL: соединение, SqlHelper, SqlExpression]]
 - [[recipe-d7-transactions|Транзакции D7: начать, зафиксировать, откатить]]
 - [[concept-postgresql-compatibility|Код, совместимый с PostgreSQL]]
+- [[recipe-http-client|HTTP-запрос из коробки: HttpClient]]
+- [[concept-d7-logging|Логирование D7: логгеры, уровни, настройка]]
+- [[recipe-box-debugging|Отладка коробки: дампы, замеры, панель]]
+- [[pattern-stepper-long-operations|Длинная операция шагами: Stepper]]
+- [[concept-datetime-and-timezones|Дата и время: Date, DateTime, часовые пояса]]
+- [[concept-localization-lang-files|Локализация: Loc и языковые файлы]]
+- [[recipe-image-processing|Обработка изображений: Main\File\Image]]
 - [[concept-service-locator|ServiceLocator: регистрация и подмена сервисов]]
 - [[concept-validation-d7|Валидация D7: PHP-атрибуты вместо простыней if]]
 - [[recipe-d7-custom-validation-rule|Свой валидатор и правило валидации D7]] · черновик
@@ -66,6 +73,8 @@ updated: "2026-09-24"
 - [[entity-php-interface|Каталог php_interface]] — init.php, dbconn.php и соседи
 - [[entity-urlrewrite|urlrewrite.php]] — правила обработки адресов
 - [[entity-admin-php-console|Командная PHP-строка]] — диагностика из админки
+- [[entity-numerator|Numerator]] — нумерация документов
+- [[entity-user-consent|UserConsent]] — согласия пользователей в формах
 
 ## Статус покрытия
 Есть стандарт разработки и иерархия инвазивности, организация кода и соглашения именования,
@@ -75,7 +84,8 @@ updated: "2026-09-24"
 ORM разобрана по курсу 43 (2026-09-23) и прогнана на стенде: сущность, запись, выборка,
 объекты и коллекции, связи.
 Слой БД добавлен по документации фреймворка (2026-09-24): прямой SQL и `SqlHelper`, транзакции,
-переносимость на PostgreSQL.
+переносимость на PostgreSQL. Оттуда же (раздел «Расширенные знания», 2026-09-24): HTTP-клиент,
+логгеры и отладка, `Stepper`, дата и время, локализация, изображения, нумератор, согласия.
 `Loader` и `Config\Option` сверены по справочнику D7 на `dev.1c-bitrix.ru` (2026-09-18).
 `ModuleManager` сверен по исходникам ядра 2026-09-23 — черновиков в разделе не осталось.
 

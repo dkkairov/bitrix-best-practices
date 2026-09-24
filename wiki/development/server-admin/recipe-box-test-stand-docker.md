@@ -10,7 +10,7 @@ tags: [docker, стенд, тестовый портал, env-docker, устан
 sources: []
 related: ["[[checklist-dev-environment-and-git]]", "[[recipe-mysql-connection-refused]]", "[[pattern-bizproc-ai-assisted-generation]]", "[[antipattern-cli-php-as-root]]", "[[recipe-cli-script-bootstrap]]"]
 aliases: []
-updated: "2026-09-22"
+updated: "2026-09-24"
 ---
 
 # Тестовый стенд коробки Битрикс24 в Docker
@@ -222,6 +222,7 @@ COption::SetOptionString('main', 'session_expand', 'N');
 | В настройках адрес сайта `_` | мастер взял `server_name _` из конфига nginx | шаг 6, пункт 3 |
 | README окружения запрещает `localhost` в адресах | внутри контейнера `php` адрес `localhost` — сам контейнер, публикация push туда не дойдёт | серверные пути `path_to_publish` и `path_to_json_rpc` — через `http://nginx/...`, браузерные — через `localhost` |
 | Нужен чистый стенд | — | `docker compose down -v` удаляет контейнеры **и тома с порталом и базой** |
+| `docker cp … dev_php:/tmp/x.php` отработал с кодом 0, а файла в контейнере нет | `/tmp` в контейнере — `tmpfs`: копия легла в слой образа под точкой монтирования и не видна | копировать в обычный каталог, например `/home/bitrix/`, оттуда и запускать |
 
 ## Источники и связанное
 - Окружение: [bitrix-tools/env-docker](https://github.com/bitrix-tools/env-docker) (README: пароли,

@@ -45,7 +45,7 @@ curl -s https://docs.1c-bitrix.ru/sitemap.xml \
 | `cms-basics` | 16 | нет |
 | `advanced` | 16 | **12 из 16, 2026-09-24** — взяты: HTTP-клиент, логгеры, отладка, Stepper, дата-время, локализация, изображения, нумератор, соглашения, многосайтовость, бэкап, монитор качества; отложены `uuid`, `encoding`, `geolocation` (по требованию) и `vue` (пойдёт с разделом `ui`) |
 | `orm` | 15 | сверено 2026-09-24 ([[concept-d7-orm-entity]], бэклог источников) |
-| `security` | 14 | нет |
+| `security` | 14 | **да, 2026-09-24** — четыре страницы: уязвимости и экранирование, шифрование, проактивная защита, чек-лист приёмки; частности (captcha, firewall, frame-protection, JWT, access-control) свёрнуты в них или отложены |
 | `database` | 12 | **да, 2026-09-24** — см. `wiki/development/core-d7/` |
 | `performance` | 6 | **да, 2026-09-24** — см. `wiki/development/performance/` |
 | `about` | 3 | нет |

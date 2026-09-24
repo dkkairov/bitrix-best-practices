@@ -62,6 +62,7 @@
 - [[checklist-permissions-audit|Аудит прав доступа]] · Права · both · черновик
 - [[checklist-tasks-regulations|Регламент постановки задач]] · Задачи · both · черновик
 - [[checklist-bizproc-template-review|Ревью шаблона БП: ошибки проектирования]] · БП · both
+- [[checklist-box-security|Безопасность коробки перед сдачей]] · Разработка · box
 
 ### Паттерны
 - [[pattern-crm-sales-funnel-design|Проектирование воронки и стадий]] · CRM · both
@@ -108,6 +109,7 @@
 - [[recipe-image-processing|Обработка изображений: Main\File\Image]] · Разработка · box · проверено
 - [[recipe-box-backup|Резервная копия коробки: снять и восстановить]] · Разработка · box
 - [[recipe-console-commands|Консольные команды ядра: bitrix.php и свои команды]] · Разработка · box · проверено
+- [[recipe-encrypt-sensitive-data|Шифровать чувствительные данные: Cipher, CryptoField]] · Разработка · box · проверено
 - [[recipe-cli-script-bootstrap|Консольный и cron-скрипт: подключение ядра]] · Разработка · box · проверено
 - [[recipe-d7-custom-validation-rule|Свой валидатор и правило валидации D7]] · Разработка · box · проверено
 - [[recipe-custom-list-page-filter-grid|Своя страница-список: фильтр, грид, тулбар]] · Разработка · box · проверено
@@ -164,6 +166,8 @@
 - [[concept-d7-session-storage|Сессия D7, LocalSession и временное хранилище]] · Разработка · box · проверено
 - [[concept-js-extensions|Расширения JS и CSS: свой bundle]] · Разработка · box · проверено
 - [[concept-component-structure|Компонент 2.0: структура, кэш, AJAX]] · Разработка · box · проверено
+- [[concept-web-vulnerabilities-bitrix|XSS, CSRF, SSRF, инъекции: чем закрывает ядро]] · Разработка · box · проверено
+- [[concept-proactive-security|Проактивная защита: уровни, 2FA, побочные эффекты]] · Администрирование · box
 - [[concept-d7-logging|Логирование D7: логгеры, уровни, настройка]] · Разработка · box · проверено
 - [[concept-datetime-and-timezones|Дата и время: Date, DateTime, часовые пояса]] · Разработка · box · проверено
 - [[concept-localization-lang-files|Локализация: Loc и языковые файлы]] · Разработка · box · проверено

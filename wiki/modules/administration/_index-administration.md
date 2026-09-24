@@ -25,6 +25,7 @@ updated: "2026-09-24"
 - [[recipe-custom-left-menu-section|Свой раздел в левом меню через Intranet\CustomSection]] · коробка
 - [[recipe-intranet-absence-import|Запись отсутствий из кода (импорт отпусков)]] · коробка · черновик
 - [[entity-quality-monitor|Монитор качества: проверка проекта перед сдачей]] · коробка
+- [[concept-proactive-security|Проактивная защита: уровни, 2FA, побочные эффекты]] · коробка
 
 ### Классы (справочник API, коробка)
 - [[entity-cintranet-utils|CIntranetUtils]] — оргструктура и отсутствия (C-API интранета)

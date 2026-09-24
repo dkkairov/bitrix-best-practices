@@ -28,6 +28,7 @@ updated: "2026-09-24"
 - [[recipe-git-deploy-to-production|Доставка правки на прод через git]]
 - [[checklist-windows-to-linux-deploy|Заливка с Windows на Linux-сервер: шесть тихих граблей]]
 - [[recipe-mysql-connection-refused|MySQL (2002) Connection refused: диагностика и подъём]]
+- [[checklist-box-security|Чек-лист безопасности коробки перед сдачей]]
 - [[recipe-box-backup|Резервная копия коробки: снять и восстановить]]
 - [[concept-multisite|Многосайтовость: один домен и разные домены]]
 - [[antipattern-cli-php-as-root|Антипаттерн: консольный PHP от root портит кэш портала]]

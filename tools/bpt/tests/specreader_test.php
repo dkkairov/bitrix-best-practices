@@ -113,3 +113,22 @@ steps: []
 ";
     assertSame(['n'], array_keys(SpecReader::parse($yaml, 'yaml')['variables']));
 });
+
+test('SpecReader: код-булево в поточном стиле тоже ловится', function () {
+    if (!SpecReader::hasYaml()) {
+        return;
+    }
+    // {n: ...} — тот же дефект, что и блочный ключ: код становится ключом 0.
+    $yaml = "bizproc: 1\nname: Тест\nvariables: {n: {Type: string}, amount: {Type: double}}\nsteps: []\n";
+    assertThrows(fn () => SpecReader::parse($yaml, 'yaml'), 'кавычк', 'поточный стиль');
+});
+
+test('SpecReader: блочный скаляр списком — не ложное срабатывание', function () {
+    if (!SpecReader::hasYaml()) {
+        return;
+    }
+    // «- |» вводит блочный скаляр без ключа перед ним; строки внутри — текст, а не ключи.
+    $yaml = "bizproc: 1\nname: Тест\nnotes:\n  - |\n    no: это текст, а не ключ\nsteps: []\n";
+    $spec = SpecReader::parse($yaml, 'yaml');
+    assertTrue(str_contains($spec['notes'][0], 'это текст'), 'блочный скаляр прочитан');
+});

@@ -72,8 +72,17 @@ final class Acceptance
                     $errors[] = "{$key}[{$i}]: нужны id и text";
                     continue;
                 }
+                if (in_array($id, array_column(array_merge($out['defects'], $out['traps']), 'id'), true)) {
+                    // Итог считается по id: повтор молча удвоил бы дефект или сделал ловушку
+                    // неотличимой от дефекта
+                    $errors[] = "{$key}[{$i}]: id «{$id}» уже занят";
+                    continue;
+                }
                 $out[$key][] = ['id' => $id, 'text' => $text];
             }
+        }
+        if ($out['kind'] !== 'modify' && $out['preserved']) {
+            $errors[] = 'preserved: только для вида «modify» — сохранять нечего';
         }
         // Вид задачи диктует, чем её вообще можно оценить: ревью — списком дефектов, правка —
         // сценариями на стенде. Без этой проверки задача молча превратилась бы в «0 из 0».

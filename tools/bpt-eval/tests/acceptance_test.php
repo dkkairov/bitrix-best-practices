@@ -107,3 +107,18 @@ test('Acceptance: неизвестный вид задачи — ошибка', 
     assertThrows(fn () => Acceptance::fromArray(['task' => 'X', 'document' => 'Заявки', 'kind' => 'аудит',
         'checklist' => ['x']], 'x'), 'kind', 'неизвестный вид');
 });
+
+test('Acceptance: одинаковые id дефектов и ловушек — ошибка', function () {
+    assertThrows(fn () => Acceptance::fromArray(['task' => 'R01', 'document' => 'Заявки', 'kind' => 'review',
+        'input' => 'i.yaml', 'defects' => [['id' => 'dup', 'text' => 'раз'], ['id' => 'dup', 'text' => 'два']]], 'x'),
+        'id', 'повтор внутри списка');
+    assertThrows(fn () => Acceptance::fromArray(['task' => 'R01', 'document' => 'Заявки', 'kind' => 'review',
+        'input' => 'i.yaml', 'defects' => [['id' => 'same', 'text' => 'дефект']],
+        'traps' => [['id' => 'same', 'text' => 'ловушка']]], 'x'), 'id', 'дефект и ловушка с одним id');
+});
+
+test('Acceptance: preserved — только для правки', function () {
+    assertThrows(fn () => Acceptance::fromArray(['task' => 'R01', 'document' => 'Заявки', 'kind' => 'review',
+        'input' => 'i.yaml', 'preserved' => ['Шаг'],
+        'defects' => [['id' => 'd', 'text' => 'дефект']]], 'x'), 'preserved', 'ревью не имеет своих шагов');
+});

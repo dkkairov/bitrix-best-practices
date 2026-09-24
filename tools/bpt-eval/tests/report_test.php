@@ -152,7 +152,7 @@ function reviewFixture(array $score): Report
 }
 
 test('Отчёт: ревью — нашёл все дефекты и не купился на ловушку', function () {
-    $row = reviewFixture(['defects' => [['id' => 'stage-midway', 'found' => true], ['id' => 'no-timeout', 'found' => true]],
+    $row = reviewFixture(['defects' => [['id' => 'stage-midway', 'found' => true, 'quote' => 'ц'], ['id' => 'no-timeout', 'found' => true, 'quote' => 'ц']],
         'traps' => [['id' => 'msgtype-4', 'flagged' => false]]])->rows()['R01'];
     assertSame('2/2', $row['checklist']);
     assertSame('—', $row['scenarios']);
@@ -160,14 +160,14 @@ test('Отчёт: ревью — нашёл все дефекты и не куп
 });
 
 test('Отчёт: ревью — пропущенный дефект не даёт «пройдена»', function () {
-    $row = reviewFixture(['defects' => [['id' => 'stage-midway', 'found' => true], ['id' => 'no-timeout', 'found' => false]],
+    $row = reviewFixture(['defects' => [['id' => 'stage-midway', 'found' => true, 'quote' => 'ц'], ['id' => 'no-timeout', 'found' => false]],
         'traps' => [['id' => 'msgtype-4', 'flagged' => false]]])->rows()['R01'];
     assertSame('1/2', $row['checklist']);
     assertTrue(!$row['passed'], 'дефект пропущен');
 });
 
 test('Отчёт: ревью — сработавшая ловушка валит задачу и попадает в заметку', function () {
-    $row = reviewFixture(['defects' => [['id' => 'stage-midway', 'found' => true], ['id' => 'no-timeout', 'found' => true]],
+    $row = reviewFixture(['defects' => [['id' => 'stage-midway', 'found' => true, 'quote' => 'ц'], ['id' => 'no-timeout', 'found' => true, 'quote' => 'ц']],
         'traps' => [['id' => 'msgtype-4', 'flagged' => true]]])->rows()['R01'];
     assertTrue(!$row['passed'], 'ложная тревога — не пройдена');
     assertTrue(str_contains($row['note'], 'ложная тревога'), "заметка называет причину: {$row['note']}");
@@ -182,4 +182,20 @@ test('Отчёт: правка — потерянные исходные шаг�
         'reason' => 'исходные шаги потеряны: Согласование юристом', 'category' => '', 'note' => '']];
     $row = Report::fromData($results, [], ['M01' => $acc], [], 'r')->rows()['M01'];
     assertTrue(!$row['passed'], 'шаблон переписан с нуля — не пройдена');
+});
+
+test('Отчёт: дефект без цитаты не засчитывается — как и пункт чек-листа', function () {
+    $row = reviewFixture(['defects' => [['id' => 'stage-midway', 'found' => true, 'quote' => 'видно в схеме'],
+        ['id' => 'no-timeout', 'found' => true, 'quote' => '']],
+        'traps' => [['id' => 'msgtype-4', 'flagged' => false]]])->rows()['R01'];
+    assertSame('1/2', $row['checklist']);
+    assertTrue(!$row['passed'], 'без цитаты дефект не считается найденным');
+});
+
+test('Отчёт: выдуманный проверяющим id ловушки не валит задачу', function () {
+    // Проверяющий — модель: опечатка в id не должна означать ложную тревогу у агента
+    $row = reviewFixture(['defects' => [['id' => 'stage-midway', 'found' => true, 'quote' => 'ц'],
+        ['id' => 'no-timeout', 'found' => true, 'quote' => 'ц']],
+        'traps' => [['id' => 'msgtype-опечатка', 'flagged' => true]]])->rows()['R01'];
+    assertTrue($row['passed'], 'ловушки с таким id в задаче нет — не считается');
 });

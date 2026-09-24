@@ -64,14 +64,19 @@ final class Report
         $defects = $acceptance?->defects() ?? [];
         $traps = $acceptance?->traps() ?? [];
         $found = $flagged = [];
+        // Цитата обязательна — то же правило, что у чек-листа: «нашёл» без подтверждения не считается
         foreach ($score['defects'] ?? [] as $item) {
-            if ($item['found'] ?? false) {
+            if (($item['found'] ?? false) && trim((string) ($item['quote'] ?? '')) !== '') {
                 $found[(string) ($item['id'] ?? '')] = true;
             }
         }
+        // Проверяющий — модель: id с опечаткой не должен означать ложную тревогу у агента,
+        // поэтому считаем только ловушки, которые в задаче действительно есть
+        $trapIds = array_column($traps, 'id');
         foreach ($score['traps'] ?? [] as $item) {
-            if ($item['flagged'] ?? false) {
-                $flagged[] = (string) ($item['id'] ?? '');
+            $id = (string) ($item['id'] ?? '');
+            if (($item['flagged'] ?? false) && in_array($id, $trapIds, true)) {
+                $flagged[] = $id;
             }
         }
         $foundCount = count(array_filter($defects, fn ($d) => isset($found[$d['id']])));

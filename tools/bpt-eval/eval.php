@@ -78,12 +78,16 @@ try {
             if ($task === '') {
                 throw new EvalException('нужна задача первым аргументом: input <задача> --run=<прогон>');
             }
-            $checker = new CheckRunner(Stand::fromEnv(), $root, $run);
-            $acceptance = Acceptance::load($checker->taskDir($task) . '/acceptance.yaml');
+            // Стенд здесь не нужен: шаблон собирается локально, из спецификации задачи
+            $taskDirs = glob("{$root}/tools/bpt-eval/tasks/{$task}-*", GLOB_ONLYDIR) ?: [];
+            if (count($taskDirs) !== 1) {
+                throw new EvalException("задача {$task}: папка tasks/{$task}-* не найдена или не одна");
+            }
+            $acceptance = Acceptance::load($taskDirs[0] . '/acceptance.yaml');
             if ($acceptance->input() === '') {
                 throw new EvalException("{$task}: у задачи вида «{$acceptance->kind()}» нет входного шаблона");
             }
-            $inputSpec = $checker->taskDir($task) . '/' . $acceptance->input();
+            $inputSpec = $taskDirs[0] . '/' . $acceptance->input();
             $snapshot = Snapshot::load("{$runDir}/portal.yaml");
             $compiled = (new Compiler(Catalog::load(), $snapshot, true))->compile(SpecReader::read($inputSpec));
             if ($compiled['errors']) {
@@ -105,7 +109,7 @@ try {
             $answer = $kind === 'review' ? 'review.md' : 'process.bizproc.yaml';
             $result = $checker->check($task, "{$runDir}/{$task}/{$answer}", "{$runDir}/{$task}");
             if ($kind === 'review') {
-                printf("%s: отчёт ревью %s" . PHP_EOL, $task, $result['reason'] ?: 'на месте');
+                printf("%s: %s" . PHP_EOL, $task, $result['reason'] ?: 'отчёт ревью на месте');
                 exit(0);
             }
             printf("%s: сборка %s, импорт %s, сценарии %d/%d%s\n", $task, $result['compile'], $result['import'],

@@ -8,6 +8,9 @@ declare(strict_types=1);
 
 final class SpecReader
 {
+    /** Слова, которые YAML 1.1 считает булевыми или пустым значением: ключ из такого слова теряется. */
+    private const BOOL_WORDS = 'n|y|on|off|yes|no|true|false|null|~';
+
     public static function hasYaml(): bool
     {
         return function_exists('yaml_parse');
@@ -44,8 +47,14 @@ final class SpecReader
     {
         $found = [];
         foreach (self::mappingLines($text) as $no => $line) {
-            if (preg_match('/^\s*(?:-\s+)?(n|y|on|off|yes|no|true|false|null|~)\s*:(?:\s|$)/ui', $line, $m)) {
-                $found[] = 'строка ' . $no . ': «' . trim($m[1]) . '»';
+            // Ключ в начале строки (блочный стиль) и ключ внутри {…} (поточный): «variables: {n: …}»
+            // теряется ровно так же, но под первое правило не попадает
+            foreach (['/^\s*(?:-\s+)?(' . self::BOOL_WORDS . ')\s*:(?:\s|$)/ui',
+                      '/[{,]\s*(' . self::BOOL_WORDS . ')\s*:/ui'] as $pattern) {
+                if (preg_match($pattern, $line, $m)) {
+                    $found[] = 'строка ' . $no . ': «' . trim($m[1]) . '»';
+                    break;
+                }
             }
         }
         if (!$found) {
@@ -75,7 +84,8 @@ final class SpecReader
                 $blockIndent = null;
             }
             $lines[$i + 1] = $line;
-            if (preg_match('/:\s*[|>][+-]?\d*\s*$/u', $line)) {
+            // Заголовок блочного скаляра: «EventText: |», «text: >-», а также элемент списка «- |»
+            if (preg_match('/(?::|^\s*-)\s*[|>][0-9+-]*\s*$/u', $line)) {
                 $blockIndent = $indent;
             }
         }

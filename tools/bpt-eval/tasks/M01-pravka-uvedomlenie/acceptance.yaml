@@ -1,0 +1,32 @@
+# Правка готового шаблона. preserved — заголовки действий, которые обязаны уцелеть: если агент
+# собрал похожий процесс заново вместо правки, их не будет.
+task: M01
+document: Заявки
+kind: modify
+input: input.bizproc.yaml
+start: create
+item:
+  Сумма к оплате: 50000
+  Проект: Проект Альфа
+preserved:
+  - Согласование юристом
+  - Запись решения в историю
+scenarios:
+  - name: юрист согласовал — как было
+    steps:
+      - {task_for: Юристы, do: approve, comment: Юридически чисто}
+    expect:
+      stage: Согласовано
+      history_contains: [согласована]
+      process: completed
+  - name: юрист отказал — новое поведение
+    steps:
+      - {task_for: Юристы, do: reject, comment: Нет приложения к договору}
+    expect:
+      stage: Доработка
+      notify: [{to: Инициатор, contains: Нет приложения к договору}]
+      history_contains: [Нет приложения к договору]
+      process: completed
+checklist:
+  - Кому уведомление при отказе — создателю заявки или ответственному
+  - {text: Нужен ли срок на согласование, required: false}

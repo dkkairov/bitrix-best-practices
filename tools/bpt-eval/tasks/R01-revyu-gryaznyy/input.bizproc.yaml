@@ -1,0 +1,50 @@
+# Вход R01: намеренно с дефектами. Агенту выдаётся собранный .bpt, эту спецификацию он не видит.
+# Дефекты: «или» в первой строке условия; смена стадии раньше записи в историю; задание без срока
+# при запрете делегирования. Ловушки (верно, но выглядит подозрительно): MessageType 4 в ветке
+# отказа; ветка «иначе» условием «Истина».
+bizproc: 1
+name: EVAL R01 вход
+steps:
+  - approve:
+      id: lawyer
+      Users: ["{{user:Юрист Тест}}"]
+      ApproveType: any
+      CommentRequired: "YR"
+      DelegationType: "2"
+      Name: "Согласуйте заявку «{=Document:TITLE}»"
+      on_yes:
+        - if:
+            title: Крупная сумма?
+            branches:
+              - title: Больше 100 000
+                when:
+                  fieldcondition:
+                    - ["{{field:Сумма к оплате}}", ">", "100000", "1"]
+                    - ["{{field:Проект}}", "!empty", "", "0"]
+                steps:
+                  - approve:
+                      id: fin
+                      Users: ["{{user:Финансовый директор Тест}}"]
+                      ApproveType: any
+                      Name: "Согласуйте крупную заявку «{=Document:TITLE}»"
+                      on_yes:
+                        - crm_event:
+                            EventText: "Согласовано финансовым директором"
+                            EventUser: ["{=@fin:LastApprover}"]
+                        - change_stage: {TargetStatus: "{{stage:Согласовано}}"}
+                      on_no:
+                        - change_stage: {TargetStatus: "{{stage:Доработка}}"}
+              - title: Обычная заявка
+                else: true
+                steps:
+                  - change_stage: {TargetStatus: "{{stage:Согласовано}}"}
+                  - crm_event:
+                      EventText: "Согласовано юристом: {=@lawyer:Comments}"
+                      EventUser: ["{=@lawyer:LastApprover}"]
+      on_no:
+        - notify:
+            MessageSite: "Юрист отклонил заявку «{=Document:TITLE}»: {=@lawyer:Comments}"
+            MessageType: "4"
+            MessageUserFrom: ["{{user:Инженер ПТО Тест}}"]
+            MessageUserTo: ["{=Document:CREATED_BY}"]
+        - change_stage: {TargetStatus: "{{stage:Доработка}}"}

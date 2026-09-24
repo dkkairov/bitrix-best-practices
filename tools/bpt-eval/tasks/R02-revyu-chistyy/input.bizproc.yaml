@@ -1,0 +1,27 @@
+# Вход R02: шаблон почти корректный. Единственный дефект — отправитель уведомления взят из
+# «Последнего голосовавшего» при заданном сроке: по таймауту ветка «нет» срабатывает без голосующего.
+# Остальное — ловушки: ApproveType any при одном согласующем, отсутствие смены стадии в начале,
+# инициатор через CREATED_BY.
+bizproc: 1
+name: EVAL R02 вход
+steps:
+  - approve:
+      id: lawyer
+      Users: ["{{group:Юристы}}"]
+      ApproveType: any
+      CommentRequired: "YR"
+      TimeoutDuration: "3"
+      TimeoutDurationType: "d"
+      Name: "Согласуйте заявку «{=Document:TITLE}»"
+      Description: "Сумма: {=Document:{{field:Сумма к оплате}} > printable}"
+      on_yes:
+        - crm_event:
+            EventText: "Заявка согласована юристом"
+            EventUser: ["{=@lawyer:LastApprover}"]
+        - change_stage: {TargetStatus: "{{stage:Согласовано}}"}
+      on_no:
+        - notify:
+            MessageSite: "Юрист отклонил заявку «{=Document:TITLE}»: {=@lawyer:Comments}"
+            MessageUserFrom: ["{=@lawyer:LastApprover}"]
+            MessageUserTo: ["{=Document:CREATED_BY}"]
+        - change_stage: {TargetStatus: "{{stage:Доработка}}"}

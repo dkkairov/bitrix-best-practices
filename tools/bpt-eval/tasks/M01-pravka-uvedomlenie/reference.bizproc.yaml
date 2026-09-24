@@ -1,0 +1,33 @@
+# Эталон M01: исходный шаблон плюс ветка отказа. Агенту не показывается.
+bizproc: 1
+name: EVAL M01 эталон
+steps:
+  - approve:
+      id: lawyer
+      title: Согласование юристом
+      Users: ["{{group:Юристы}}"]
+      ApproveType: any
+      CommentRequired: "YR"
+      Name: "Согласуйте заявку «{=Document:TITLE}»"
+      on_yes:
+        - crm_event:
+            title: Запись решения в историю
+            EventText: "Заявка согласована юристом: {=@lawyer:Comments}"
+            EventUser: ["{=@lawyer:LastApprover}"]
+        - change_stage:
+            title: Перевод на «Согласовано»
+            TargetStatus: "{{stage:Согласовано}}"
+      on_no:
+        - crm_event:
+            title: Запись отказа в историю
+            EventText: "Юрист отклонил заявку: {=@lawyer:Comments}"
+            EventUser: ["{=@lawyer:LastApprover}"]
+        - notify:
+            title: Уведомление инициатору об отказе
+            MessageSite: "Заявка «{=Document:TITLE}» отклонена юристом: {=@lawyer:Comments}"
+            MessageType: "4"
+            MessageUserFrom: ["{=Document:CREATED_BY}"]
+            MessageUserTo: ["{=Document:CREATED_BY}"]
+        - change_stage:
+            title: Возврат на «Доработку»
+            TargetStatus: "{{stage:Доработка}}"

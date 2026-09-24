@@ -1,0 +1,21 @@
+# Вход M01: рабочий шаблон без ветки отказа. Агент получает собранный .bpt и должен его доработать,
+# а не собрать похожий заново — за это отвечают заголовки из preserved.
+bizproc: 1
+name: EVAL M01 вход
+steps:
+  - approve:
+      id: lawyer
+      title: Согласование юристом
+      Users: ["{{group:Юристы}}"]
+      ApproveType: any
+      CommentRequired: "YR"
+      Name: "Согласуйте заявку «{=Document:TITLE}»"
+      on_yes:
+        - crm_event:
+            title: Запись решения в историю
+            EventText: "Заявка согласована юристом: {=@lawyer:Comments}"
+            EventUser: ["{=@lawyer:LastApprover}"]
+        - change_stage:
+            title: Перевод на «Согласовано»
+            TargetStatus: "{{stage:Согласовано}}"
+      on_no: []

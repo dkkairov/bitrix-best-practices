@@ -1,0 +1,43 @@
+# Эталон M02: тот же шаблон, но после юриста — финансовый директор. Агенту не показывается.
+bizproc: 1
+name: EVAL M02 эталон
+steps:
+  - approve:
+      id: lawyer
+      title: Согласование юристом
+      Users: ["{{group:Юристы}}"]
+      ApproveType: any
+      CommentRequired: "YR"
+      Name: "Согласуйте заявку «{=Document:TITLE}»"
+      on_yes:
+        - approve:
+            id: fin
+            title: Согласование финансовым директором
+            Users: ["{{user:Финансовый директор Тест}}"]
+            ApproveType: any
+            CommentRequired: "YR"
+            Name: "Согласуйте заявку «{=Document:TITLE}» после юриста"
+            on_yes:
+              - change_stage:
+                  title: Перевод на «Согласовано»
+                  TargetStatus: "{{stage:Согласовано}}"
+            on_no:
+              - notify:
+                  title: Уведомление инициатору об отказе финансового директора
+                  MessageSite: "Заявка «{=Document:TITLE}» отклонена: {=@fin:Comments}"
+                  MessageType: "4"
+                  MessageUserFrom: ["{=Document:CREATED_BY}"]
+                  MessageUserTo: ["{=Document:CREATED_BY}"]
+              - change_stage:
+                  title: Возврат на «Доработку» после финансового директора
+                  TargetStatus: "{{stage:Доработка}}"
+      on_no:
+        - notify:
+            title: Уведомление инициатору об отказе
+            MessageSite: "Заявка «{=Document:TITLE}» отклонена: {=@lawyer:Comments}"
+            MessageType: "4"
+            MessageUserFrom: ["{=Document:CREATED_BY}"]
+            MessageUserTo: ["{=Document:CREATED_BY}"]
+        - change_stage:
+            title: Возврат на «Доработку»
+            TargetStatus: "{{stage:Доработка}}"

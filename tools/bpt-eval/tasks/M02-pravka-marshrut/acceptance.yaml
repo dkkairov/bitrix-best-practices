@@ -1,0 +1,39 @@
+# Правка маршрута: добавляется второй согласующий. Проверяем и новое поведение, и то, что старое
+# не сломалось (отказ юриста по-прежнему уведомляет инициатора и возвращает на доработку).
+task: M02
+document: Заявки
+kind: modify
+input: input.bizproc.yaml
+start: create
+item:
+  Сумма к оплате: 250000
+  Проект: Проект Альфа
+preserved:
+  - Согласование юристом
+scenarios:
+  - name: согласовали оба
+    steps:
+      - {task_for: Юристы, do: approve, comment: Юридически чисто}
+      - {task_for: Финансовый директор, do: approve, comment: Бюджет есть}
+    expect:
+      stage: Согласовано
+      process: completed
+  - name: юрист отказал — как было
+    steps:
+      - {task_for: Юристы, do: reject, comment: Нет приложения к договору}
+    expect:
+      stage: Доработка
+      notify: [{to: Инициатор, contains: Нет приложения к договору}]
+      no_task_for: [Финансовый директор]
+      process: completed
+  - name: финансовый директор отказал
+    steps:
+      - {task_for: Юристы, do: approve, comment: Юридически чисто}
+      - {task_for: Финансовый директор, do: reject, comment: Нет бюджета в этом квартале}
+    expect:
+      stage: Доработка
+      notify: [{to: Инициатор, contains: Нет бюджета в этом квартале}]
+      process: completed
+checklist:
+  - Порядок согласующих — сначала юрист, потом финансовый директор
+  - {text: Уведомлять ли юриста, когда финансовый директор отказал после его согласования, required: false}

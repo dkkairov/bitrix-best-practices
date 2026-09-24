@@ -5,12 +5,12 @@ module: core-d7
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-23 / курс 43 «Разработчик Bitrix Framework» (уроки 4803, 2244) + коробка в Docker, main 26.750.0: наличие isCacheable(), алиасы Entity\\* на ORM\\*, состав полей через getEntity()"
+verified: "2026-09-23 / курс 43 «Разработчик Bitrix Framework» (уроки 4803, 2244) + коробка в Docker, main 26.750.0: наличие isCacheable(), алиасы Entity\\* на ORM\\*, состав полей через getEntity(); 2026-09-24 — полный состав классов main/lib/ORM/Fields сверен по ядру стенда и docs.1c-bitrix.ru"
 tags: [orm, d7, datamanager, сущность, поля, кэш]
 sources: ["[[source-course43-orm-events]]"]
 related: ["[[concept-d7-orm-query]]", "[[recipe-d7-orm-crud]]", "[[concept-d7-orm-objects]]", "[[concept-orm-datamanager-events]]", "[[concept-bitrix-naming-conventions]]"]
 aliases: []
-updated: "2026-09-23"
+updated: "2026-09-24"
 ---
 
 # Сущность ORM: Table-класс и описание полей
@@ -96,8 +96,8 @@ class BookTable extends DataManager
 
 ## Типы полей
 
-Восемь скалярных типов (`ScalarField`): целое, число, строка, текст, дата, дата-время, да/нет,
-значение из списка. Два требуют настройки значений:
+Курс называет восемь скалярных типов (`ScalarField`): целое, число, строка, текст, дата,
+дата-время, да/нет, значение из списка. Два из них требуют настройки значений:
 
 ```php
 (new Fields\BooleanField('IS_ARCHIVED'))->configureValues('N', 'Y'),   // false, true
@@ -106,6 +106,27 @@ class BookTable extends DataManager
 
 `BooleanField` хранит в базе пару значений, а в коде работает с `true`/`false` — в объектах
 приведение строгое ([[concept-d7-orm-objects]]).
+
+**Типов в ядре больше восьми.** Состав `main/lib/ORM/Fields` на стенде (26.750.0) совпадает с тем,
+что показывает [новая документация фреймворка](https://docs.1c-bitrix.ru/pages/orm/orm-concepts.html):
+
+| Класс | Наследует | Когда нужен |
+|---|---|---|
+| `IntegerField`, `FloatField`, `StringField`, `DateField` | `ScalarField` | базовые скаляры |
+| `TextField` | `StringField` | длинный текст |
+| `DatetimeField` | `DateField` | дата со временем |
+| `DecimalField` | `FloatField` | фиксированная точность: деньги, количества |
+| `BooleanField`, `EnumField` | `ScalarField` | пара значений / список, оба с `configureValues()` |
+| `ArrayField` | `ScalarField` | массив: `configureSerializationJson()`, `configureSerializationPhp()` или своя пара `configureSerializeCallback()` / `configureUnserializeCallback()` |
+| `JsonField` | `ScalarField` | JSON-значение |
+| `ObjectField` | `ScalarField` | объект: `configureObjectClass()` плюс те же callback'и |
+| `CryptoField` | `TextField` | шифрование при записи и расшифровка при чтении; ключ — параметр `crypto_key` поля или `crypto` → `crypto_key` из `.settings.php`, без ключа поле ведёт себя как обычный текст |
+| `SecretField` | `CryptoField` | секрет с генерацией значения: `configureSecretLength()` |
+| `UserTypeField` | `ExpressionField` | UF-поле; в `getMap()` руками не пишем — его добавляет ядро по `getUfId()` |
+| `ExpressionField` | `Field` | вычисляемое поле, только чтение (ниже) |
+
+`ArrayField` и `ObjectField` — штатная замена ярлыку `serialized`: способ сериализации задаётся
+явно, а JSON вместо `serialize()` читается человеком и переживает переименование класса.
 
 ## Вычисляемые поля (ExpressionField)
 

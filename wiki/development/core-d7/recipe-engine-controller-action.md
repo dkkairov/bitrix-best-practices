@@ -5,7 +5,7 @@ module: core-d7
 edition: box
 status: verified
 provenance: mixed
-verified: "2026-09-24 / коробка в Docker, main 26.750.0: у Engine\\Controller есть configureActions, processBeforeAction, processAfterAction, addError, getAutoWiredParameters, renderView, renderComponent, renderExtension; классы ответов AjaxJson, Json, Component, File, BFile, ResizedImage, Redirect и фильтры-атрибуты Authentication, HttpMethod, Csrf, Scope, ContentType, CloseSession на месте; текст — документация фреймворка (docs.1c-bitrix.ru, «Контроллеры»)"
+verified: "2026-09-24 / коробка в Docker, main 26.750.0: фильтры по умолчанию (Authentication, HttpMethod GET+POST, Csrf) и полный состав ActionFilter — по исходнику Controller.php; у Engine\\Controller есть configureActions, processBeforeAction, processAfterAction, addError, getAutoWiredParameters, renderView, renderComponent, renderExtension; классы ответов AjaxJson, Json, Component, File, BFile, ResizedImage, Redirect и фильтры-атрибуты Authentication, HttpMethod, Csrf, Scope, ContentType, CloseSession на месте; текст — документация фреймворка (docs.1c-bitrix.ru, «Контроллеры»)"
 tags: [контроллер, ajax, действия, фильтры, атрибуты, engine]
 sources: []
 related: ["[[concept-routing]]", "[[antipattern-ajax-controller-lowercase-name]]", "[[concept-validation-d7]]", "[[entity-main-result]]", "[[concept-service-locator]]"]
@@ -78,9 +78,31 @@ public function saveAction(): array { ... }
 > **Нельзя настраивать одно действие и через `configureActions()`, и атрибутами** — контроллер
 > ответит `Invalid configuration of actions`. Выбираем один способ на действие.
 
-Доступные фильтры на стенде: `Authentication`, `HttpMethod`, `Csrf`, `Scope`, `ContentType`,
-`CloseSession`. Последний важен для долгих действий: он снимает блокировку сессии, и параллельные
-запросы перестают ждать.
+**Фильтры по умолчанию** (из исходника `Controller::getDefaultPreFilters()`, 26.750.0):
+`Authentication`, `HttpMethod([GET, POST])`, `Csrf`. Постфильтров по умолчанию нет. Переопределить
+набор для всего контроллера — `getDefaultPreFilters()` / `getDefaultPostFilters()`.
+
+Состав `Bitrix\Main\Engine\ActionFilter\` на стенде шире, чем список документации:
+`Authentication`, `HttpMethod`, `Csrf`, `Scope`, `ContentType`, `CloseSession`, `Cors`, `Token`,
+`PostDecode`, `Access`, `AccessCheck`, `ClosureWrapper`. `CloseSession` важен для долгих действий:
+он снимает блокировку сессии, и параллельные запросы перестают ждать ([[concept-d7-session-storage]]);
+`Cors` ставит заголовки для запросов со стороннего домена.
+
+Синтаксис настройки:
+
+| Приём | Что делает |
+|---|---|
+| `'+prefilters' => [new MyFilter()]` | добавить фильтр к умолчанию |
+| `'-prefilters' => [Csrf::class]` | снять фильтр |
+| `#[Prefilters([...])]`, `#[Postfilters([...])]` | задать набор атрибутом |
+| `#[EnablePrefilters([...])]`, `#[DisablePrefilters([...])]` (и `*Postfilters`) | добавить или снять |
+
+Атрибуты лежат в `Engine\ActionFilter\Attribute\Rule\`: `Authentication`, `HttpMethod`, `Csrf`,
+`Scope`, `ContentType`, `CloseSession`, `Cors`, `Token`, плюс перечисленные `*filters`.
+
+**Свой фильтр** — наследник `Engine\ActionFilter\Base` с методами `onBeforeAction(Event $event)` и
+`onAfterAction(Event $event)`. Вернуть `EventResult` со статусом `ERROR` — прервать действие;
+подменить ответ — `$event->setParameter('result', …)`.
 
 ## Жизненный цикл действия
 

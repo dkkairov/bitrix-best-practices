@@ -7,6 +7,23 @@
 
 ## 2026-09
 
+- **2026-09-24 — ingest: документация фреймворка, «Основы фреймворка» (часть 4, раздел закрыт)** —
+  дочитаны оставшиеся темы, новых страниц не потребовалось:
+  - **пре- и постфильтры** — дополнили [[recipe-engine-controller-action]]: фильтры по умолчанию
+    взяты из исходника (`Authentication`, `HttpMethod` c `GET`+`POST`, `Csrf`; постфильтров нет),
+    состав `Engine\ActionFilter\` на стенде шире документации (ещё `Cors`, `Token`, `PostDecode`,
+    `Access`, `AccessCheck`, `ClosureWrapper`), добавлены атрибуты `#[Prefilters]`,
+    `#[EnablePrefilters]`, `#[DisablePrefilters]` и рецепт своего фильтра на `ActionFilter\Base`;
+  - **автозагрузка** — в [[concept-code-namespaces-and-autoloading]] добавлен
+    `Loader::registerNamespace()` (PSR-4) и порядок поиска класса;
+  - **валидация** — в [[concept-validation-d7]] отмечено, что состав из шестнадцати правил
+    перепроверен на стенде, а документация о группах валидации не пишет (у нас они разобраны);
+  - **агенты и фоновые задачи** — ограничения агентов (`$USER`, `SITE_ID`, язык) в
+    [[pattern-agents-vs-cron]] уже описаны и совпали с документацией, правок не потребовалось;
+  - **архитектура** — обзорная страница, фактов сверх уже описанного нет.
+
+  Раздел `framework` в манифесте и бэклоге отмечен как пройденный.
+
 - **2026-09-24 — ingest: документация фреймворка, «Основы фреймворка» (часть 3)** — заведён раздел
   [components](../wiki/development/components/_index-components.md): [[concept-component-structure]]
   (файлы компонента, `CBitrixComponent`, кэш и `SetResultCacheKeys`, `result_modifier` против

@@ -10,7 +10,7 @@ tags: [d7, namespaces, автозагрузка, local, разработка]
 sources: ["[[source-bxfw-course43-namespaces]]", "[[source-devbook-dev-rules]]"]
 related: ["[[antipattern-box-core-modification]]", "[[recipe-module-structure-and-install]]", "[[pattern-local-solution-structure]]", "[[entity-local-directory]]"]
 aliases: ["code-namespaces-and-autoloading"]
-updated: "2026-09-23"
+updated: "2026-09-24"
 ---
 
 # Организация кода: пространства имён и автозагрузка
@@ -39,6 +39,17 @@ updated: "2026-09-23"
       'Vendor\\Module\\Foo' => 'lib/foo.php',
   ]);
   ```
+- **Целое пространство имён по PSR-4** регистрируется одной строкой (метод есть в ядре 26.750.0,
+  документация фреймворка называет его основным способом):
+  ```php
+  \Bitrix\Main\Loader::registerNamespace('Vendor\\Module', '/local/modules/vendor.module/lib');
+  ```
+  Парный метод — `unregisterNamespace()`. Регистрацию кладём в `include.php` модуля: ядро
+  подключает этот файл при `includeModule()`.
+- **Порядок поиска класса:** сначала то, что зарегистрировано через `registerAutoLoadClasses`,
+  затем PSR-4-пространства, и только потом ошибка «класс не найден». Отсюда практическое следствие:
+  если класс упорно «не находится», сначала проверяем, какой из двух механизмов должен был его
+  отдать.
 
 ## Сокращение путей через `use`
 ```php

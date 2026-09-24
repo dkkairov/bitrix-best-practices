@@ -10,7 +10,7 @@ tags: [d7, валидация, атрибуты, dto, контроллеры, re
 sources: ["[[source-devbook-core-d7]]"]
 related: ["[[concept-service-locator]]", "[[concept-coding-standards]]", "[[concept-change-invasiveness-hierarchy]]", "[[antipattern-ajax-controller-lowercase-name]]", "[[recipe-d7-custom-validation-rule]]", "[[entity-validation-service]]", "[[entity-validation-result]]"]
 aliases: ["bitrix24-validacia"]
-updated: "2026-09-22"
+updated: "2026-09-24"
 ---
 
 # Валидация D7
@@ -89,6 +89,13 @@ if (!$result->isSuccess()) {
 | `RegExp` | `pattern`, `flags`, `offset` (`preg_match`) |
 | `ElementsType` | тип из `Bitrix\Main\Validation\Rule\Enum\Type` (`Integer`, `String`, `Float`, `Numeric`) или класс |
 | `Json`, `Phone`, `Url` | — |
+
+Состав каталога перепроверен на стенде 2026-09-24 (main 26.750.0): все шестнадцать правил выше
+лежат в `Bitrix\Main\Validation\Rule\`, там же `AbstractPropertyValidationAttribute`,
+`AbstractClassValidationAttribute`, их интерфейсы и `ValidateByGroupInterface`. Документация
+фреймворка ([«Валидация»](https://docs.1c-bitrix.ru/pages/framework/validation.html)) перечисляет
+тот же набор, но **о группах валидации не пишет вовсе** — у нас они разобраны ниже и проверены
+прогоном.
 
 Почти все правила принимают `errorMessage` — строку или локализуемое сообщение; исключение — `Json`.
 Правила ставят и на свойства, и на параметры (в том числе promoted-параметры конструктора и

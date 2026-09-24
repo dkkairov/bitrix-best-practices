@@ -67,3 +67,43 @@ test('Проверки: загрузка из файла', function () {
     file_put_contents($path, SpecReader::dump(acceptanceData()));
     assertSame('T04', Acceptance::load($path)->task());
 });
+
+test('Acceptance: вид задачи — build по умолчанию', function () {
+    $acc = Acceptance::fromArray(['task' => 'T01', 'document' => 'Заявки', 'checklist' => ['Срок']], 'x');
+    assertSame('build', $acc->kind());
+    assertSame([], $acc->defects());
+    assertSame([], $acc->traps());
+});
+
+test('Acceptance: ревью требует вход и список дефектов', function () {
+    assertThrows(fn () => Acceptance::fromArray(['task' => 'R01', 'document' => 'Заявки', 'kind' => 'review',
+        'checklist' => ['x']], 'x'), 'input', 'ревью без входного шаблона');
+    assertThrows(fn () => Acceptance::fromArray(['task' => 'R01', 'document' => 'Заявки', 'kind' => 'review',
+        'input' => 'input.bizproc.yaml', 'checklist' => ['x']], 'x'), 'defects', 'ревью без дефектов');
+});
+
+test('Acceptance: дефекты и ловушки разбираются с id и текстом', function () {
+    $acc = Acceptance::fromArray(['task' => 'R01', 'document' => 'Заявки', 'kind' => 'review',
+        'input' => 'input.bizproc.yaml',
+        'defects' => [['id' => 'stage-midway', 'text' => 'Смена стадии в середине ветки']],
+        'traps' => [['id' => 'msgtype-4', 'text' => 'MessageType 4 в ветке отказа — так и надо']]], 'x');
+    assertSame('review', $acc->kind());
+    assertSame('input.bizproc.yaml', $acc->input());
+    assertSame([['id' => 'stage-midway', 'text' => 'Смена стадии в середине ветки']], $acc->defects());
+    assertSame([['id' => 'msgtype-4', 'text' => 'MessageType 4 в ветке отказа — так и надо']], $acc->traps());
+});
+
+test('Acceptance: правка требует вход и сценарии, preserved — список заголовков', function () {
+    assertThrows(fn () => Acceptance::fromArray(['task' => 'M01', 'document' => 'Заявки', 'kind' => 'modify',
+        'scenarios' => [['name' => 's', 'steps' => [], 'expect' => ['stage' => 'Клиент']]]], 'x'),
+        'input', 'правка без входного шаблона');
+    $acc = Acceptance::fromArray(['task' => 'M01', 'document' => 'Заявки', 'kind' => 'modify',
+        'input' => 'input.bizproc.yaml', 'preserved' => ['Согласование юристом'],
+        'scenarios' => [['name' => 's', 'steps' => [], 'expect' => ['stage' => 'Клиент']]]], 'x');
+    assertSame(['Согласование юристом'], $acc->preserved());
+});
+
+test('Acceptance: неизвестный вид задачи — ошибка', function () {
+    assertThrows(fn () => Acceptance::fromArray(['task' => 'X', 'document' => 'Заявки', 'kind' => 'аудит',
+        'checklist' => ['x']], 'x'), 'kind', 'неизвестный вид');
+});

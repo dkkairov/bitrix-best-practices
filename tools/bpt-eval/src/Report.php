@@ -18,7 +18,7 @@ final class Report
 
     public static function fromRunDir(string $runDir, string $tasksDir): self
     {
-        $results = $checklists = $acceptances = [];
+        $results = $checklists = $acceptances = $scores = [];
         foreach (glob(rtrim($runDir, '/\\') . '/*/result.json') ?: [] as $file) {
             $result = self::readJson($file);
             $task = (string) $result['task'];
@@ -34,6 +34,14 @@ final class Report
                     $checklists[$task] = ['items' => [], 'broken' => true];
                 }
             }
+            $scoreFile = dirname($file) . '/review_score.json';
+            if (is_file($scoreFile)) {
+                try {
+                    $scores[$task] = self::readJson($scoreFile);
+                } catch (EvalException $e) {
+                    $scores[$task] = ['defects' => [], 'traps' => []];   // битый файл — дефекты считаем ненайденными
+                }
+            }
             $taskDirs = glob(rtrim($tasksDir, '/\\') . "/{$task}-*", GLOB_ONLYDIR) ?: [];
             if ($taskDirs) {
                 $acceptances[$task] = Acceptance::load($taskDirs[0] . '/acceptance.yaml');
@@ -42,7 +50,54 @@ final class Report
         $agentsFile = rtrim($runDir, '/\\') . '/agents.json';
         $agents = is_file($agentsFile) ? self::readJson($agentsFile) : [];
         ksort($results);
-        return self::fromData($results, $checklists, $acceptances, $agents, basename(rtrim($runDir, '/\\')));
+        return self::fromData($results, $checklists, $acceptances, $agents, basename(rtrim($runDir, '/\\')), $scores);
+    }
+
+    /**
+     * Строка отчёта для задачи-ревью. Здесь нет ни сборки, ни сценариев: итог считается по эталону —
+     * сколько дефектов из списка агент нашёл и не поднял ли тревогу по ловушке (верному месту,
+     * которое выглядит подозрительно). Ловушки нужны, чтобы нельзя было «найти всё», перечислив
+     * полсотни замечаний.
+     */
+    private static function reviewRow(string $task, array $r, ?Acceptance $acceptance, ?array $score, array $agent): array
+    {
+        $defects = $acceptance?->defects() ?? [];
+        $traps = $acceptance?->traps() ?? [];
+        $found = $flagged = [];
+        foreach ($score['defects'] ?? [] as $item) {
+            if ($item['found'] ?? false) {
+                $found[(string) ($item['id'] ?? '')] = true;
+            }
+        }
+        foreach ($score['traps'] ?? [] as $item) {
+            if ($item['flagged'] ?? false) {
+                $flagged[] = (string) ($item['id'] ?? '');
+            }
+        }
+        $foundCount = count(array_filter($defects, fn ($d) => isset($found[$d['id']])));
+        $note = (string) ($r['note'] ?? '');
+        if ($flagged) {
+            $note = trim($note . '; ложная тревога: ' . implode(', ', $flagged), '; ');
+        }
+        if ($score === null && $defects) {
+            $note = trim($note . '; ревью не проверено', '; ');
+        }
+        return [
+            'task' => $task,
+            'compile' => '—',
+            'import' => '—',
+            'scenarios' => '—',
+            'checklist' => "{$foundCount}/" . count($defects),
+            'passed' => $score !== null && !($r['reason'] ?? '') && $foundCount === count($defects) && !$flagged,
+            'category' => (string) ($r['category'] ?? ''),
+            'reason' => (string) ($r['reason'] ?? ''),
+            'note' => $note,
+            // Не проверенное ревью не входит в долю — как и задача без чек-листа: это забытый шаг
+            // прогона, а не провал навыка
+            'counted' => ($r['category'] ?? '') !== 'harness' && !($score === null && $defects),
+            'tokens' => $agent['tokens'] ?? null,
+            'minutes' => isset($agent['duration_ms']) ? round($agent['duration_ms'] / 60000, 1) : null,
+        ];
     }
 
     /**
@@ -68,10 +123,15 @@ final class Report
         }
     }
 
-    public static function fromData(array $results, array $checklists, array $acceptances, array $agents, string $run): self
+    public static function fromData(array $results, array $checklists, array $acceptances, array $agents, string $run, array $scores = []): self
     {
         $rows = [];
         foreach ($results as $task => $r) {
+            if (($r['kind'] ?? 'build') === 'review') {
+                $rows[$task] = self::reviewRow((string) $task, $r, $acceptances[$task] ?? null,
+                    $scores[$task] ?? null, $agents[$task] ?? []);
+                continue;
+            }
             $scenarios = $r['scenarios'] ?? [];
             $ok = count(array_filter($scenarios, fn ($s) => $s['ok'] ?? false));
             // Знаменатель — сценарии задачи: упавший импорт или константы не должны давать «0 из 0»
@@ -105,7 +165,8 @@ final class Report
                 'import' => $r['import'] ?? 'fail',
                 'scenarios' => "{$ok}/{$expected}",
                 'checklist' => count($raised) . '/' . count($items),
-                'passed' => $compileOk && $importOk && $ok === $expected && $requiredRaised === count($required),
+                'passed' => $compileOk && $importOk && $ok === $expected && $requiredRaised === count($required)
+                    && !($r['preserved_missing'] ?? []),
                 'category' => (string) ($r['category'] ?? ''),
                 'reason' => (string) ($r['reason'] ?? ''),
                 'note' => $note,

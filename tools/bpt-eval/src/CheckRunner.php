@@ -32,9 +32,18 @@ final class CheckRunner
         if (!is_dir($outDir) && !@mkdir($outDir, 0777, true)) {
             throw new EvalException("не удалось создать каталог задачи: {$outDir}");
         }
-        $result = ['task' => $task, 'run' => $this->run, 'spec' => $specFile, 'compile' => 'skip', 'compile_errors' => [],
-            'import' => 'skip', 'import_error' => '', 'template_id' => null, 'constants_matched' => [],
-            'constants_unmatched' => [], 'scenarios' => [], 'reason' => '', 'category' => '', 'note' => '', 'cleanup_error' => ''];
+        $result = ['task' => $task, 'run' => $this->run, 'kind' => $acceptance->kind(), 'spec' => $specFile,
+            'compile' => 'skip', 'compile_errors' => [], 'import' => 'skip', 'import_error' => '', 'template_id' => null,
+            'constants_matched' => [], 'constants_unmatched' => [], 'scenarios' => [], 'preserved_missing' => [],
+            'reason' => '', 'category' => '', 'note' => '', 'cleanup_error' => ''];
+        // Ревью не даёт своего процесса: оценивать нечего ни на сборке, ни на стенде — итог считается
+        // по списку дефектов и ловушек (review_score.json), его пишет проверяющий, как и чек-лист.
+        if ($acceptance->kind() === 'review') {
+            if (!is_file($specFile)) {
+                $result['reason'] = 'нет отчёта ревью';
+            }
+            return $this->save($outDir, $result);
+        }
         if (!is_file($specFile)) {
             if ($acceptance->scenarios()) {   // задача со сценариями без решения — провал, а не «0 из 0»
                 $result['compile'] = 'fail';
@@ -52,6 +61,16 @@ final class CheckRunner
             return $this->save($outDir, $result);
         }
         $result['compile'] = 'ok';
+        // Правка готового шаблона: агент обязан изменить процесс, а не собрать похожий заново.
+        // Сторожим по заголовкам действий из задачи — они переживают decompile и пересборку.
+        if ($acceptance->kind() === 'modify' && $acceptance->preserved()) {
+            $titles = self::titles($compiled['bpt']['TEMPLATE'] ?? []);
+            $missing = array_values(array_filter($acceptance->preserved(), fn ($t) => !in_array($t, $titles, true)));
+            if ($missing) {
+                $result['preserved_missing'] = $missing;
+                $result['reason'] = 'исходные шаги потеряны: ' . implode('; ', $missing);
+            }
+        }
         $bptFile = "{$outDir}/eval.bpt";
         BptFile::write($bptFile, $compiled['bpt'], null, true);
 
@@ -113,6 +132,27 @@ final class CheckRunner
             }
         }
         return $this->save($outDir, $result);
+    }
+
+    /**
+     * Заголовки всех действий шаблона, включая вложенные ветки.
+     *
+     * @return string[]
+     */
+    private static function titles(array $nodes): array
+    {
+        $titles = [];
+        foreach ($nodes as $node) {
+            if (!is_array($node)) {
+                continue;
+            }
+            $title = trim((string) ($node['Properties']['Title'] ?? ''));
+            if ($title !== '') {
+                $titles[] = $title;
+            }
+            array_push($titles, ...self::titles($node['Children'] ?? []));
+        }
+        return $titles;
     }
 
     private function save(string $outDir, array $result): array

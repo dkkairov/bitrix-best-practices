@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 final class Acceptance
 {
+    /** Вид задачи: сборка по ТЗ, ревью чужого шаблона, правка готового. */
+    public const KINDS = ['build', 'review', 'modify'];
     public const STARTS = ['create', 'manual'];
     public const ACTIONS = ['approve', 'reject', 'review', 'provide', 'complete'];
     public const EXPECT_KEYS = ['stage', 'fields', 'history_contains', 'notify', 'task_created',
@@ -35,9 +37,18 @@ final class Acceptance
             'start'      => (string) ($data['start'] ?? 'create'),
             'parameters' => is_array($data['parameters'] ?? []) ? ($data['parameters'] ?? []) : [],
             'item'       => is_array($data['item'] ?? []) ? ($data['item'] ?? []) : [],
+            'kind'       => (string) ($data['kind'] ?? 'build'),
+            'input'      => trim((string) ($data['input'] ?? '')),
             'scenarios'  => [],
             'checklist'  => [],
+            'defects'    => [],
+            'traps'      => [],
+            'preserved'  => array_values(array_filter(array_map(
+                fn ($t) => trim((string) $t), (array) ($data['preserved'] ?? [])))),
         ];
+        if (!in_array($out['kind'], self::KINDS, true)) {
+            $errors[] = "kind: «{$out['kind']}» — допустимо: " . implode(', ', self::KINDS);
+        }
         if (!in_array($out['start'], self::STARTS, true)) {
             $errors[] = "start: «{$out['start']}» — допустимо: " . implode(', ', self::STARTS);
         }
@@ -53,7 +64,35 @@ final class Acceptance
                 $errors[] = "checklist[{$i}]: нужна строка или {text, required}";
             }
         }
-        if (!$out['scenarios'] && !$out['checklist']) {
+        foreach (['defects', 'traps'] as $key) {
+            foreach (array_values((array) ($data[$key] ?? [])) as $i => $item) {
+                $id = is_array($item) ? trim((string) ($item['id'] ?? '')) : '';
+                $text = is_array($item) ? trim((string) ($item['text'] ?? '')) : '';
+                if ($id === '' || $text === '') {
+                    $errors[] = "{$key}[{$i}]: нужны id и text";
+                    continue;
+                }
+                $out[$key][] = ['id' => $id, 'text' => $text];
+            }
+        }
+        // Вид задачи диктует, чем её вообще можно оценить: ревью — списком дефектов, правка —
+        // сценариями на стенде. Без этой проверки задача молча превратилась бы в «0 из 0».
+        if ($out['kind'] !== 'build' && $out['input'] === '') {
+            $errors[] = "input: для вида «{$out['kind']}» нужен входной шаблон";
+        }
+        if ($out['kind'] === 'review' && !$out['defects']) {
+            $errors[] = 'defects: ревью оценивается списком дефектов — он пуст';
+        }
+        if ($out['kind'] === 'review' && $out['scenarios']) {
+            $errors[] = 'scenarios: у ревью нет своего процесса — сценарии не применимы';
+        }
+        if ($out['kind'] !== 'review' && ($out['defects'] || $out['traps'])) {
+            $errors[] = 'defects/traps: только для вида «review»';
+        }
+        if ($out['kind'] === 'modify' && !$out['scenarios']) {
+            $errors[] = 'scenarios: правка проверяется сценариями на стенде — их нет';
+        }
+        if ($out['kind'] !== 'review' && !$out['scenarios'] && !$out['checklist']) {
             $errors[] = 'нет ни сценариев, ни чек-листа';
         }
         if ($errors) {
@@ -69,6 +108,11 @@ final class Acceptance
     public function item(): array { return $this->data['item']; }
     public function scenarios(): array { return $this->data['scenarios']; }
     public function checklist(): array { return $this->data['checklist']; }
+    public function kind(): string { return $this->data['kind']; }
+    public function input(): string { return $this->data['input']; }
+    public function defects(): array { return $this->data['defects']; }
+    public function traps(): array { return $this->data['traps']; }
+    public function preserved(): array { return $this->data['preserved']; }
     public function toArray(): array { return $this->data; }
 
     /** @return string[] все роли, упомянутые в шагах и проверках, по алфавиту */

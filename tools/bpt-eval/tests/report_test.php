@@ -137,3 +137,49 @@ test('Отчёт: markdown', function () {
     assertTrue(str_contains($md, '- spec: T02 (сырые ID)'), 'слабые места по категориям');
     assertTrue(str_contains($md, '- harness: T03 (стенд)'), 'сбой прогонщика тоже в разборе');
 });
+
+/** Задача-ревью: свой acceptance и свой результат — считается по дефектам и ловушкам. */
+function reviewFixture(array $score): Report
+{
+    $acc = Acceptance::fromArray(['task' => 'R01', 'document' => 'Заявки', 'kind' => 'review',
+        'input' => 'input.bizproc.yaml',
+        'defects' => [['id' => 'stage-midway', 'text' => 'Смена стадии в середине ветки'],
+            ['id' => 'no-timeout', 'text' => 'Задание без срока']],
+        'traps' => [['id' => 'msgtype-4', 'text' => 'MessageType 4 в ветке отказа — так и надо']]], 'R01');
+    $results = ['R01' => ['task' => 'R01', 'kind' => 'review', 'compile' => 'skip', 'import' => 'skip',
+        'scenarios' => [], 'reason' => '', 'category' => '', 'note' => '']];
+    return Report::fromData($results, [], ['R01' => $acc], [], 'r', ['R01' => $score]);
+}
+
+test('Отчёт: ревью — нашёл все дефекты и не купился на ловушку', function () {
+    $row = reviewFixture(['defects' => [['id' => 'stage-midway', 'found' => true], ['id' => 'no-timeout', 'found' => true]],
+        'traps' => [['id' => 'msgtype-4', 'flagged' => false]]])->rows()['R01'];
+    assertSame('2/2', $row['checklist']);
+    assertSame('—', $row['scenarios']);
+    assertTrue($row['passed'], 'все дефекты найдены, ловушка не сработала');
+});
+
+test('Отчёт: ревью — пропущенный дефект не даёт «пройдена»', function () {
+    $row = reviewFixture(['defects' => [['id' => 'stage-midway', 'found' => true], ['id' => 'no-timeout', 'found' => false]],
+        'traps' => [['id' => 'msgtype-4', 'flagged' => false]]])->rows()['R01'];
+    assertSame('1/2', $row['checklist']);
+    assertTrue(!$row['passed'], 'дефект пропущен');
+});
+
+test('Отчёт: ревью — сработавшая ловушка валит задачу и попадает в заметку', function () {
+    $row = reviewFixture(['defects' => [['id' => 'stage-midway', 'found' => true], ['id' => 'no-timeout', 'found' => true]],
+        'traps' => [['id' => 'msgtype-4', 'flagged' => true]]])->rows()['R01'];
+    assertTrue(!$row['passed'], 'ложная тревога — не пройдена');
+    assertTrue(str_contains($row['note'], 'ложная тревога'), "заметка называет причину: {$row['note']}");
+});
+
+test('Отчёт: правка — потерянные исходные шаги валят задачу', function () {
+    $acc = Acceptance::fromArray(['task' => 'M01', 'document' => 'Заявки', 'kind' => 'modify',
+        'input' => 'input.bizproc.yaml', 'preserved' => ['Согласование юристом'],
+        'scenarios' => [['name' => 's', 'steps' => [], 'expect' => ['stage' => 'Клиент']]]], 'M01');
+    $results = ['M01' => ['task' => 'M01', 'kind' => 'modify', 'compile' => 'ok', 'import' => 'skip',
+        'scenarios' => [['ok' => true]], 'preserved_missing' => ['Согласование юристом'],
+        'reason' => 'исходные шаги потеряны: Согласование юристом', 'category' => '', 'note' => '']];
+    $row = Report::fromData($results, [], ['M01' => $acc], [], 'r')->rows()['M01'];
+    assertTrue(!$row['passed'], 'шаблон переписан с нуля — не пройдена');
+});

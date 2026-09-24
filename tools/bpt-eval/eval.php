@@ -3,6 +3,7 @@
  * Оценка навыка «БП по ТЗ» на типовых задачах. Команды:
  *   php tools/bpt-eval/eval.php prepare   --run=<прогон>
  *   php tools/bpt-eval/eval.php reference <задача|all> --run=<прогон>
+ *   php tools/bpt-eval/eval.php input     <задача> --run=<прогон>   (только review/modify)
  *   php tools/bpt-eval/eval.php check     <задача> --run=<прогон>
  *   php tools/bpt-eval/eval.php usage     <задача> --run=<прогон> --tokens=N --tools=N --ms=N
  *   php tools/bpt-eval/eval.php report    --run=<прогон>
@@ -70,10 +71,43 @@ try {
             }
             echo "Снимок: {$runDir}/portal.yaml", PHP_EOL;
             exit(0);
+        case 'input':
+            // Входной шаблон для задач вида review/modify: агент получает только .bpt (как выгрузку
+            // из дизайнера), а не спецификацию — иначе это ответ на задачу, а не исходные данные.
+            $task = (string) ($positional[0] ?? '');
+            if ($task === '') {
+                throw new EvalException('нужна задача первым аргументом: input <задача> --run=<прогон>');
+            }
+            $checker = new CheckRunner(Stand::fromEnv(), $root, $run);
+            $acceptance = Acceptance::load($checker->taskDir($task) . '/acceptance.yaml');
+            if ($acceptance->input() === '') {
+                throw new EvalException("{$task}: у задачи вида «{$acceptance->kind()}» нет входного шаблона");
+            }
+            $inputSpec = $checker->taskDir($task) . '/' . $acceptance->input();
+            $snapshot = Snapshot::load("{$runDir}/portal.yaml");
+            $compiled = (new Compiler(Catalog::load(), $snapshot, true))->compile(SpecReader::read($inputSpec));
+            if ($compiled['errors']) {
+                throw new EvalException("{$task}: входной шаблон не собрался — " . implode('; ', $compiled['errors']));
+            }
+            $taskDir = "{$runDir}/{$task}";
+            if (!is_dir($taskDir) && !@mkdir($taskDir, 0777, true)) {
+                throw new EvalException("не удалось создать каталог задачи: {$taskDir}");
+            }
+            BptFile::write("{$taskDir}/input.bpt", $compiled['bpt'], null, true);
+            echo "{$task}: входной шаблон — {$taskDir}/input.bpt", PHP_EOL;
+            exit(0);
         case 'check':
             $task = (string) ($positional[0] ?? '');
-            $result = (new CheckRunner(Stand::fromEnv(), $root, $run))->check($task,
-                "{$runDir}/{$task}/process.bizproc.yaml", "{$runDir}/{$task}");
+            $checker = new CheckRunner(Stand::fromEnv(), $root, $run);
+            // У ревью результат агента — отчёт, а не спецификация: сверять его с дефектами будет
+            // проверяющий, сюда попадает только факт наличия отчёта.
+            $kind = Acceptance::load($checker->taskDir($task) . '/acceptance.yaml')->kind();
+            $answer = $kind === 'review' ? 'review.md' : 'process.bizproc.yaml';
+            $result = $checker->check($task, "{$runDir}/{$task}/{$answer}", "{$runDir}/{$task}");
+            if ($kind === 'review') {
+                printf("%s: отчёт ревью %s" . PHP_EOL, $task, $result['reason'] ?: 'на месте');
+                exit(0);
+            }
             printf("%s: сборка %s, импорт %s, сценарии %d/%d%s\n", $task, $result['compile'], $result['import'],
                 count(array_filter($result['scenarios'], fn ($s) => $s['ok'])), count($result['scenarios']),
                 $result['reason'] ? " — {$result['reason']}" : '');

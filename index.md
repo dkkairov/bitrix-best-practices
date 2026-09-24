@@ -34,7 +34,7 @@
 - [Миграции](wiki/development/migrations/_index-migrations.md) — sprint.migration, обновления, перенос
 - [Администрирование сервера](wiki/development/server-admin/_index-server-admin.md) — окружение, git, бэкапы
 - [Шаблоны и вёрстка](wiki/development/templates-design/_index-templates-design.md) — UI-подсистема, тулбар, фильтр, грид
-- _Планируются:_ Компоненты
+- [Компоненты](wiki/development/components/_index-components.md) — структура, кэш, шаблоны, AJAX
 
 ### Сквозное
 - [Playbooks](wiki/cross-cutting/playbooks/_index-playbooks.md) — жизненный цикл: пресейл → деплой → поддержка
@@ -107,6 +107,7 @@
 - [[recipe-box-debugging|Отладка коробки: дампы, замеры, панель]] · Разработка · box · проверено
 - [[recipe-image-processing|Обработка изображений: Main\File\Image]] · Разработка · box · проверено
 - [[recipe-box-backup|Резервная копия коробки: снять и восстановить]] · Разработка · box
+- [[recipe-console-commands|Консольные команды ядра: bitrix.php и свои команды]] · Разработка · box · проверено
 - [[recipe-cli-script-bootstrap|Консольный и cron-скрипт: подключение ядра]] · Разработка · box · проверено
 - [[recipe-d7-custom-validation-rule|Свой валидатор и правило валидации D7]] · Разработка · box · проверено
 - [[recipe-custom-list-page-filter-grid|Своя страница-список: фильтр, грид, тулбар]] · Разработка · box · проверено
@@ -162,6 +163,7 @@
 - [[concept-messenger-queues|Очереди сообщений ядра (альфа)]] · Разработка · box · проверено
 - [[concept-d7-session-storage|Сессия D7, LocalSession и временное хранилище]] · Разработка · box · проверено
 - [[concept-js-extensions|Расширения JS и CSS: свой bundle]] · Разработка · box · проверено
+- [[concept-component-structure|Компонент 2.0: структура, кэш, AJAX]] · Разработка · box · проверено
 - [[concept-d7-logging|Логирование D7: логгеры, уровни, настройка]] · Разработка · box · проверено
 - [[concept-datetime-and-timezones|Дата и время: Date, DateTime, часовые пояса]] · Разработка · box · проверено
 - [[concept-localization-lang-files|Локализация: Loc и языковые файлы]] · Разработка · box · проверено
@@ -209,7 +211,8 @@
 [[entity-local-directory|/local/]] · [[entity-php-interface|php_interface]] ·
 [[entity-urlrewrite|urlrewrite.php]] · [[entity-admin-php-console|Командная PHP-строка]] ·
 [[entity-numerator|Numerator]] · [[entity-user-consent|UserConsent]] ·
-[[entity-settings-php|.settings.php]] · [[entity-web-cookie|Web\Cookie]]
+[[entity-settings-php|.settings.php]] · [[entity-web-cookie|Web\Cookie]] ·
+[[entity-http-request-response|HttpRequest / HttpResponse]]
 
 **UI и шаблоны** — [[entity-toolbar|UI\Toolbar]] · [[entity-ui-button|Button]] ·
 [[entity-filter-component|main.ui.filter]] · [[entity-filter-field-adapter|FieldAdapter]] ·

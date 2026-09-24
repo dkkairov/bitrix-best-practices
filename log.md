@@ -7,6 +7,25 @@
 
 ## 2026-09
 
+- **2026-09-24 — ingest: документация фреймворка, «Основы фреймворка» (часть 3)** — заведён раздел
+  [components](../wiki/development/components/_index-components.md): [[concept-component-structure]]
+  (файлы компонента, `CBitrixComponent`, кэш и `SetResultCacheKeys`, `result_modifier` против
+  `component_epilog`, AJAX через `Controllerable` или свой контроллер, размещение в
+  `/local/components`). Плюс две страницы в ядре: [[entity-http-request-response]] и
+  [[recipe-console-commands]].
+
+  Стенд (26.750.0):
+  - запрос — `Main\HttpRequest` (наследник `Main\Request`), ответ — `Main\HttpResponse`, контекст
+    отдаёт ещё `getServer()`, `getCulture()`, `getSite()`. **Метода `isGet()`, который называет
+    документация, в ядре нет** — помечено на странице;
+  - у `CBitrixComponent` все методы из документации на месте, интерфейс
+    `Engine\Contract\Controllerable` есть, каталога `/local/components` на чистой коробке нет;
+  - консоль ядра: файл `/bitrix/bitrix.php` есть, но `php bitrix/bitrix.php list` отвечает
+    «Symfony Console is not installed» — нет composer, нет `vendor`, секция `console` не задана.
+    То есть генераторы `make:*` (с 25.900.0), `orm:annotate`, `messenger:consume` и
+    `translate:index` доступны только после настройки composer. Путь к скрипту — `bitrix/bitrix.php`,
+    документация пишет `bitrix.php`.
+
 - **2026-09-24 — ingest: документация фреймворка, «Основы фреймворка» (часть 2)** — ещё четыре
   страницы и сверка трёх существующих.
 

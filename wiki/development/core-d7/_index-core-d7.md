@@ -32,6 +32,8 @@ updated: "2026-09-24"
 - [[concept-d7-orm-relations|Связи ORM: Reference, OneToMany, ManyToMany]]
 - [[recipe-d7-orm-crud|Запись через ORM: add, update, delete и проверки данных]]
 - [[concept-orm-datamanager-events|События ORM DataManager: девять хуков и формат имени]]
+- [[concept-user-fields|Пользовательские поля (UF): типы, создание, ORM]]
+- [[recipe-mail-event-send|Письмо из кода: почтовое событие и шаблон]]
 - [[concept-highload-blocks|Highload-блоки: своя таблица без своего модуля]]
 - [[concept-iblocks-and-lists|Инфоблоки и «Списки» портала]]
 - [[concept-web-vulnerabilities-bitrix|XSS, CSRF, SSRF, инъекции: чем закрывает ядро]]
@@ -103,6 +105,7 @@ ORM разобрана по курсу 43 (2026-09-23) и прогнана на 
 сверены страницы про события, `ServiceLocator`, `Result`, валидацию и автозагрузку.
 Из раздела «Безопасность» (2026-09-24) — уязвимости и экранирование, шифрование данных.
 Из раздела «Модули» (2026-09-24) — highload-блоки и инфоблоки как хранилища данных портала.
+Из «Основ CMS» (2026-09-24) — пользовательские поля и почтовые события.
 `Loader` и `Config\Option` сверены по справочнику D7 на `dev.1c-bitrix.ru` (2026-09-18).
 `ModuleManager` сверен по исходникам ядра 2026-09-23 — черновиков в разделе не осталось.
 

@@ -110,6 +110,7 @@
 - [[recipe-box-backup|Резервная копия коробки: снять и восстановить]] · Разработка · box
 - [[recipe-console-commands|Консольные команды ядра: bitrix.php и свои команды]] · Разработка · box · проверено
 - [[recipe-encrypt-sensitive-data|Шифровать чувствительные данные: Cipher, CryptoField]] · Разработка · box · проверено
+- [[recipe-mail-event-send|Письмо из кода: почтовое событие и шаблон]] · Разработка · box · проверено
 - [[recipe-cli-script-bootstrap|Консольный и cron-скрипт: подключение ядра]] · Разработка · box · проверено
 - [[recipe-d7-custom-validation-rule|Свой валидатор и правило валидации D7]] · Разработка · box · проверено
 - [[recipe-custom-list-page-filter-grid|Своя страница-список: фильтр, грид, тулбар]] · Разработка · box · проверено
@@ -166,6 +167,8 @@
 - [[concept-d7-session-storage|Сессия D7, LocalSession и временное хранилище]] · Разработка · box · проверено
 - [[concept-js-extensions|Расширения JS и CSS: свой bundle]] · Разработка · box · проверено
 - [[concept-component-structure|Компонент 2.0: структура, кэш, AJAX]] · Разработка · box · проверено
+- [[concept-user-fields|Пользовательские поля (UF): типы, создание, ORM]] · Разработка · box · проверено
+- [[concept-users-and-groups|Пользователи и группы: API и что важно при внедрении]] · Права · box · проверено
 - [[concept-highload-blocks|Highload-блоки: своя таблица без своего модуля]] · Разработка · box · проверено
 - [[concept-iblocks-and-lists|Инфоблоки и «Списки» портала]] · Разработка · box · проверено
 - [[concept-web-vulnerabilities-bitrix|XSS, CSRF, SSRF, инъекции: чем закрывает ядро]] · Разработка · box · проверено
